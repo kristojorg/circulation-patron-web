@@ -1,5 +1,6 @@
 const config = {
   env: {
+    COMPANION_APP: process.env.COMPANION_APP,
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
     SHORTEN_URLS: process.env.SHORTEN_URLS,
     CONFIG_FILE: process.env.CONFIG_FILE,
