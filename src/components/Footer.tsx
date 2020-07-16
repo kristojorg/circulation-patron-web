@@ -9,7 +9,9 @@ import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
-import { SHOW_SIMPLYE_BRANDING } from "../utils/env";
+import { COMPANION_APP } from "../utils/env";
+
+const SHOW_SIMPLYE_BRANDING = Boolean(COMPANION_APP === "simplye");
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();
@@ -98,7 +100,6 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "1 1 0" }} />
-
       {SHOW_SIMPLYE_BRANDING && <DownloadSimplyECallout />}
     </footer>
   );

@@ -45,39 +45,81 @@ test("shows external links when present in state w/ apropriate attributes", () =
   expect(myBooks).toHaveAttribute("href", "/loans");
 });
 
-test("shows simplyE callout", () => {
-  const utils = render(<Footer />);
-
-  expect(
-    utils.getByRole("heading", { name: /download simplye/i })
-  ).toBeInTheDocument();
-  expect(
-    utils.getByText(
-      "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
-    )
-  ).toBeInTheDocument();
-
-  // badges
-  const iosbadge = utils.getByRole("link", {
-    name: /download simplye on the apple app store/i
+describe("toggling SimplyE Branding", () => {
+  beforeAll(() => {
+    jest.resetModules();
   });
-  expect(iosbadge).toBeInTheDocument();
-  expect(iosbadge).toHaveAttribute(
-    "href",
-    "https://apps.apple.com/us/app/simplye/id1046583900"
-  );
 
-  const googleBadge = utils.getByRole("link", {
-    name: /get simplye on the google play store/i
+  test("does not show simplyE callout", () => {
+    process.env.COMPANION_APP = "openebooks";
+
+    const utils = render(<Footer />);
+
+    expect(process.env.COMPANION_APP).toBe("openebooks");
+    expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
+
+    expect(
+      utils.queryByText(
+        "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
+      )
+    ).not.toBeInTheDocument();
+
+    // badges
+    const iosbadge = utils.queryByText(
+      /download simplye on the apple app store/i
+    );
+
+    expect(iosbadge).not.toBeInTheDocument();
+
+    const googleBadge = utils.queryByText(
+      /get simplye on the google play store/
+    );
+    expect(googleBadge).not.toBeInTheDocument();
+
+    // my books nav link
+    const myBooks = utils.queryByText(/my books/i);
+    expect(myBooks).toBeInTheDocument();
+    expect(myBooks).toHaveAttribute("href", "/loans");
   });
-  expect(googleBadge).toBeInTheDocument();
-  expect(googleBadge).toHaveAttribute(
-    "href",
-    "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
-  );
 
-  // my books nav link
-  const myBooks = utils.getByRole("link", { name: /my books/i });
-  expect(myBooks).toBeInTheDocument();
-  expect(myBooks).toHaveAttribute("href", "/loans");
+  test("shows simplyE callout", () => {
+    process.env.COMPANION_APP = "simplye";
+
+    const utils = render(<Footer />);
+
+    expect(process.env.COMPANION_APP).toBe("simplye");
+    expect(
+      utils.getByRole("heading", { name: /download simplye/i })
+    ).toBeInTheDocument();
+
+    expect(
+      utils.getByText(
+        "Our mobile app lets you browse, borrow and read from our whole collection of eBooks and Audiobooks right on your phone!"
+      )
+    ).toBeInTheDocument();
+
+    // badges
+    const iosbadge = utils.getByRole("link", {
+      name: /download simplye on the apple app store/i
+    });
+    expect(iosbadge).toBeInTheDocument();
+    expect(iosbadge).toHaveAttribute(
+      "href",
+      "https://apps.apple.com/us/app/simplye/id1046583900"
+    );
+
+    const googleBadge = utils.getByRole("link", {
+      name: /get simplye on the google play store/i
+    });
+    expect(googleBadge).toBeInTheDocument();
+    expect(googleBadge).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=org.nypl.simplified.simplye&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"
+    );
+
+    // my books nav link
+    const myBooks = utils.getByRole("link", { name: /my books/i });
+    expect(myBooks).toBeInTheDocument();
+    expect(myBooks).toHaveAttribute("href", "/loans");
+  });
 });
