@@ -50,7 +50,7 @@ describe("toggling SimplyE Branding", () => {
     jest.resetModules();
   });
 
-  test("does not show simplyE callout", () => {
+  test("does not show simplyE callout when COMPANION_APP is 'openebooks'", () => {
     process.env.COMPANION_APP = "openebooks";
 
     const utils = render(<Footer />);
@@ -82,7 +82,7 @@ describe("toggling SimplyE Branding", () => {
     expect(myBooks).toHaveAttribute("href", "/loans");
   });
 
-  test("shows simplyE callout", () => {
+  test("shows simplyE callout when COMPANION_APP is 'simplye'", () => {
     process.env.COMPANION_APP = "simplye";
 
     const utils = render(<Footer />);
