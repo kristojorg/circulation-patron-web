@@ -4,7 +4,7 @@
  */
 
 export const COMPANION_APP =
-  process.env.COMPANION_APP == "openebooks" ? "openebooks" : "simplye";
+  process.env.COMPANION_APP === "openebooks" ? "openebooks" : "simplye";
 
 export const SHORTEN_URLS = !(process.env.SHORTEN_URLS === "false");
 export const REGISTRY_BASE = process.env.REGISTRY_BASE;
