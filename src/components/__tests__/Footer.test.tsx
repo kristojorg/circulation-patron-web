@@ -3,6 +3,7 @@ import { render, fixtures } from "../../test-utils";
 import merge from "deepmerge";
 import Footer from "components/Footer";
 import { LibraryData, Link } from "../../interfaces";
+import * as env from "../../utils/env";
 
 const link: Link = {
   href: "/wherever",
@@ -52,10 +53,11 @@ describe("toggling SimplyE Branding", () => {
 
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
     process.env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
+    // @ts-ignore
+    env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
 
     const utils = render(<Footer />);
 
-    expect(process.env.NEXT_PUBLIC_COMPANION_APP).toBe("openebooks");
     expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
 
     expect(
@@ -83,13 +85,15 @@ describe("toggling SimplyE Branding", () => {
   });
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
-    process.env.NEXT_PUBLIC_COMPANION_APP = "simplye";
+    // @ts-ignore
+    env.NEXT_PUBLIC_COMPANION_APP = "simplye";
 
     const utils = render(<Footer />);
 
-    expect(process.env.NEXT_PUBLIC_COMPANION_APP).toBe("simplye");
     expect(
-      utils.getByRole("heading", { name: /download simplye/i })
+      utils.getByRole("heading", {
+        name: /download simplye/i
+      })
     ).toBeInTheDocument();
 
     expect(
@@ -118,7 +122,9 @@ describe("toggling SimplyE Branding", () => {
     );
 
     // my books nav link
-    const myBooks = utils.getByRole("link", { name: /my books/i });
+    const myBooks = utils.getByRole("link", {
+      name: /my books/i
+    });
     expect(myBooks).toBeInTheDocument();
     expect(myBooks).toHaveAttribute("href", "/loans");
   });
