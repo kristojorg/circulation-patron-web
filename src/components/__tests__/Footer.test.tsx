@@ -50,12 +50,12 @@ describe("toggling SimplyE Branding", () => {
     jest.resetModules();
   });
 
-  test("does not show simplyE callout when COMPANION_APP is 'openebooks'", () => {
-    process.env.COMPANION_APP = "openebooks";
+  test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
+    process.env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
 
     const utils = render(<Footer />);
 
-    expect(process.env.COMPANION_APP).toBe("openebooks");
+    expect(process.env.NEXT_PUBLIC_COMPANION_APP).toBe("openebooks");
     expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
 
     expect(
@@ -82,12 +82,12 @@ describe("toggling SimplyE Branding", () => {
     expect(myBooks).toHaveAttribute("href", "/loans");
   });
 
-  test("shows simplyE callout when COMPANION_APP is 'simplye'", () => {
-    process.env.COMPANION_APP = "simplye";
+  test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
+    process.env.NEXT_PUBLIC_COMPANION_APP = "simplye";
 
     const utils = render(<Footer />);
 
-    expect(process.env.COMPANION_APP).toBe("simplye");
+    expect(process.env.NEXT_PUBLIC_COMPANION_APP).toBe("simplye");
     expect(
       utils.getByRole("heading", { name: /download simplye/i })
     ).toBeInTheDocument();

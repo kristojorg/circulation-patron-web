@@ -97,7 +97,9 @@ const Footer: React.FC<{ className?: string }> = ({ className }) => {
         </FooterList>
       </div>
       <div sx={{ flex: "1 1 0" }} />
-      {process.env.COMPANION_APP === "simplye" && <DownloadSimplyECallout />}
+      {process.env.NEXT_PUBLIC_COMPANION_APP === "simplye" && (
+        <DownloadSimplyECallout />
+      )}
     </footer>
   );
 };

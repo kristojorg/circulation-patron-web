@@ -3,6 +3,11 @@
  * Simply exporting processed env vars
  */
 
+export const NEXT_PUBLIC_COMPANION_APP =
+  process.env.NEXT_PUBLIC_COMPANION_APP === "openebooks"
+    ? "openebooks"
+    : "simplye";
+
 export const SHORTEN_URLS = !(process.env.SHORTEN_URLS === "false");
 export const REGISTRY_BASE = process.env.REGISTRY_BASE;
 export const CIRCULATION_MANAGER_BASE = process.env.SIMPLIFIED_CATALOG_BASE;
