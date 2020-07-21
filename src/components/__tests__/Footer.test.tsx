@@ -47,12 +47,7 @@ test("shows external links when present in state w/ apropriate attributes", () =
 });
 
 describe("toggling SimplyE Branding", () => {
-  beforeAll(() => {
-    jest.resetModules();
-  });
-
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
-    process.env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
     // @ts-ignore
     env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
 
