@@ -32,3 +32,5 @@ wallaby.js
 config/
 .vscode/
 .vercel
+
+public/library-simplified-webpub-viewer

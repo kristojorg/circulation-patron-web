@@ -2,6 +2,8 @@ const withTM = require("next-transpile-modules")([
   "library-simplified-webpub-viewer"
 ]);
 
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
 const config = {
   env: {
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
@@ -15,6 +17,17 @@ const config = {
     // Perform customizations to webpack config
     // Important: return the modified config
     !isServer && config.plugins.push(new webpack.IgnorePlugin(/jsdom$/));
+
+    config.plugins.push(
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "node_modules/library-simplified-webpub-viewer/dist",
+            to: "../public/library-simplified-webpub-viewer/dist"
+          }
+        ]
+      })
+    );
     // Fixes dependency on "fs" module.
     // we don't (and can't) depend on this in client-side code.
     if (!isServer) {
