@@ -36,6 +36,7 @@ const config = {
       };
     }
 
+    config.resolve.extensions = [".js", ".jsx", ".ts", ".tsx"];
     return config;
   }
 };
