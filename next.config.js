@@ -1,6 +1,5 @@
 const config = {
   env: {
-    NEXT_PUBLIC_COMPANION_APP: process.env.NEXT_PUBLIC_COMPANION_APP,
     SIMPLIFIED_CATALOG_BASE: process.env.SIMPLIFIED_CATALOG_BASE,
     SHORTEN_URLS: process.env.SHORTEN_URLS,
     CONFIG_FILE: process.env.CONFIG_FILE,

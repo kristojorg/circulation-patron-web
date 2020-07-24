@@ -48,10 +48,8 @@ test("shows external links when present in state w/ apropriate attributes", () =
 
 describe("toggling SimplyE Branding", () => {
   test("does not show simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'openebooks'", () => {
-    /* eslint-disable */
-    // @ts-ignore
-    env.NEXT_PUBLIC_COMPANION_APP = "openebooks";
-    /* eslint-enable*/
+    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+
     const utils = render(<Footer />);
 
     expect(utils.queryByText(/download simplye/i)).not.toBeInTheDocument();
@@ -81,10 +79,7 @@ describe("toggling SimplyE Branding", () => {
   });
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
-    /* eslint-disable */
-    // @ts-ignore
-    env.NEXT_PUBLIC_COMPANION_APP = "simplye";
-    /* eslint-enable */
+    (env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye";
 
     const utils = render(<Footer />);
 
