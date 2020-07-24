@@ -38,24 +38,26 @@ const body = `<!DOCTYPE html>
       import IFrameNavigator from "../../../library-simplified-webpub-viewer/dist/IFrameNavigator.js";
 
 
-      var getURLQueryParams = function () {
-        var params = {};
-        var query = window.location.search;
-        if (query && query.length) {
-          query = query.substring(1);
-          var keyParams = query.split("&");
-          for (var x = 0; x < keyParams.length; x++) {
-            var keyVal = keyParams[x].split("=");
-            if (keyVal.length > 1) {
-              params[keyVal[0]] = decodeURIComponent(keyVal[1]);
-            }
-          }
-        }
-        return params;
-      };
+      // var getURLQueryParams = function () {
+      //   var params = {};
+      //   var query = window.location.search;
+      //   if (query && query.length) {
+      //     query = query.substring(1);
+      //     var keyParams = query.split("&");
+      //     for (var x = 0; x < keyParams.length; x++) {
+      //       var keyVal = keyParams[x].split("=");
+      //       if (keyVal.length > 1) {
+      //         params[keyVal[0]] = decodeURIComponent(keyVal[1]);
+      //       }
+      //     }
+      //   }
+      //   return params;
+      // };
+
       var element = document.getElementById("viewer");
-      var urlParams = getURLQueryParams();
-      var webpubManifestUrl = urlParams["url"] ? new URL(urlParams["url"]) : "";
+     // var urlParams = getURLQueryParams();
+      var webpubManifestUrl = new URL("https://researchnow-reader.nypl.org/pub/aHR0cHM6Ly9jb250ZW50c2VydmVyLmFkb2JlLmNvbS9zdG9yZS9ib29rcy9hbGljZUR5bmFtaWMuZXB1Yg==/manifest.json");
+      // urlParams["url"] ? new URL(urlParams["url"]) : "";
        var containerHref = webpubManifestUrl.href.endsWith("container.xml") ? webpubManifestUrl.href : "";
 
         (function () {
