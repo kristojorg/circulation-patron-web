@@ -188,7 +188,7 @@ test("renders select Clever with multiple providers present", async () => {
   expect(utils.getByLabelText("Login to SAML IdP")).toBeInTheDocument();
 
   expect(
-    utils.getByRole("button", {
+    utils.getByRole("link", {
       name: "Log In with Clever"
     })
   ).toBeInTheDocument();
@@ -196,7 +196,7 @@ test("renders select Clever with multiple providers present", async () => {
   // should be able to click to select Clever
 
   userEvent.click(
-    utils.getByRole("button", {
+    utils.getByRole("link", {
       name: "Log In with Clever"
     })
   );
