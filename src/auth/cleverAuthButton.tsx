@@ -2,11 +2,21 @@ import * as React from "react";
 import { AuthMethod } from "opds-web-client/lib/interfaces";
 import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
-import { AnchorButton } from "components/Button";
+import Button from "components/Button";
 
 import { modalButtonStyles } from "components/Modal";
+import { useRouter } from "next/router";
+
+export function getAuthUrl(provider, currentUrl) {
+  // double encoding is required for unshortened book urls to be redirected to properly
+  return `${
+    (provider?.method.links || []).find(link => link.rel === "authenticate")
+      ?.href
+  }&redirect_uri=${encodeURIComponent(encodeURIComponent(currentUrl))}`;
+}
 
 const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({ provider }) => {
+  const router = useRouter();
   const { actions, dispatch } = useActions();
 
   const currentUrl = window.location.origin + window.location.pathname;
@@ -14,23 +24,20 @@ const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({ provider }) => {
   const imageUrl = (provider?.method.links || []).find(
     link => link.rel === "logo"
   )?.href;
-  // double encoding is required for unshortened book urls to be redirected to properly
-  const authUrl = `${
-    (provider?.method.links || []).find(link => link.rel === "authenticate")
-      ?.href
-  }&redirect_uri=${encodeURIComponent(encodeURIComponent(currentUrl))}`;
+
+  const authUrl = getAuthUrl(provider, currentUrl);
 
   return authUrl ? (
-    <AnchorButton
-      href={authUrl}
-      onClick={() =>
+    <Button
+      onClick={() => {
         dispatch(
           actions.saveAuthCredentials({
             provider: "Clever",
             credentials: ""
           })
-        )
-      }
+        );
+        router.push(authUrl);
+      }}
       type="submit"
       sx={{
         ...modalButtonStyles,
@@ -41,7 +48,7 @@ const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({ provider }) => {
       aria-label="Log In with Clever"
     >
       {!imageUrl ? "Log In With Clever" : ""}
-    </AnchorButton>
+    </Button>
   ) : null;
 };
 
