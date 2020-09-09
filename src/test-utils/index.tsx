@@ -68,17 +68,23 @@ const customRender = (ui: any, options?: CustomRenderOptions) => {
     .mockImplementation(origDispatch);
   store.dispatch = mockDispatch as typeof origDispatch;
 
+  const theme = makeTheme({
+    primary: "#337ab7",
+    secondary: "#d9534f"
+  });
   const AllTheProviders = ({ children }) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
-        <ContextProvider
-          library={options?.library ?? library}
-          store={store}
-          fetcher={fetcher}
-          actions={actions}
-        >
-          {children}
-        </ContextProvider>
+        <ThemeProvider theme={theme}>
+          <ContextProvider
+            library={options?.library ?? library}
+            store={store}
+            fetcher={fetcher}
+            actions={actions}
+          >
+            {children}
+          </ContextProvider>
+        </ThemeProvider>
       </MockNextRouterContextProvider>
     );
   };
