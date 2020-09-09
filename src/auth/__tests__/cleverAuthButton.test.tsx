@@ -3,8 +3,6 @@ import { CleverButton, getAuthUrl } from "../cleverAuthButton";
 import { render } from "../../../src/test-utils";
 import React from "react";
 
-const useRouter = jest.spyOn(require("next/router"), "useRouter");
-
 const provider = {
   id: "http://librarysimplified.org/authtype/OAuth-with-intermediary",
   plugin: {
