@@ -5,6 +5,7 @@
 - Feature: Add support for Clever auth providers.
 - Redesign: in Auth Modal display AuthProvider logos as selectable buttons when there are 2-4 AuthProviders instead of Combobox
 - Fix: Update CleverAuth button to use AnchorButton for a11y and semantic reasons
+- Fix: Get loans to display on /loans from state.loans instead of state.collection.
 
 # 2.3.0
 
