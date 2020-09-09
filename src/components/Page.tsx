@@ -9,7 +9,6 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
-import Layout from "./Layout";
 
 const Page: React.FC<AppProps> = props => {
   /**
@@ -38,9 +37,7 @@ const Page: React.FC<AppProps> = props => {
         <title>{library.catalogName}</title>
       </Head>
       <ContextProvider library={library} store={store}>
-        <Auth>
-          <Layout>{children}</Layout>
-        </Auth>
+        <Auth>{children}</Auth>
       </ContextProvider>
     </ErrorBoundary>
   );
