@@ -31,7 +31,7 @@ exports[`LinkButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: #ffffff;
+  background-color: #337ab7;
   height: 32px;
   min-width: 32px;
   color: white;
@@ -40,7 +40,7 @@ exports[`LinkButton renders correct element 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #f2f2f2;
+  background-color: #2d6da3;
   color: white;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -51,7 +51,7 @@ exports[`LinkButton renders correct element 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #e6e6e6;
+  background-color: #285f8f;
 }
 
 .emotion-0:disabled {
@@ -102,7 +102,7 @@ exports[`NavButton renders correct element 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: #ffffff;
+  background-color: #337ab7;
   height: 32px;
   min-width: 32px;
   color: white;
@@ -117,7 +117,7 @@ exports[`NavButton renders correct element 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #f2f2f2;
+  background-color: #2d6da3;
   color: white;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -128,7 +128,7 @@ exports[`NavButton renders correct element 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #e6e6e6;
+  background-color: #285f8f;
 }
 
 .emotion-0:disabled {
@@ -176,7 +176,7 @@ exports[`variants filled (default) 1`] = `
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
-  background-color: #ffffff;
+  background-color: #337ab7;
   height: 32px;
   min-width: 32px;
   color: white;
@@ -185,7 +185,7 @@ exports[`variants filled (default) 1`] = `
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #f2f2f2;
+  background-color: #2d6da3;
   color: white;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -196,7 +196,7 @@ exports[`variants filled (default) 1`] = `
 }
 
 .emotion-0:active {
-  background-color: #e6e6e6;
+  background-color: #285f8f;
 }
 
 .emotion-0:disabled {
@@ -247,14 +247,14 @@ exports[`variants ghost 1`] = `
   background-color: transparent;
   height: 32px;
   min-width: 32px;
-  color: #ffffff;
-  fill: #ffffff;
+  color: #337ab7;
+  fill: #337ab7;
 }
 
 .emotion-0:focus,
 .emotion-0:hover {
-  background-color: #d9d9d9;
-  color: #ffffff;
+  background-color: #c3daee;
+  color: #337ab7;
   -webkit-text-decoration: none;
   text-decoration: none;
 }
@@ -303,13 +303,13 @@ exports[`variants link 1`] = `
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.5;
-  color: #ffffff;
+  color: #337ab7;
   padding: 0;
-  fill: #ffffff;
+  fill: #337ab7;
 }
 
 .emotion-0:hover {
-  color: #ffffff;
+  color: #337ab7;
 }
 
 <button
