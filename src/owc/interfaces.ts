@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import AuthPlugin from "./AuthPlugin";
 
 export const ATOM_MEDIA_TYPE =
