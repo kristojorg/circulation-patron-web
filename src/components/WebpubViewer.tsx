@@ -4,7 +4,7 @@ import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import DataFetcher from "owc/DataFetcher";
 
 const initializeReader = async (

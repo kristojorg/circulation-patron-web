@@ -8,7 +8,7 @@ import {
   mapDispatchToProps,
   mapStateToProps,
   mergeRootProps
-} from "owc/components/mergeRootProps";
+} from "owc/mergeRootProps";
 import { BookData, FetchErrorData } from "owc/interfaces";
 import { connect } from "react-redux";
 import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";

@@ -3,8 +3,8 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import Button from "components/Button";
 import { ClientSamlMethod } from "owc/interfaces";
-import { AuthFormProps } from "owc/components/AuthProviderSelectionForm";
 import { modalButtonStyles } from "../components/Modal";
+import { AuthFormProps } from "owc/AuthPlugin";
 /**
  * Auth form
  */

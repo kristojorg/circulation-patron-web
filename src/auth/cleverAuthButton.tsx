@@ -1,9 +1,9 @@
 import * as React from "react";
 import { AuthMethod } from "owc/interfaces";
-import { AuthButtonProps } from "owc/components/AuthProviderSelectionForm";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import Button from "components/Button";
 import { modalButtonStyles } from "components/Modal";
+import { AuthButtonProps } from "owc/AuthPlugin";
 
 const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({ provider }) => {
   const { actions, dispatch } = useActions();

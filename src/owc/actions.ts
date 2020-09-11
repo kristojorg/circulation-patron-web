@@ -83,7 +83,7 @@ export default class ActionCreator {
   }
 
   fetchBlob(type: string, url: string) {
-    return (dispatch): Promise<Blob> => {
+    return (dispatch: any): Promise<Blob> => {
       dispatch(this.request(type, url));
       return new Promise<Blob>((resolve, reject) => {
         this.fetcher
@@ -113,7 +113,7 @@ export default class ActionCreator {
 
   fetchJSON<T>(type: string, url: string) {
     let err: RequestError;
-    return (dispatch): Promise<T> => {
+    return (dispatch: any): Promise<T> => {
       return new Promise<T>((resolve, reject) => {
         dispatch(this.request(type, url));
         this.fetcher
@@ -127,7 +127,7 @@ export default class ActionCreator {
                   dispatch(this.load<T>(type, data));
                   resolve(data);
                 })
-                .catch(parseError => {
+                .catch((_parseError: any) => {
                   err = {
                     status: response.status,
                     response: "Non-json response",
@@ -148,7 +148,7 @@ export default class ActionCreator {
                   dispatch(this.failure(type, err));
                   reject(err);
                 })
-                .catch(parseError => {
+                .catch((_parseError: any) => {
                   err = {
                     status: response.status,
                     response: "Request failed",
@@ -173,12 +173,12 @@ export default class ActionCreator {
   }
 
   fetchOPDS<T>(type: string, url: string) {
-    return (dispatch): Promise<T> => {
+    return (dispatch: any): Promise<T> => {
       dispatch(this.request(type, url));
       return new Promise<T>((resolve, reject) => {
         this.fetcher
           .fetchOPDSData(url)
-          .then((data: T) => {
+          .then((data: any) => {
             dispatch(this.success(type));
             dispatch(this.load<T>(type, data, url));
             resolve(data);
@@ -224,11 +224,11 @@ export default class ActionCreator {
   }
 
   fetchSearchDescription(url: string) {
-    return dispatch => {
+    return (dispatch: any) => {
       return new Promise<SearchData>((resolve, reject) => {
         this.fetcher
           .fetchSearchDescriptionData(url)
-          .then((data: SearchData) => {
+          .then((data: any) => {
             dispatch(
               this.load<SearchData>(ActionCreator.SEARCH_DESCRIPTION, data, url)
             );
@@ -272,8 +272,10 @@ export default class ActionCreator {
         dispatch(this.request(ActionCreator.FULFILL_BOOK, url));
         this.fetcher
           .fetchOPDSData(url)
-          .then((book: BookData) => {
-            let link = book.fulfillmentLinks?.find(link => link.type === type);
+          .then((book: any) => {
+            const link = book.fulfillmentLinks?.find(
+              (link: any) => link.type === type
+            );
 
             if (link) {
               dispatch(this.success(ActionCreator.FULFILL_BOOK));
@@ -319,7 +321,7 @@ export default class ActionCreator {
   }
 
   closeErrorAndHideAuthForm() {
-    return dispatch => {
+    return (dispatch: any) => {
       dispatch(this.closeError());
       dispatch(this.hideAuthForm());
     };

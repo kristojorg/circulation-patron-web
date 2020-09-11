@@ -2,11 +2,9 @@ import * as React from "react";
 import { LibraryData } from "interfaces";
 import UrlShortener from "UrlShortener";
 import { LibraryProvider } from "./LibraryContext";
-import PathForProvider from "owc/components/context/PathForContext";
 import { RouterProvider } from "./RouterContext";
-import OPDSStore from "owc/components/context/StoreContext";
 import { RecommendationsProvider } from "./RecommendationsContext";
-import { ActionsProvider } from "owc/components/context/ActionsContext";
+import { ActionsProvider } from "owc/ActionsContext";
 import { Provider as ReakitProvider } from "reakit";
 import { State } from "owc/state";
 import { Store } from "redux";
@@ -22,6 +20,8 @@ import getPathFor from "utils/getPathFor";
 import { LinkUtilsProvider } from "./LinkUtilsContext";
 import { SHORTEN_URLS } from "utils/env";
 import { PathFor } from "owc/interfaces";
+import PathForProvider from "owc/PathForContext";
+import OPDSStore from "owc/StoreContext";
 
 type ProviderProps = {
   library: LibraryData;

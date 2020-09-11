@@ -8,7 +8,7 @@ import Modal, { modalButtonStyles } from "./Modal";
 import ClientOnly from "./ClientOnly";
 import { H2 } from "./Text";
 import Button from "components/Button";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import useTypedSelector from "hooks/useTypedSelector";
 import FormLabel from "./form/FormLabel";
 import Select from "./Select";

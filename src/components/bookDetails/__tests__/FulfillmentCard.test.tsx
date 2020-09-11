@@ -12,7 +12,7 @@ import { FetchErrorData } from "owc/interfaces";
 import userEvent from "@testing-library/user-event";
 import { State } from "owc/state";
 import * as useBorrow from "hooks/useBorrow";
-import _download from "owc/components/download";
+import _download from "downloadjs";
 
 import * as env from "../../../utils/env";
 

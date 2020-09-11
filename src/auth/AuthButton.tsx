@@ -2,9 +2,8 @@
 import { jsx } from "theme-ui";
 import Button from "components/Button";
 import { AuthMethod } from "owc/interfaces";
-import { AuthButtonProps } from "owc/components/AuthProviderSelectionForm";
-
 import { modalButtonStyles } from "../components/Modal";
+import { AuthButtonProps } from "owc/AuthPlugin";
 
 const BasicAuthButton: React.FC<AuthButtonProps<AuthMethod>> = ({
   provider,

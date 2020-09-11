@@ -4,7 +4,7 @@ import collection, {
   CollectionState
 } from "owc/reducers/collection";
 import useThunkReducer from "../../hooks/useThunkReducer";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 
 /**
  * The recommendations state is somewhat confusing. It is no longer stored

@@ -1,7 +1,5 @@
 import * as React from "react";
-import OPDSRouterContextProvider, {
-  RouterContext
-} from "owc/components/context/RouterContext";
+import OPDSRouterContextProvider, { RouterContext } from "owc/RouterContext";
 import { Router as RouterType, Location } from "owc/interfaces";
 import { useRouter } from "next/router";
 

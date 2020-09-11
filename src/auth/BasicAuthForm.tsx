@@ -5,12 +5,11 @@ import useTypedSelector from "hooks/useTypedSelector";
 import { useForm } from "react-hook-form";
 import Button from "components/Button";
 import FormInput from "components/form/FormInput";
-import { useActions } from "owc/components/context/ActionsContext";
 import { generateCredentials } from "owc/utils/auth";
 import { BasicAuthMethod } from "owc/interfaces";
-import { AuthFormProps } from "owc/components/AuthProviderSelectionForm";
-
 import { modalButtonStyles } from "../components/Modal";
+import { AuthFormProps } from "owc/AuthPlugin";
+import { useActions } from "owc/ActionsContext";
 
 type FormData = {
   [key: string]: string;

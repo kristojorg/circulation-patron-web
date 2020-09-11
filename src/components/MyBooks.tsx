@@ -6,10 +6,10 @@ import {
   mapStateToProps,
   mapDispatchToProps,
   mergeRootProps
-} from "owc/components/mergeRootProps";
+} from "owc/mergeRootProps";
 import useAuth from "../hooks/useAuth";
 import useTypedSelector from "../hooks/useTypedSelector";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import { ListView } from "./BookList";
 
 import Head from "next/head";

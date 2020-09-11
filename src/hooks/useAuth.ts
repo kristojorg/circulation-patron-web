@@ -1,6 +1,6 @@
 import * as React from "react";
 import useTypedSelector from "./useTypedSelector";
-import { useActions } from "owc/components/context/ActionsContext";
+import { useActions } from "owc/ActionsContext";
 import { useRouter, NextRouter } from "next/router";
 import useLinkUtils from "components/context/LinkUtilsContext";
 import CleverAuthPlugin from "../auth/cleverAuthPlugin";

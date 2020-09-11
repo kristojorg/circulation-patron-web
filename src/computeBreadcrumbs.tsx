@@ -1,5 +1,5 @@
+import { hierarchyComputeBreadcrumbs } from "owc/breadcrumbs";
 import { CollectionData, LinkData } from "owc/interfaces";
-import { hierarchyComputeBreadcrumbs } from "owc/components/Breadcrumbs";
 
 // Custom URL comparator to ignore trailing slashes.
 const urlComparator = (
