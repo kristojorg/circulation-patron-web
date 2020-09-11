@@ -39,7 +39,6 @@
     "next": "^9.5.3",
     "next-transpile-modules": "^4.0.0",
     "opds-feed-parser": "0.0.18",
-    "opds-web-client": "^0.5.5",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-hook-form": "^4.9.2",
