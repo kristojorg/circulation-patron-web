@@ -2,9 +2,9 @@ import * as React from "react";
 import { shallow } from "enzyme";
 import { renderHook } from "@testing-library/react-hooks";
 import AppContextProvider from "../ContextProvider";
-import { usePathFor } from "opds-web-client/lib/components/context/PathForContext";
+import { usePathFor } from "owc/components/context/PathForContext";
 import { LibraryData } from "../../../interfaces";
-import { State } from "opds-web-client/lib/state";
+import { State } from "owc/state";
 import useLibraryContext from "../LibraryContext";
 import { MockNextRouterContextProvider } from "../../../test-utils/mockNextRouter";
 

@@ -9,7 +9,7 @@ import {
   mapStateToProps,
   mapDispatchToProps,
   mergeRootProps
-} from "opds-web-client/lib/components/mergeRootProps";
+} from "owc/components/mergeRootProps";
 import { PageLoader } from "../components/LoadingIndicator";
 import useNormalizedCollection from "../hooks/useNormalizedCollection";
 import { ListView, LanesView } from "./BookList";

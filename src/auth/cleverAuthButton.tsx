@@ -1,7 +1,7 @@
 import * as React from "react";
-import { AuthMethod } from "opds-web-client/lib/interfaces";
-import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
-import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
+import { AuthMethod } from "owc/interfaces";
+import { AuthButtonProps } from "owc/components/AuthProviderSelectionForm";
+import { useActions } from "owc/components/context/ActionsContext";
 import Button from "components/Button";
 import { modalButtonStyles } from "components/Modal";
 

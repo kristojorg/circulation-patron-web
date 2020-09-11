@@ -1,8 +1,8 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import Button from "components/Button";
-import { AuthMethod } from "opds-web-client/lib/interfaces";
-import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
+import { AuthMethod } from "owc/interfaces";
+import { AuthButtonProps } from "owc/components/AuthProviderSelectionForm";
 
 import { modalButtonStyles } from "../components/Modal";
 

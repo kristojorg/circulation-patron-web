@@ -1,8 +1,8 @@
 import * as React from "react";
 import OPDSRouterContextProvider, {
   RouterContext
-} from "opds-web-client/lib/components/context/RouterContext";
-import { Router as RouterType, Location } from "opds-web-client/lib/interfaces";
+} from "owc/components/context/RouterContext";
+import { Router as RouterType, Location } from "owc/interfaces";
 import { useRouter } from "next/router";
 
 export const RouterProvider: React.FC = ({ children }) => {
