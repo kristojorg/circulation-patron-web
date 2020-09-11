@@ -19,12 +19,48 @@ import {
   LinkData,
   FacetGroupData,
   SearchData,
-  FulfillmentLink
+  FulfillmentLink,
+  MediaLink,
+  MediaType
 } from "./interfaces";
 
-const resolve = (base, relative) => new URL(relative, base).toString();
+/**
+ * Type guards used for filtering links or narrowing
+ * the type of a value to something more specific
+ */
+function isAcquisitionLink(link: OPDSLink): link is OPDSAcquisitionLink {
+  return link instanceof OPDSAcquisitionLink;
+}
+function isDefined<T>(value: T | undefined): value is T {
+  return typeof value !== "undefined";
+}
+function isFacetLink(link: OPDSLink): link is OPDSFacetLink {
+  return link instanceof OPDSFacetLink;
+}
 
-let sanitizeHtml;
+/**
+ * Utilities
+ */
+
+const resolve = (base: string, relative: string) =>
+  new URL(relative, base).toString();
+
+function buildFulfillmentLink(feedUrl: string) {
+  return (link: OPDSAcquisitionLink): FulfillmentLink | undefined => {
+    const indirects = link.indirectAcquisitions;
+    const first = indirects[0];
+    const indirectType = first?.type as string | undefined;
+    // it is possible that it doesn't exist in the array of indirects
+    if (!indirectType) return;
+    return {
+      url: resolve(feedUrl, link.href),
+      type: link.type as MediaType,
+      indirectType
+    };
+  };
+}
+
+let sanitizeHtml: any;
 const createDOMPurify = require("dompurify");
 if (typeof window === "undefined") {
   // sanitization needs to work server-side,
@@ -49,10 +85,10 @@ export function adapter(
   url: string
 ): CollectionData | BookData {
   if (data instanceof OPDSFeed) {
-    let collectionData = feedToCollection(data, url);
+    const collectionData = feedToCollection(data, url);
     return collectionData;
   } else if (data instanceof OPDSEntry) {
-    let bookData = entryToBook(data, url);
+    const bookData = entryToBook(data, url);
     return bookData;
   } else {
     throw "parsed data must be OPDSFeed or OPDSEntry";
@@ -60,16 +96,16 @@ export function adapter(
 }
 
 export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
-  let authors = entry.authors.map(author => {
+  const authors = entry.authors.map(author => {
     return author.name;
   });
 
-  let contributors = entry.contributors.map(contributor => {
+  const contributors = entry.contributors.map(contributor => {
     return contributor.name;
   });
 
   let imageUrl, imageThumbLink;
-  let artworkLinks = entry.links.filter(link => {
+  const artworkLinks = entry.links.filter(link => {
     return link instanceof OPDSArtworkLink;
   });
   if (artworkLinks.length > 0) {
@@ -85,16 +121,18 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
   }
 
   let detailUrl;
-  let detailLink = entry.links.find(link => link instanceof CompleteEntryLink);
+  const detailLink = entry.links.find(
+    link => link instanceof CompleteEntryLink
+  );
   if (detailLink) {
     detailUrl = resolve(feedUrl, detailLink.href);
   }
 
-  let categories = entry.categories
+  const categories = entry.categories
     .filter(category => !!category.label)
     .map(category => category.label);
 
-  let openAccessLinks = entry.links
+  const openAccessLinks = entry.links
     .filter(link => {
       return (
         link instanceof OPDSAcquisitionLink &&
@@ -109,7 +147,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     });
 
   let borrowUrl;
-  let borrowLink = <OPDSAcquisitionLink>entry.links.find(link => {
+  const borrowLink = <OPDSAcquisitionLink>entry.links.find(link => {
     return (
       link instanceof OPDSAcquisitionLink &&
       link.rel === OPDSAcquisitionLink.BORROW_REL
@@ -119,29 +157,15 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     borrowUrl = resolve(feedUrl, borrowLink.href);
   }
 
-  let allBorrowLinks: FulfillmentLink[] = entry.links
+  const allBorrowLinks: (FulfillmentLink | MediaLink)[] = entry.links
+    .filter(isAcquisitionLink)
     .filter(link => {
-      return (
-        link instanceof OPDSAcquisitionLink &&
-        link.rel === OPDSAcquisitionLink.BORROW_REL
-      );
+      return link.rel === OPDSAcquisitionLink.BORROW_REL;
     })
-    .map(link => {
-      let indirectType;
-      let indirects = (link as OPDSAcquisitionLink).indirectAcquisitions;
+    .map(buildFulfillmentLink(feedUrl))
+    .filter(isDefined);
 
-      if (indirects && indirects.length > 0) {
-        indirectType = indirects[0].type;
-      }
-      return {
-        url: resolve(feedUrl, link.href),
-        type: link.type,
-        indirectType
-      };
-    });
-
-  let fulfillmentType;
-  let fulfillmentLinks = entry.links
+  const fulfillmentLinks = entry.links
     .filter(link => {
       return (
         link instanceof OPDSAcquisitionLink &&
@@ -150,7 +174,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     })
     .map(link => {
       let indirectType;
-      let indirects = (link as OPDSAcquisitionLink).indirectAcquisitions;
+      const indirects = (link as OPDSAcquisitionLink).indirectAcquisitions;
 
       if (indirects && indirects.length > 0) {
         indirectType = indirects[0].type;
@@ -165,7 +189,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
   let availability;
   let holds;
   let copies;
-  let linkWithAvailability = <OPDSAcquisitionLink>entry.links.find(link => {
+  const linkWithAvailability = <OPDSAcquisitionLink>entry.links.find(link => {
     return link instanceof OPDSAcquisitionLink && !!link.availability;
   });
   if (linkWithAvailability) {
@@ -198,7 +222,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
 }
 
 function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
-  let links = entry.links;
+  const links = entry.links;
   if (links.length > 0) {
     const href = resolve(feedUrl, links[0].href);
     return {
@@ -216,7 +240,7 @@ function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
 
 function dedupeBooks(books: BookData[]): BookData[] {
   // using Map because it preserves key order
-  let bookIndex = books.reduce((index, book) => {
+  const bookIndex = books.reduce((index, book) => {
     index.set(book.id, book);
     return index;
   }, new Map<any, BookData>());
@@ -225,7 +249,7 @@ function dedupeBooks(books: BookData[]): BookData[] {
 }
 
 function formatDate(inputDate: string): string {
-  let monthNames = [
+  const monthNames = [
     "January",
     "February",
     "March",
@@ -240,16 +264,19 @@ function formatDate(inputDate: string): string {
     "December"
   ];
 
-  let date = new Date(inputDate);
-  let day = date.getUTCDate();
-  let monthIndex = date.getUTCMonth();
-  let month = monthNames[monthIndex];
-  let year = date.getUTCFullYear();
+  const date = new Date(inputDate);
+  const day = date.getUTCDate();
+  const monthIndex = date.getUTCMonth();
+  const month = monthNames[monthIndex];
+  const year = date.getUTCFullYear();
 
   return `${month} ${day}, ${year}`;
 }
 
-function OPDSLinkToLinkData(feedUrl, link: OPDSLink = null): LinkData | null {
+function OPDSLinkToLinkData(
+  feedUrl: any,
+  link: OPDSLink | null = null
+): LinkData | null {
   if (!link || !link.href) {
     return null;
   }
@@ -265,16 +292,16 @@ export function feedToCollection(
   feed: OPDSFeed,
   feedUrl: string
 ): CollectionData {
-  let collection = <CollectionData>{
+  const collection = <CollectionData>{
     id: feed.id,
     title: feed.title,
     url: feedUrl
   };
-  let books: BookData[] = [];
-  let navigationLinks: LinkData[] = [];
+  const books: BookData[] = [];
+  const navigationLinks: LinkData[] = [];
   let lanes: LaneData[] = [];
-  let laneTitles: any[] = [];
-  let laneIndex: {
+  const laneTitles: any[] = [];
+  const laneIndex: {
     title: any;
     url: string;
     books: BookData[];
@@ -282,24 +309,24 @@ export function feedToCollection(
   let facetGroups: FacetGroupData[] = [];
   let search: SearchData | undefined = undefined;
   let nextPageUrl: string | undefined = undefined;
-  let catalogRootLink: OPDSLink;
-  let parentLink: OPDSLink;
+  let catalogRootLink: OPDSLink | undefined;
+  let parentLink: OPDSLink | undefined;
   let shelfUrl: string | undefined = undefined;
   let links: OPDSLink[] = [];
 
   feed.entries.forEach(entry => {
     if (feed instanceof AcquisitionFeed) {
-      let book = entryToBook(entry, feedUrl);
-      const collectionLink: OPDSCollectionLink = entry.links.find(
+      const book = entryToBook(entry, feedUrl);
+      const collectionLink: OPDSCollectionLink | undefined = entry.links.find(
         link => link instanceof OPDSCollectionLink
       );
       if (collectionLink) {
-        let { title, href } = collectionLink;
+        const { title, href } = collectionLink;
 
-        if (laneIndex[title]) {
-          laneIndex[title].books.push(book);
+        if (laneIndex[title as any]) {
+          laneIndex[title as any].books.push(book);
         } else {
-          laneIndex[title] = {
+          laneIndex[title as any] = {
             title,
             url: resolve(feedUrl, href),
             books: [book]
@@ -311,13 +338,13 @@ export function feedToCollection(
         books.push(book);
       }
     } else {
-      let link = entryToLink(entry, feedUrl);
+      const link = entryToLink(entry, feedUrl);
       if (link) navigationLinks.push(link);
     }
   });
 
   lanes = laneTitles.reduce((result, title) => {
-    let lane = laneIndex[title];
+    const lane = laneIndex[title];
     lane.books = dedupeBooks(lane.books);
     result.push(lane);
     return result;
@@ -325,18 +352,16 @@ export function feedToCollection(
 
   let facetLinks: OPDSFacetLink[] = [];
   if (feed.links) {
-    facetLinks = feed.links.filter(link => {
-      return link instanceof OPDSFacetLink;
-    });
+    facetLinks = feed.links.filter(isFacetLink);
 
-    let searchLink = feed.links.find(link => {
+    const searchLink = feed.links.find(link => {
       return link instanceof SearchLink;
     });
     if (searchLink) {
       search = { url: resolve(feedUrl, searchLink.href) };
     }
 
-    let nextPageLink = feed.links.find(link => {
+    const nextPageLink = feed.links.find(link => {
       return link.rel === "next";
     });
     if (nextPageLink) {
@@ -349,7 +374,7 @@ export function feedToCollection(
 
     parentLink = feed.links.find(link => link.rel === "up");
 
-    let shelfLink = feed.links.find(link => link instanceof OPDSShelfLink);
+    const shelfLink = feed.links.find(link => link instanceof OPDSShelfLink);
     if (shelfLink) {
       shelfUrl = shelfLink.href;
     }
@@ -357,17 +382,17 @@ export function feedToCollection(
     links = feed.links;
   }
 
-  facetGroups = facetLinks.reduce((result, link) => {
-    let groupLabel = link.facetGroup;
-    let label = link.title;
-    let href = resolve(feedUrl, link.href);
-    let active = link.activeFacet;
-    let facet = { label, href, active };
-    let newResult: any[] = [];
+  facetGroups = facetLinks.reduce<FacetGroupData[]>((result, link) => {
+    const groupLabel = link.facetGroup;
+    const label = link.title;
+    const href = resolve(feedUrl, link.href);
+    const active = link.activeFacet;
+    const facet = { label, href, active };
+    const newResult: any[] = [];
     let foundGroup = false;
     result.forEach(group => {
       if (group.label === groupLabel) {
-        let facets = group.facets.concat(facet);
+        const facets = group.facets.concat(facet);
         newResult.push({ label: groupLabel, facets });
         foundGroup = true;
       } else {
@@ -375,7 +400,7 @@ export function feedToCollection(
       }
     });
     if (!foundGroup) {
-      let facets = [facet];
+      const facets = [facet];
       newResult.push({ label: groupLabel, facets });
     }
     return newResult;

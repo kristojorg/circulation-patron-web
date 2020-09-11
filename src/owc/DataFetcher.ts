@@ -39,7 +39,7 @@ export default class DataFetcher {
   }
 
   fetchOPDSData(url: string) {
-    let parser = new OPDSParser();
+    const parser = new OPDSParser();
 
     if (!this.adapter) {
       return Promise.reject({
@@ -69,7 +69,7 @@ export default class DataFetcher {
                 .then((parsedData: OPDSFeed | OPDSEntry) => {
                   resolve(this.adapter?.(parsedData, url));
                 })
-                .catch(err => {
+                .catch(_err => {
                   reject({
                     status: null,
                     response: "Failed to parse OPDS data",
@@ -91,7 +91,7 @@ export default class DataFetcher {
   }
 
   fetchSearchDescriptionData(searchDescriptionUrl: string) {
-    let parser = new OpenSearchDescriptionParser();
+    const parser = new OpenSearchDescriptionParser();
 
     return new Promise((resolve, reject: RequestRejector) => {
       this.fetch(searchDescriptionUrl)
@@ -110,7 +110,7 @@ export default class DataFetcher {
               .then(openSearchDescription => {
                 resolve(openSearchDescription);
               })
-              .catch(err => {
+              .catch(_err => {
                 reject({
                   status: null,
                   response: "Failed to parse OPDS data",
@@ -123,11 +123,11 @@ export default class DataFetcher {
     });
   }
 
-  fetch(url: string, options = {}) {
+  fetch(url: string, options: any = {}) {
     options = Object.assign({ credentials: "same-origin" }, options);
 
     if (this.proxyUrl) {
-      let formData = new (window as any).FormData();
+      const formData = new (window as any).FormData();
       formData.append("url", url);
       Object.assign(options, {
         method: "POST",
@@ -148,7 +148,7 @@ export default class DataFetcher {
   }
 
   getAuthCredentials(): AuthCredentials | undefined {
-    let credentials = Cookie.get(this.authKey);
+    const credentials = Cookie.get(this.authKey);
     if (credentials) {
       return JSON.parse(credentials);
     }
@@ -164,7 +164,7 @@ export default class DataFetcher {
     // ugly basic auth popup
     headers["X-Requested-With"] = "XMLHttpRequest";
 
-    let credentials = this.getAuthCredentials();
+    const credentials = this.getAuthCredentials();
     headers["Authorization"] = credentials?.credentials ?? "";
 
     return headers;
