@@ -1,12 +1,9 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "../../test-utils";
+import { render, fixtures, actions, waitFor } from "test-utils";
 import merge from "deepmerge";
 import BasicAuthForm from "auth/BasicAuthForm";
-import { AuthProvider, BasicAuthMethod } from "owc/interfaces";
-import { AuthState } from "owc/reducers/auth";
-import { State } from "owc/state";
+import { AuthProvider, BasicAuthMethod } from "interfaces";
 import userEvent from "@testing-library/user-event";
-import * as authDep from "owc/utils/auth";
 
 const provider: AuthProvider<BasicAuthMethod> = {
   id: "provider-id",

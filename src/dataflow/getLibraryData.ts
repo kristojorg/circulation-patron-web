@@ -8,6 +8,7 @@ import {
 import getConfigFile from "./getConfigFile";
 import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
 import { CatalogEntry } from "types/opds2";
+import { flattenSamlMethod } from "utils/auth";
 
 /**
  * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
@@ -171,6 +172,7 @@ export function buildLibraryData(
   const headerLinks =
     authDoc.links?.filter(link => link.rel === "navigation") ?? [];
   const libraryLinks = parseLinks(authDoc.links ?? []);
+  const authMethods = flattenSamlMethod(authDoc);
   return {
     slug: librarySlug ?? null,
     catalogUrl,
@@ -184,7 +186,8 @@ export function buildLibraryData(
           }
         : null,
     headerLinks,
-    libraryLinks
+    libraryLinks,
+    authMethods
   };
 }
 
