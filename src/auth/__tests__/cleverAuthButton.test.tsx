@@ -29,14 +29,6 @@ describe("CleverButton", () => {
     );
   });
 
-  it("constructs no authUrl if provider is not defined", () => {
-    expect(getAuthUrl(undefined, "/")).toBe("");
-  });
-
-  it("constructs no authUrl if currentUrl is an empty string", () => {
-    expect(getAuthUrl(provider, "")).toBe("");
-  });
-
   it("when there is an auth provider returns button labeled Log In With Clever", () => {
     const button = render(<CleverButton provider={provider} />);
     const buttonLabelText = button.getByLabelText("Log In with Clever");

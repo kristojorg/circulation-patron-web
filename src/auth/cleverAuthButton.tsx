@@ -1,6 +1,7 @@
 import * as React from "react";
 import { AuthProvider, AuthMethod } from "opds-web-client/lib/interfaces";
 
+import { AuthButtonProps } from "opds-web-client/lib/components/AuthProviderSelectionForm";
 import { useActions } from "opds-web-client/lib/components/context/ActionsContext";
 import Button from "components/Button";
 
@@ -8,14 +9,10 @@ import { modalButtonStyles } from "components/Modal";
 import { useRouter } from "next/router";
 
 export function getAuthUrl(
-  provider: AuthProvider<AuthMethod> | undefined,
+  provider: AuthProvider<AuthMethod>,
   currentUrl: string
 ) {
   // double encoding is required for unshortened book urls to be redirected to properly
-
-  if (!provider || !currentUrl) {
-    return "";
-  }
 
   return `${
     (provider?.method.links || []).find(link => link.rel === "authenticate")
@@ -23,7 +20,9 @@ export function getAuthUrl(
   }&redirect_uri=${encodeURIComponent(encodeURIComponent(currentUrl))}`;
 }
 
-export function CleverButton({ provider }): JSX.Element | null {
+export const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({
+  provider
+}) => {
   const router = useRouter();
   const { actions, dispatch } = useActions();
 
@@ -33,7 +32,8 @@ export function CleverButton({ provider }): JSX.Element | null {
     link => link.rel === "logo"
   )?.href;
 
-  const authUrl = provider ? getAuthUrl(provider, currentUrl) : null;
+  const authUrl =
+    provider && currentUrl ? getAuthUrl(provider, currentUrl) : null;
 
   return authUrl ? (
     <Button
@@ -58,6 +58,6 @@ export function CleverButton({ provider }): JSX.Element | null {
       {!imageUrl ? "Log In With Clever" : ""}
     </Button>
   ) : null;
-}
+};
 
 export default CleverButton;
