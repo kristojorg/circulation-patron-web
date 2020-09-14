@@ -1,7 +1,6 @@
-import { CleverButton, getAuthUrl } from "../cleverAuthButton";
-
+import * as React from "react";
 import { render } from "../../../src/test-utils";
-import React from "react";
+import { CleverButton, getAuthUrl } from "../cleverAuthButton";
 
 describe("CleverButton", () => {
   let wrapper: any;
