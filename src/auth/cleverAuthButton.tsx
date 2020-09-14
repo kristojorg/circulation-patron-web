@@ -6,7 +6,6 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 import Button from "components/Button";
 
 import { modalButtonStyles } from "components/Modal";
-import { useRouter } from "next/router";
 
 export function getAuthUrl(
   provider: AuthProvider<AuthMethod>,
@@ -23,7 +22,6 @@ export function getAuthUrl(
 export const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({
   provider
 }) => {
-  const router = useRouter();
   const { actions, dispatch } = useActions();
 
   const currentUrl = window.location.origin + window.location.pathname;
@@ -44,7 +42,7 @@ export const CleverButton: React.FC<AuthButtonProps<AuthMethod>> = ({
             credentials: ""
           })
         );
-        router.push(authUrl);
+        window.location.href = authUrl;
       }}
       type="submit"
       sx={{
