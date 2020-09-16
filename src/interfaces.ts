@@ -92,7 +92,7 @@ export interface MediaLink {
 }
 
 export interface FulfillmentLink extends MediaLink {
-  indirectType: string;
+  indirectType?: string;
 }
 
 export type BookMedium =
