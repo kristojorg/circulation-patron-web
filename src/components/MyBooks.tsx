@@ -7,17 +7,15 @@ import {
   mapDispatchToProps,
   mergeRootProps
 } from "owc/mergeRootProps";
-import useAuth from "../hooks/useAuth";
-import useTypedSelector from "../hooks/useTypedSelector";
-import { useActions } from "owc/ActionsContext";
 import { ListView } from "./BookList";
-
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { H3 } from "./Text";
 import { BookData } from "owc/interfaces";
 import PageTitle from "./PageTitle";
 import SignOut from "./SignOut";
+import useUser from "hooks/useUser";
+import { PageLoader } from "components/LoadingIndicator";
 
 const availableUntil = (book: BookData) =>
   book.availability?.until ? new Date(book.availability.until) : "NaN";
@@ -34,20 +32,15 @@ function sortBooksByLoanExpirationDate(books: BookData[]) {
 }
 
 export const MyBooks: React.FC = () => {
-  const { actions, dispatch } = useActions();
-  const loans = useTypedSelector(state => state.loans);
+  const { isAuthenticated, loans, isValidating, showAuthForm } = useUser();
 
-  const { isSignedIn } = useAuth();
-  const books = loans?.books && loans.books.length > 0 && loans.books;
-  const sortedBooks = books ? sortBooksByLoanExpirationDate(books) : [];
-
-  const loansUrl = useTypedSelector(state => {
-    return state.loans.url;
-  });
-
+  // show the auth form if we are unauthenticated
   React.useEffect(() => {
-    if (loansUrl) dispatch(actions.fetchLoans(loansUrl));
-  }, [loansUrl, actions, dispatch]);
+    if (!isAuthenticated) showAuthForm();
+  }, [isAuthenticated, showAuthForm]);
+
+  const sortedBooks = loans ? sortBooksByLoanExpirationDate(loans) : [];
+  const noBooks = sortedBooks.length === 0;
 
   return (
     <div sx={{ bg: "ui.gray.lightWarm", flex: 1, pb: 4 }}>
@@ -57,12 +50,14 @@ export const MyBooks: React.FC = () => {
 
       <BreadcrumbBar currentLocation="My Books" />
       <PageTitle>My Books</PageTitle>
-      {!isSignedIn ? (
-        <Unauthorized />
-      ) : books ? (
+      {noBooks && isValidating ? (
+        <PageLoader />
+      ) : isAuthenticated && noBooks ? (
+        <Empty />
+      ) : isAuthenticated ? (
         <LoansContent books={sortedBooks} />
       ) : (
-        <Empty />
+        <Unauthorized />
       )}
     </div>
   );

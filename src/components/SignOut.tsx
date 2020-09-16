@@ -4,12 +4,12 @@ import * as React from "react";
 import Modal from "./Modal";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import Button from "./Button";
-import useAuth from "hooks/useAuth";
 import Stack from "./Stack";
+import useUser from "hooks/useUser";
 
 export default function SignOut() {
   const dialog = useDialogState();
-  const { signOutAndGoHome } = useAuth();
+  const { signOut } = useUser();
   return (
     <>
       <DialogDisclosure as={Button} color="ui.black" {...dialog}>
@@ -29,7 +29,7 @@ export default function SignOut() {
           </Button>
           <Button
             color="ui.error"
-            onClick={signOutAndGoHome}
+            onClick={signOut}
             aria-label="Confirm Sign Out"
           >
             Sign out

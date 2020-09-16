@@ -9,9 +9,9 @@ import Link from "./Link";
 import BookIcon from "../icons/Book";
 import useLibraryContext from "./context/LibraryContext";
 import { Text } from "./Text";
-import useAuth from "hooks/useAuth";
 import Stack from "./Stack";
 import SignOut from "./SignOut";
+import useUser from "hooks/useUser";
 
 export interface HeaderContext extends NavigateContext {
   library: LibraryData;
@@ -75,7 +75,7 @@ const HeaderFC: React.FC<{ className?: string }> = ({ className }) => {
 const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
   const { helpWebsite, libraryWebsite } = library.libraryLinks;
   const libraryName = library.catalogName;
-  const { isSignedIn, signIn } = useAuth();
+  const { isAuthenticated, showAuthForm } = useUser();
 
   return (
     <div
@@ -126,7 +126,11 @@ const HeaderLinks: React.FC<{ library: LibraryData }> = ({ library }) => {
       >
         My Books
       </NavButton>
-      {isSignedIn ? <SignOut /> : <Button onClick={signIn}>Sign In</Button>}
+      {isAuthenticated ? (
+        <SignOut />
+      ) : (
+        <Button onClick={showAuthForm}>Sign In</Button>
+      )}
     </div>
   );
 };

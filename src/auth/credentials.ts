@@ -1,7 +1,8 @@
 import * as React from "react";
 import Cookie from "js-cookie";
-import { AuthCredentials } from "interfaces";
+import { AuthCredentials, OPDS1 } from "interfaces";
 import { IS_SERVER } from "utils/env";
+import { NextRouter } from "next/router";
 
 /**
  * If you pass a librarySlug, the cookie will be scoped to the
@@ -40,19 +41,6 @@ export function generateToken(username: string, password: string) {
   return `Basic ${btoaStr}`;
 }
 
-type UrlCredentialsResult =
-  | { token: string }
-  | { error: string | undefined }
-  | undefined;
-/**
- * Checks for credentials or auth errors embedded
- * in the browser url
- */
-export function checkForCredentialsInUrl(): UrlCredentialsResult {
-  const clever = lookForCleverCredentials();
-  if (clever) return clever;
-}
-
 /**
  * Check for clever auth access token in the browser url
  */
@@ -68,7 +56,7 @@ function lookForCleverCredentials(): UrlCredentialsResult {
           .slice(accessTokenStart + accessTokenKey.length)
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
-        return { token };
+        return { token, methodType: OPDS1.CleverAuthType };
       } else if (window.location.hash.indexOf(errorKey) !== -1) {
         const hash = window.location.hash;
         const errorStart = hash.indexOf(errorKey);
@@ -77,8 +65,43 @@ function lookForCleverCredentials(): UrlCredentialsResult {
           decodeURIComponent(error.replace(/\+/g, "%20"))
         );
         window.location.hash = "";
-        return { error: problemDetail?.title as string | undefined };
+        return {
+          error:
+            problemDetail?.title ?? "An unknown Clever Auth error occurred."
+        };
       }
     }
   }
+}
+
+function lookForSamlCredentials(
+  router: NextRouter
+): AuthCredentials | undefined {
+  const { access_token: samlAccessToken } = router.query;
+  if (samlAccessToken) {
+    return {
+      token: `Bearer ${samlAccessToken}`,
+      methodType: OPDS1.SamlAuthType
+    };
+  }
+}
+
+type UrlAuthError = { error: string | undefined };
+type UrlCredentialsResult = AuthCredentials | UrlAuthError | undefined;
+/**
+ * Checks for credentials or auth errors embedded
+ * in the browser url
+ */
+export function lookForUrlCredentials(
+  router: NextRouter
+): UrlCredentialsResult {
+  /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
+
+  const clever = lookForCleverCredentials();
+  if (clever) return clever;
+
+  const saml = lookForSamlCredentials(router);
+  if (saml) return saml;
+
+  return undefined;
 }

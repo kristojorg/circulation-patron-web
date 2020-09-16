@@ -1,4 +1,9 @@
+import AuthForm from "auth/AuthForm";
 import * as React from "react";
+
+/**
+ * This context just tracks whether we should be showing the auth modal at any given point.
+ */
 
 const AuthFormContext = React.createContext<
   { showForm: () => void } | undefined

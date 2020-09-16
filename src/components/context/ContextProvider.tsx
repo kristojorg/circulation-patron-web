@@ -13,9 +13,6 @@ import makeTheme from "../../theme";
 import DataFetcher from "owc/DataFetcher";
 import ActionsCreator from "owc/actions";
 import { adapter } from "owc/OPDSDataAdapter";
-import basicAuthPlugin from "auth/basicAuthPlugin";
-import samlAuthPlugin from "auth/samlAuthPlugin";
-import CleverAuthPlugin from "auth/cleverAuthPlugin";
 import getPathFor from "utils/getPathFor";
 import { LinkUtilsProvider } from "./LinkUtilsContext";
 import { SHORTEN_URLS } from "utils/env";
@@ -58,10 +55,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
       <ReakitProvider>
         <RouterProvider>
           <PathForProvider pathFor={pathFor}>
-            <OPDSStore
-              store={store}
-              authPlugins={[basicAuthPlugin, samlAuthPlugin, CleverAuthPlugin]}
-            >
+            <OPDSStore store={store}>
               <RecommendationsProvider>
                 <ActionsProvider
                   actions={computedActions}
