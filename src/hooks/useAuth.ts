@@ -56,7 +56,7 @@ function useAuth() {
   const { buildMultiLibraryLink } = useLinkUtils();
 
   const clearWebpubViewerStorage = () => {
-    const WebpubViewerStorage = window?.indexedDB?.open("WebpubViewerDb", 2);
+    const WebpubViewerStorage = window?.indexedDB?.open("WebpubViewerDb");
     if (WebpubViewerStorage) {
       window.indexedDB.deleteDatabase("WebpubViewerDb");
     }
