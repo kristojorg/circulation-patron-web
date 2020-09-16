@@ -32,8 +32,6 @@ export function mapStateToProps(state: State, ownProps: any) {
     loadedBookUrl: state.book.url,
     collectionUrl: ownProps.collectionUrl,
     bookUrl: ownProps.bookUrl,
-    loansUrl: state.loans.url,
-    loans: state.loans.books,
     preferences: state.preferences
   };
 }
@@ -132,7 +130,6 @@ export function mergeRootProps(
     adapter: adapter
   });
   const dispatchProps = createDispatchProps.createDispatchProps(fetcher);
-  const authCredentials = fetcher.getAuthCredentials();
 
   const setCollection = (
     url: string | null
@@ -201,18 +198,7 @@ export function mergeRootProps(
 
   const { fetchCollection, fetchBook } = dispatchProps;
 
-  const updateBook = (url: string) => {
-    return dispatchProps.updateBook(url).then((data: any) => {
-      if (stateProps.loansUrl) {
-        dispatchProps.fetchLoans(stateProps.loansUrl);
-      }
-
-      return data;
-    });
-  };
-
   return Object.assign({}, componentProps, stateProps, dispatchProps, {
-    authCredentials: authCredentials,
     setCollection: setCollection,
     setBook: setBook,
     setCollectionAndBook: setCollectionAndBook,
@@ -238,7 +224,6 @@ export function mergeRootProps(
     },
     clearBook: () => {
       setBook(null);
-    },
-    updateBook: updateBook
+    }
   });
 }

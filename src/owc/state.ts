@@ -2,13 +2,11 @@ import buildStore from "./store";
 import { createFetchCollectionAndBook } from "owc/mergeRootProps";
 import { CollectionState } from "./reducers/collection";
 import { BookState } from "./reducers/book";
-import { LoansState } from "./reducers/loans";
 import { PreferencesState } from "./reducers/preferences";
 
 export interface State {
   collection: CollectionState;
   book: BookState;
-  loans: LoansState;
   preferences: PreferencesState;
 }
 
