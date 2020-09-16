@@ -1,15 +1,14 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useTypedSelector from "hooks/useTypedSelector";
 import { useForm } from "react-hook-form";
 import Button from "components/Button";
 import FormInput from "components/form/FormInput";
-import { BasicAuthMethod } from "owc/interfaces";
-import { modalButtonStyles } from "../components/Modal";
-import { AuthFormProps } from "owc/AuthPlugin";
-import { useActions } from "owc/ActionsContext";
-import { generateCredentials } from "utils/auth";
+import { modalButtonStyles } from "components/Modal";
+import { OPDS1 } from "interfaces";
+import { generateToken } from "auth/credentials";
+
+import useUser from "hooks/useUser";
 
 type FormData = {
   [key: string]: string;
@@ -18,32 +17,24 @@ type FormData = {
 /**
  * Auth form
  */
-const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
-  provider
+const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
+  method
 }) => {
-  const authState = useTypedSelector(state => state.auth);
-  const { callback, error: serverError } = authState;
-  const { actions, dispatch } = useActions();
+  const { signIn } = useUser();
+
   const { register, handleSubmit, errors } = useForm<FormData>();
 
-  const usernameInputName = provider.method.labels.login;
-  const passwordInputName = provider.method.labels.password;
+  const usernameInputName = method.labels.login;
+  const passwordInputName = method.labels.password;
 
   const onSubmit = handleSubmit(async values => {
     const login = values[usernameInputName];
     const password = values[passwordInputName];
-    // create credentials
-    const credentials = generateCredentials(login, password);
-    // save them with redux
-    dispatch(
-      actions.saveAuthCredentials({
-        provider: provider.id,
-        credentials
-      })
-    );
-    // call the callback that was saved when the form was triggered
-    callback?.();
+    // try to login with these credentials
+    const token = generateToken(login, password);
+    signIn(token, method);
   });
+
   return (
     <form
       onSubmit={onSubmit}
@@ -52,9 +43,9 @@ const BasicAuthForm: React.FC<AuthFormProps<BasicAuthMethod>> = ({
         flexDirection: "column"
       }}
     >
-      <span sx={{ color: "ui.error" }}>
+      {/* <span sx={{ color: "ui.error" }}>
         {serverError && `Error: ${serverError}`}
-      </span>
+      </span> */}
       <FormInput
         name={usernameInputName}
         label={usernameInputName}

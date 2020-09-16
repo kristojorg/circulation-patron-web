@@ -80,6 +80,7 @@ export interface LibraryData {
   headerLinks: OPDS1.Link[];
   libraryLinks: LibraryLinks;
   authMethods: AppAuthMethod[];
+  shelfUrl: string | null;
 }
 
 /**

@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import AuthPlugin from "./AuthPlugin";
 
 export const ATOM_MEDIA_TYPE =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
@@ -146,7 +145,6 @@ export interface StateProps {
   bookUrl?: string;
   isFetchingPage?: boolean;
   history?: LinkData[];
-  auth?: AuthData;
   authCredentials?: AuthCredentials;
   isSignedIn?: boolean;
   loansUrl?: string;
@@ -190,17 +188,6 @@ export interface AuthCallback {
   (): any;
 }
 
-/**
- * The provider has a method T, and the plugin might have a different
- * method, as is the case with SAML Auth where the plugin takes
- * a ClientSamlMethod but the original provider takes a ServerSamlMethod
- */
-export interface AuthProvider<T extends AuthMethod, P extends AuthMethod = T> {
-  id: string;
-  plugin: AuthPlugin<P>;
-  method: T;
-}
-
 export interface AuthLink {
   rel: string;
   href: string;
@@ -209,17 +196,6 @@ export interface AuthMethod {
   type: string;
   description?: string;
   links?: AuthLink[];
-}
-
-export interface AuthData {
-  showForm: boolean;
-  callback: AuthCallback | null;
-  cancel: (() => void) | null;
-  credentials: AuthCredentials | null;
-  title: string | null;
-  error: string | null;
-  attemptedProvider: string | null;
-  providers: AuthProvider<AuthMethod>[] | null;
 }
 
 export interface BasicAuthMethod extends AuthMethod {
