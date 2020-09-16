@@ -4,7 +4,9 @@ import { useActions } from "opds-web-client/lib/components/context/ActionsContex
 import { useRouter, NextRouter } from "next/router";
 import useLinkUtils from "components/context/LinkUtilsContext";
 import CleverAuthPlugin from "../auth/cleverAuthPlugin";
+import { NEXT_PUBLIC_COMPANION_APP } from "../utils/env";
 
+const IS_OPEN_EBOOKS = Boolean(NEXT_PUBLIC_COMPANION_APP === "openebooks");
 const SAML_AUTH_TYPE = "http://librarysimplified.org/authtype/SAML-2.0";
 
 const CREDENTIALS_NOT_FOUND = "CREDENTIALS_NOT_FOUND";
@@ -55,15 +57,15 @@ function useAuth() {
   const { actions, dispatch } = useActions();
   const { buildMultiLibraryLink } = useLinkUtils();
 
-  const clearWebpubViewerStorage = () => {
+  const clearOpenEbooksStorage = () => {
     const WebpubViewerStorage = window?.indexedDB?.open("WebpubViewerDb");
-    if (WebpubViewerStorage) {
+    if (WebpubViewerStorage && IS_OPEN_EBOOKS) {
       window.indexedDB.deleteDatabase("WebpubViewerDb");
     }
   };
   const signOut = () => {
     dispatch(actions.clearAuthCredentials());
-    clearWebpubViewerStorage();
+    IS_OPEN_EBOOKS && clearOpenEbooksStorage();
   };
   const signOutAndGoHome = () => {
     signOut();
