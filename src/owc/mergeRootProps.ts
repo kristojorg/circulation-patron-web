@@ -1,6 +1,5 @@
-import { AuthCredentials } from "hooks/useAuth";
 import DataFetcher from "owc/DataFetcher";
-import { CollectionData, BookData, AuthCallback } from "owc/interfaces";
+import { CollectionData, BookData } from "owc/interfaces";
 import { adapter } from "owc/OPDSDataAdapter";
 import ActionsCreator from "owc/actions";
 
@@ -56,22 +55,9 @@ export function mapDispatchToProps(dispatch: any) {
         fetchSearchDescription: (url: string) =>
           dispatch(actions.fetchSearchDescription(url)),
         closeError: () => dispatch(actions.closeError()),
-        updateBook: (url: string) => dispatch(actions.updateBook(url)),
         fulfillBook: (url: string) => dispatch(actions.fulfillBook(url)),
         indirectFulfillBook: (url: string, type: string) =>
           dispatch(actions.indirectFulfillBook(url, type)),
-        fetchLoans: (url: string) => dispatch(actions.fetchLoans(url)),
-        saveAuthCredentials: (credentials: AuthCredentials) =>
-          dispatch(actions.saveAuthCredentials(credentials)),
-        clearAuthCredentials: () => dispatch(actions.clearAuthCredentials()),
-        showAuthForm: (
-          callback: AuthCallback,
-          cancel: () => void,
-          providers: any,
-          title: string
-        ) => dispatch(actions.showAuthForm(callback, cancel, providers, title)),
-        closeErrorAndHideAuthForm: () =>
-          dispatch(actions.closeErrorAndHideAuthForm()),
         setPreference: (key: string, value: string) =>
           dispatch(actions.setPreference(key, value))
       };

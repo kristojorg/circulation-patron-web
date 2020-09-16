@@ -1,16 +1,10 @@
-import {
-  AuthProvider,
-  BasicAuthMethod,
-  ClientSamlMethod,
-  AuthMethod
-} from "owc/interfaces";
+import { BasicAuthMethod, ClientSamlMethod, AuthMethod } from "owc/interfaces";
 
 import CleverButton from "auth/cleverAuthButton";
 import AuthButton from "auth/AuthButton";
 
 import BasicAuthForm from "auth/BasicAuthForm";
-import { AuthState } from "owc/reducers/auth";
-import SamlAuthForm from "auth/SamlAuthForm";
+import SamlAuthButton from "auth/SamlAuthButton";
 
 export const cleverAuthId =
   "http://librarysimplified.org/authtype/OAuth-with-intermediary";

@@ -1,8 +1,5 @@
 import * as React from "react";
 import ContextProvider from "../components/context/ContextProvider";
-import { SHORTEN_URLS } from "../utils/env";
-import getPathFor from "../utils/getPathFor";
-import UrlShortener from "../UrlShortener";
 import getOrCreateStore from "../dataflow/getOrCreateStore";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Head from "next/head";
@@ -28,9 +25,7 @@ const Page: React.FC<AppProps> = props => {
   }
 
   const { library, children } = props;
-  const urlShortener = new UrlShortener(library.catalogUrl, SHORTEN_URLS);
-  const pathFor = getPathFor(urlShortener, library.slug);
-  const store = getOrCreateStore(pathFor);
+  const store = getOrCreateStore();
 
   return (
     <ErrorBoundary fallback={AppErrorFallback}>

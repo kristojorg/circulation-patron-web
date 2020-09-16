@@ -184,10 +184,6 @@ export interface AuthCredentials {
   credentials: string;
 }
 
-export interface AuthCallback {
-  (): any;
-}
-
 export interface AuthLink {
   rel: string;
   href: string;

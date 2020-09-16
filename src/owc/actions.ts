@@ -4,13 +4,8 @@ import {
   CollectionData,
   BookData,
   SearchData,
-  FetchErrorData,
-  AuthCallback,
-  AuthCredentials,
-  AuthProvider,
-  AuthMethod
+  FetchErrorData
 } from "./interfaces";
-import { flattenSamlProviders } from "./utils/auth";
 
 export interface LoadAction<T> {
   type: string;
@@ -294,51 +289,6 @@ export default class ActionCreator {
           });
       });
     };
-  }
-
-  fetchLoans(url: string) {
-    return this.fetchOPDS<CollectionData>(ActionCreator.LOANS, url);
-  }
-
-  showAuthForm(
-    callback: AuthCallback,
-    cancel: () => void,
-    providers: AuthProvider<AuthMethod>[],
-    title: string,
-    error?: string,
-    attemptedProvider?: string | null
-  ) {
-    const flattenedProviders = flattenSamlProviders(providers);
-    return {
-      type: ActionCreator.SHOW_AUTH_FORM,
-      callback,
-      cancel,
-      providers: flattenedProviders,
-      title,
-      error,
-      attemptedProvider
-    };
-  }
-
-  closeErrorAndHideAuthForm() {
-    return (dispatch: any) => {
-      dispatch(this.closeError());
-      dispatch(this.hideAuthForm());
-    };
-  }
-
-  hideAuthForm() {
-    return { type: ActionCreator.HIDE_AUTH_FORM };
-  }
-
-  saveAuthCredentials(credentials: AuthCredentials) {
-    this.fetcher.setAuthCredentials(credentials);
-    return { type: ActionCreator.SAVE_AUTH_CREDENTIALS, credentials };
-  }
-
-  clearAuthCredentials() {
-    this.fetcher.clearAuthCredentials();
-    return { type: ActionCreator.CLEAR_AUTH_CREDENTIALS };
   }
 
   setPreference(key: string, value: string) {

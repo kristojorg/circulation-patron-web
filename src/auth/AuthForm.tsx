@@ -15,13 +15,13 @@ import SamlAuthButton from "auth/SamlAuthButton";
 import CleverButton from "auth/cleverAuthButton";
 import BasicAuthButton from "auth/AuthButton";
 import { AuthFormProvider } from "auth/AuthFormCotext";
-import useTypedSelector from "hooks/useTypedSelector";
+import useUser from "hooks/useUser";
 
 const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
-  const isAuthenticated = useTypedSelector(state => !!state.auth.credentials);
+  const { isAuthenticated } = useUser();
 
   const [selectedMethod, setSelectedMethod] = React.useState<
     AppAuthMethod | undefined
