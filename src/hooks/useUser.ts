@@ -9,7 +9,6 @@ import {
 } from "auth/credentials";
 import { BookData, CollectionData } from "interfaces";
 import { AppAuthMethod } from "interfaces";
-import useAuthFormContext from "auth/AuthFormCotext";
 
 type UserState = {
   loans: CollectionData["books"] | undefined;
@@ -20,7 +19,6 @@ type UserState = {
   signOut: () => void;
   // manually sets a book in the loans. For use after borrowing.
   setBook: (book: BookData) => void;
-  showAuthForm: () => void;
 };
 
 /**
@@ -35,7 +33,6 @@ type UserState = {
  */
 export default function useUser(): UserState {
   const { shelfUrl, slug } = useLibraryContext();
-  const { showForm } = useAuthFormContext();
   const credentials = getCredentials(slug);
   const { data, mutate, error } = useSWR(
     [shelfUrl, credentials?.token, credentials?.methodType],
@@ -88,7 +85,6 @@ export default function useUser(): UserState {
     refetch: mutate,
     signIn,
     signOut,
-    setBook,
-    showAuthForm: showForm
+    setBook
   };
 }

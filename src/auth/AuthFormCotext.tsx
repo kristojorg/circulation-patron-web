@@ -1,4 +1,3 @@
-import AuthForm from "auth/AuthForm";
 import * as React from "react";
 
 /**

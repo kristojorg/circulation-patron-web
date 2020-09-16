@@ -19,7 +19,7 @@ export type OPDSStoreProps = {
  */
 export default class OPDSStore extends React.Component<OPDSStoreProps> {
   static contextType = PathForContext;
-  declare context: React.ContextType<typeof PathForContext>;
+  context: React.ContextType<typeof PathForContext>;
 
   store: Redux.Store<State>;
 

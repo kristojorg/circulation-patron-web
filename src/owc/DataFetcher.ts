@@ -2,7 +2,6 @@ import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import OpenSearchDescriptionParser from "./OpenSearchDescriptionParser";
 import { AuthCredentials } from "./interfaces";
 const Cookie = require("js-cookie");
-require("isomorphic-fetch");
 
 export interface RequestError {
   status: number | null;

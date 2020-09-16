@@ -2,6 +2,7 @@ import DataFetcher from "owc/DataFetcher";
 import { CollectionData, BookData } from "owc/interfaces";
 import { adapter } from "owc/OPDSDataAdapter";
 import ActionsCreator from "owc/actions";
+import { State } from "owc/state";
 
 export function findBookInCollection(
   collection: CollectionData | null,
@@ -18,7 +19,7 @@ export function findBookInCollection(
   }
 }
 
-export function mapStateToProps(state: any, ownProps: any) {
+export function mapStateToProps(state: State, ownProps: any) {
   return {
     collectionData: state.collection.data || ownProps.collectionData,
     isFetchingCollection: state.collection.isFetching,
@@ -33,8 +34,6 @@ export function mapStateToProps(state: any, ownProps: any) {
     bookUrl: ownProps.bookUrl,
     loansUrl: state.loans.url,
     loans: state.loans.books,
-    auth: state.auth,
-    isSignedIn: !!state.auth.credentials,
     preferences: state.preferences
   };
 }
@@ -124,7 +123,7 @@ export function fetchCollectionAndBook({
 }
 
 export function mergeRootProps(
-  stateProps: any,
+  stateProps: ReturnType<typeof mapStateToProps>,
   createDispatchProps: any,
   componentProps: any
 ) {
