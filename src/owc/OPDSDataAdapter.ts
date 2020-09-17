@@ -21,8 +21,8 @@ import {
   SearchData,
   FulfillmentLink,
   MediaLink,
-  MediaType
-} from "./interfaces";
+  OPDS1
+} from "interfaces";
 
 /**
  * Type guards used for filtering links or narrowing
@@ -54,7 +54,7 @@ function buildFulfillmentLink(feedUrl: string) {
     if (!indirectType) return;
     return {
       url: resolve(feedUrl, link.href),
-      type: link.type as MediaType,
+      type: link.type as OPDS1.AnyBookMediaType,
       indirectType
     };
   };

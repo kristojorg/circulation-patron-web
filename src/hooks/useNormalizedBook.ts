@@ -1,5 +1,5 @@
 import useUser from "hooks/useUser";
-import { BookData } from "owc/interfaces";
+import { BookData } from "interfaces";
 import useTypedSelector from "./useTypedSelector";
 
 /**

@@ -1,5 +1,5 @@
 import DataFetcher from "owc/DataFetcher";
-import { CollectionData, BookData } from "owc/interfaces";
+import { CollectionData, BookData } from "interfaces";
 import { adapter } from "owc/OPDSDataAdapter";
 import ActionsCreator from "owc/actions";
 import { State } from "owc/state";
