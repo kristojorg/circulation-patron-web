@@ -10,6 +10,10 @@ import useUser from "hooks/useUser";
 export default function SignOut() {
   const dialog = useDialogState();
   const { signOut } = useUser();
+  function signOutAndClose() {
+    signOut();
+    dialog.hide();
+  }
   return (
     <>
       <DialogDisclosure as={Button} color="ui.black" {...dialog}>
@@ -29,7 +33,7 @@ export default function SignOut() {
           </Button>
           <Button
             color="ui.error"
-            onClick={signOut}
+            onClick={signOutAndClose}
             aria-label="Confirm Sign Out"
           >
             Sign out
