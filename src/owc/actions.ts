@@ -5,7 +5,7 @@ import {
   BookData,
   SearchData,
   FetchErrorData
-} from "./interfaces";
+} from "interfaces";
 
 export interface LoadAction<T> {
   type: string;
@@ -260,7 +260,7 @@ export default class ActionCreator {
 
   indirectFulfillBook(
     url: string,
-    type: string
+    type?: string
   ): (dispatch: any) => Promise<string> {
     return dispatch => {
       return new Promise<string>((resolve, reject) => {

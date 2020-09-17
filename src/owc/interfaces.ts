@@ -1,6 +1,5 @@
 import { BookData, CollectionData, LinkData } from "interfaces";
 /* eslint-disable camelcase */
-import AuthPlugin from "./AuthPlugin";
 
 // these properties need to be optional because they're used by RootProps,
 // which doesn't implement them until Root is connected to the state by redux;
