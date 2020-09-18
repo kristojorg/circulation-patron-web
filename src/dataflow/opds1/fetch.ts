@@ -19,7 +19,8 @@ async function fetchOPDS(
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.
   if (!response.ok) {
-    throw new ServerError(url, response);
+    const json = await response.json();
+    throw new ServerError(url, response.status, json);
   }
 
   const text = await response.text();

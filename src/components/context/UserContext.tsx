@@ -1,8 +1,4 @@
-import {
-  getCredentials,
-  clearCredentials,
-  setAuthCredentials
-} from "auth/credentials";
+import useCredentials from "auth/credentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
@@ -34,32 +30,40 @@ const UserContext = React.createContext<UserState | undefined>(undefined);
  */
 export const UserProvider: React.FC = ({ children }) => {
   const { shelfUrl, slug } = useLibraryContext();
-  const credentials = getCredentials(slug);
-  const { data, mutate, error: fetchError, isValidating } = useSWR(
-    [shelfUrl, credentials?.token, credentials?.methodType],
-    fetchCollection,
+  const { credentials, setCredentials, clearCredentials } = useCredentials(
+    slug
+  );
+  const { data, mutate, error, isValidating } = useSWR(
+    // pass null if there are no credentials to tell SWR not to fetch at all.
+    credentials
+      ? [shelfUrl, credentials?.token, credentials?.methodType]
+      : null,
+    async (shelfUrl, token) => {
+      if (shelfUrl) {
+        console.log("Fetching with", token);
+        return await fetchCollection(shelfUrl, token);
+      }
+    },
     {
-      // make this only retry if the response is not a 401
+      // only retry if the response is not a 401
       shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      // add an on error to clear credentials when we receive a 401
+      // clear credentials whenever we receive a 401
       onError: err => {
-        if (err instanceof ServerError) {
-          clearCredentials(slug);
+        if (err instanceof ServerError && err?.info.status === 401) {
+          clearCredentials();
         }
       }
     }
   );
 
-  console.log(fetchError?.info);
-
   function signIn(token: string, method: AppAuthMethod) {
-    setAuthCredentials(slug, { token, methodType: method.type });
+    setCredentials({ token, methodType: method.type });
     mutate();
   }
   function signOut() {
-    clearCredentials(slug);
+    clearCredentials();
     mutate();
   }
   function setBook(book: BookData) {
@@ -102,8 +106,8 @@ export const UserProvider: React.FC = ({ children }) => {
     refetch: mutate,
     signIn,
     signOut,
-    setBook
-    // error
+    setBook,
+    error
   };
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };

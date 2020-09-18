@@ -18,21 +18,21 @@ function cookieName(librarySlug: string | null): string {
  * because we want it to stay a string so that
  * it passes === if it doesn't change.
  */
-export function getCredentials(
+function getCredentials(
   librarySlug: string | null
 ): AuthCredentials | undefined {
   const credentials = Cookie.get(cookieName(librarySlug));
   return credentials ? JSON.parse(credentials) : undefined;
 }
 
-export function setAuthCredentials(
+function setAuthCredentials(
   librarySlug: string | null,
   credentials: AuthCredentials
 ) {
   Cookie.set(cookieName(librarySlug), JSON.stringify(credentials));
 }
 
-export function clearCredentials(librarySlug: string | null) {
+function clearCredentials(librarySlug: string | null) {
   Cookie.remove(cookieName(librarySlug));
 }
 
@@ -104,4 +104,30 @@ export function lookForUrlCredentials(
   if (saml) return saml;
 
   return undefined;
+}
+
+export default function useCredentials(slug: string | null) {
+  const [credentials, set] = React.useState<AuthCredentials | undefined>(
+    undefined
+  );
+  React.useEffect(() => {
+    const cookie = getCredentials(slug);
+    if (cookie) set(cookie);
+  }, [slug]);
+
+  function setCredentials(creds: AuthCredentials) {
+    set(creds);
+    setAuthCredentials(slug, creds);
+  }
+
+  function clear() {
+    set(undefined);
+    clearCredentials(slug);
+  }
+
+  return {
+    credentials,
+    setCredentials,
+    clearCredentials: clear
+  };
 }

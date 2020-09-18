@@ -43,39 +43,46 @@ type ProblemDocument = {
   status: number;
   title: string;
   type?: string;
-  authDocument?: OPDS1.AuthDocument;
 };
+
+type InvalidCredentialsType = "http://librarysimplified.org/terms/problem/credentials-invalid";
+
+type ErrorType = "invalid-credentials" | "other";
+
+function isProblemDocument(
+  details: ProblemDocument | OPDS1.AuthDocument
+): details is ProblemDocument {
+  return !(typeof (details as OPDS1.AuthDocument).id === "string");
+}
 export class ServerError extends ApplicationError {
   // a default problem document
+  url: string;
   info: ProblemDocument = {
     detail: "An unknown error server occurred.",
     status: 500,
     title: "Server Error"
   };
+  authDocument?: OPDS1.AuthDocument;
 
-  constructor(url: string, response: Response) {
+  constructor(
+    url: string,
+    status: number,
+    details: ProblemDocument | OPDS1.AuthDocument
+  ) {
     super("Server Error");
+    this.url = url;
     Object.setPrototypeOf(this, ServerError.prototype);
-    response
-      .json()
-      .then((problem: ProblemDocument | OPDS1.AuthDocument) => {
-        if (response.status === 401) {
-          // we get back an auth document instead of problem document
-          // we will construct our own problem document.
-          this.info = {
-            status: 401,
-            title: "No Authorized",
-            detail: "You are not authorized for the requested resource.",
-            authDocument: problem
-          };
-        }
-        this.info = problem;
-      })
-      .catch(e => {
-        // the problem could not be parsed as json. Continue.
-        this.info.detail =
-          "The server error document could not be parsed as json.";
-        console.error("The server error could not be parsed.", e);
-      });
+    if (status === 401 && !isProblemDocument(details)) {
+      // we get back an auth document instead of problem document
+      // we will construct our own problem document.
+      this.info = {
+        status: 401,
+        title: "No Authorized",
+        detail: "You are not authorized for the requested resource."
+      };
+      this.authDocument = details;
+    } else if (isProblemDocument(details)) {
+      this.info = details;
+    }
   }
 }
