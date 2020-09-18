@@ -16,27 +16,13 @@ import CleverButton from "auth/cleverAuthButton";
 import { AuthFormProvider } from "auth/AuthFormCotext";
 import useUser from "components/context/UserContext";
 import LoadingIndicator from "components/LoadingIndicator";
-import {
-  basicAuthMethod,
-  cleverAuthMethod,
-  createSamlMethod
-} from "test-utils/fixtures";
 import Button from "components/Button";
-import { ArrowForward, ArrowRight, ChevronRight } from "icons";
-
-const methods: AppAuthMethod[] = [
-  basicAuthMethod,
-  cleverAuthMethod,
-  createSamlMethod(0),
-  createSamlMethod(1)
-  // createSamlMethod(2)
-];
+import ExternalLink from "components/ExternalLink";
 
 const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
-  const { catalogName } = useLibraryContext();
-  const authMethods = methods;
+  const { catalogName, authMethods } = useLibraryContext();
   const { isAuthenticated, isLoading } = useUser();
 
   /**
@@ -89,20 +75,6 @@ const AuthForm: React.FC = ({ children }) => {
           ) : (
             <Buttons authMethods={authMethods} />
           )}
-
-          {/* <Button
-            onClick={() =>
-              authProvider && (visibleProviders?.length ?? 0) > 1
-                ? cancelGoBackToAuthSelection()
-                : typeof cancel === "function" && cancel()
-            }
-            sx={{
-              ...modalButtonStyles
-            }}
-            variant="ghost"
-          >
-            Cancel
-          </Button> */}
         </Modal>
       </ClientOnly>
       {/* We render this to provide the dialog a focus target after it closes
@@ -149,9 +121,34 @@ const SignInForm: React.FC<{
 };
 
 const NoAuth: React.FC = () => {
-  return <div>No auth configured</div>;
+  const {
+    libraryLinks: { helpEmail }
+  } = useLibraryContext();
+  return (
+    <div sx={{ display: "flex", justifyContent: "center", maxWidth: 500 }}>
+      <Text>
+        This Library does not have any authentication configured.{" "}
+        {helpEmail && (
+          <Text>
+            If this is an error, please contact your site administrator via
+            email at:{" "}
+            <ExternalLink href={helpEmail.href}>
+              {helpEmail.href.replace("mailto:", "")}
+            </ExternalLink>
+            .
+          </Text>
+        )}
+      </Text>
+    </div>
+  );
 };
 
+/**
+ * Renders buttons that allow selecting between auth providers.
+ * If you click a button that leads to a form, it will show the form.
+ * If you click one that leads to external site, it will take you there
+ * instead.
+ */
 const Buttons: React.FC<{
   authMethods: AppAuthMethod[];
 }> = ({ authMethods }) => {
@@ -206,6 +203,9 @@ const Buttons: React.FC<{
   );
 };
 
+/**
+ * Renders a combobox style auth method selector.
+ */
 const Combobox: React.FC<{
   authMethods: AppAuthMethod[];
 }> = ({ authMethods }) => {
