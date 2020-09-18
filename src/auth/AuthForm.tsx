@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
-import Modal from "../components/Modal";
+import Modal, { modalButtonStyles } from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
 import { H2, Text } from "../components/Text";
 import FormLabel from "../components/form/FormLabel";
@@ -13,29 +13,30 @@ import { AppAuthMethod, OPDS1 } from "interfaces";
 import BasicAuthForm from "auth/BasicAuthForm";
 import SamlAuthButton from "auth/SamlAuthButton";
 import CleverButton from "auth/cleverAuthButton";
-import BasicAuthButton from "auth/AuthButton";
 import { AuthFormProvider } from "auth/AuthFormCotext";
 import useUser from "components/context/UserContext";
 import LoadingIndicator from "components/LoadingIndicator";
+import {
+  basicAuthMethod,
+  cleverAuthMethod,
+  createSamlMethod
+} from "test-utils/fixtures";
+import Button from "components/Button";
+
+const methods: AppAuthMethod[] = [
+  basicAuthMethod,
+  cleverAuthMethod,
+  createSamlMethod(0),
+  createSamlMethod(1)
+  // createSamlMethod(2)
+];
 
 const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
-  const { catalogName, authMethods } = useLibraryContext();
+  const { catalogName } = useLibraryContext();
+  const authMethods = methods;
   const { isAuthenticated, isLoading } = useUser();
-
-  const [selectedMethod, setSelectedMethod] = React.useState<
-    AppAuthMethod | undefined
-  >(undefined);
-
-  const handleChangeMethod = (type: string) => {
-    const method = authMethods.find(method => method.type === type);
-    if (method) setSelectedMethod(method);
-  };
-
-  const cancelGoBackToAuthSelection = () => {
-    setSelectedMethod(undefined);
-  };
 
   /**
    * If the user becomes authenticated, we can hide the form
@@ -46,8 +47,7 @@ const AuthForm: React.FC = ({ children }) => {
 
   /**
    * The options:
-   *  - We are authenticating the user, show a loading screen
-   *  - A method is selected, show the form.
+   *  - We are authenticating the user, show a loading indicator
    *  - No auth methods available. Tell the user.
    *  - There is only one method. Show the form for that one.
    *  - There are 1-5 methods. Show a button for each.
@@ -55,8 +55,6 @@ const AuthForm: React.FC = ({ children }) => {
    */
   const formStatus = isLoading
     ? "loading"
-    : selectedMethod
-    ? "method-selected"
     : authMethods.length === 0
     ? "no-auth"
     : authMethods.length === 1
@@ -81,25 +79,14 @@ const AuthForm: React.FC = ({ children }) => {
           </div>
           {formStatus === "loading" ? (
             <Loading />
-          ) : formStatus === "method-selected" && selectedMethod ? (
-            <SignInForm
-              method={selectedMethod}
-              goBackToSelection={cancelGoBackToAuthSelection}
-            />
           ) : formStatus === "no-auth" ? (
             <NoAuth />
           ) : formStatus === "single-auth" ? (
             <SignInForm method={authMethods[0]} />
           ) : formStatus === "combobox" ? (
-            <Combobox
-              authMethods={authMethods}
-              handleChangeMethod={handleChangeMethod}
-            />
+            <Combobox authMethods={authMethods} />
           ) : (
-            <Buttons
-              authMethods={authMethods}
-              handleChangeMethod={handleChangeMethod}
-            />
+            <Buttons authMethods={authMethods} />
           )}
 
           {/* <Button
@@ -166,36 +153,70 @@ const NoAuth: React.FC = () => {
 
 const Buttons: React.FC<{
   authMethods: AppAuthMethod[];
-  handleChangeMethod: (type: string) => void;
-}> = ({ authMethods, handleChangeMethod }) => {
+}> = ({ authMethods }) => {
+  const [selectedMethod, setSelectedMethod] = React.useState<
+    AppAuthMethod | undefined
+  >(undefined);
+
+  const handleChangeMethod = (type: string) => {
+    const method = authMethods.find(method => method.type === type);
+    if (method) setSelectedMethod(method);
+  };
+
+  const cancelSelection = () => setSelectedMethod(undefined);
+
   return (
     <Stack direction="column">
-      {authMethods.map(method => {
-        switch (method.type) {
-          case OPDS1.BasicAuthType:
-            return (
-              <BasicAuthButton
-                method={method}
-                key={method.type}
-                onClick={handleChangeMethod}
-              />
-            );
-          case OPDS1.SamlAuthType:
-            return <SamlAuthButton method={method} key={method.type} />;
-          case OPDS1.CleverAuthType:
-            return <CleverButton method={method} key={method.type} />;
-          default:
-            return null;
-        }
-      })}
+      {!selectedMethod &&
+        authMethods.map(method => {
+          switch (method.type) {
+            case OPDS1.BasicAuthType:
+              return (
+                <Button
+                  key={method.type}
+                  sx={{ ...modalButtonStyles }}
+                  onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
+                >
+                  Login with {method.description ?? "Basic Auth"}
+                </Button>
+              );
+            case OPDS1.SamlAuthType:
+              return <SamlAuthButton method={method} key={method.type} />;
+            case OPDS1.CleverAuthType:
+              return <CleverButton method={method} key={method.type} />;
+            default:
+              return null;
+          }
+        })}
+      {selectedMethod && (
+        <Stack direction="column">
+          <SignInForm method={selectedMethod} />
+          <Button
+            onClick={cancelSelection}
+            variant="ghost"
+            color="ui.gray.dark"
+            sx={{ alignSelf: "center" }}
+          >
+            Back to selection
+          </Button>
+        </Stack>
+      )}
     </Stack>
   );
 };
 
 const Combobox: React.FC<{
   authMethods: AppAuthMethod[];
-  handleChangeMethod: (type: string) => void;
-}> = ({ authMethods, handleChangeMethod }) => {
+}> = ({ authMethods }) => {
+  const [selectedMethod, setSelectedMethod] = React.useState<AppAuthMethod>(
+    authMethods[0]
+  );
+
+  const handleChangeMethod = (type: string) => {
+    const method = authMethods.find(method => method.type === type);
+    if (method) setSelectedMethod(method);
+  };
+
   return (
     <div sx={{ mb: 2 }}>
       <FormLabel htmlFor="login-method-select">Login Method</FormLabel>
@@ -209,6 +230,7 @@ const Combobox: React.FC<{
           </option>
         ))}
       </Select>
+      <SignInForm method={selectedMethod} />
     </div>
   );
 };

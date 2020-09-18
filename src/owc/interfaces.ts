@@ -14,10 +14,6 @@ export interface StateProps {
   bookUrl?: string;
   isFetchingPage?: boolean;
   history?: LinkData[];
-  authCredentials?: AuthCredentials;
-  isSignedIn?: boolean;
-  loansUrl?: string;
-  loans?: BookData[];
   preferences?: {
     [key: string]: string;
   };
@@ -48,28 +44,6 @@ export interface NavigateContext {
   pathFor: PathFor;
 }
 
-export interface AuthCredentials {
-  provider: string;
-  credentials: string;
-}
-
-export interface AuthLink {
-  rel: string;
-  href: string;
-}
-export interface AuthMethod {
-  type: string;
-  description?: string;
-  links?: AuthLink[];
-}
-
-export interface BasicAuthMethod extends AuthMethod {
-  labels: {
-    login: string;
-    password: string;
-  };
-}
-
 /** Utility to make keys K of type T both required (defined) and not null */
 export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
   { [P in K]-?: NonNullable<T[P]> };
@@ -93,13 +67,3 @@ export type SamlIdp = {
   rel: "authenticate";
   information_urls: [];
 };
-/**
- * The server representation has multiple IDPs nested into the one.
- * We will flatten that out before placing into redux state.
- */
-export interface ServerSamlMethod extends AuthMethod {
-  links: SamlIdp[];
-}
-export interface ClientSamlMethod extends AuthMethod {
-  href: string;
-}
