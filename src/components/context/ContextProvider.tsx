@@ -19,6 +19,7 @@ import { SHORTEN_URLS } from "utils/env";
 import { PathFor } from "owc/interfaces";
 import PathForProvider from "owc/PathForContext";
 import OPDSStore from "owc/StoreContext";
+import { UserProvider } from "components/context/UserContext";
 
 type ProviderProps = {
   library: LibraryData;
@@ -66,7 +67,7 @@ const AppContextProvider: React.FC<ProviderProps> = ({
                       library={library}
                       urlShortener={urlShortener}
                     >
-                      {children}
+                      <UserProvider>{children}</UserProvider>
                     </LinkUtilsProvider>
                   </LibraryProvider>
                 </ActionsProvider>

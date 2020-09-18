@@ -8,7 +8,7 @@ import { modalButtonStyles } from "components/Modal";
 import { OPDS1 } from "interfaces";
 import { generateToken } from "auth/credentials";
 
-import useUser from "hooks/useUser";
+import useUser from "components/context/UserContext";
 
 type FormData = {
   [key: string]: string;

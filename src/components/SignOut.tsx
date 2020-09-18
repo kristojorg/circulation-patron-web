@@ -5,18 +5,23 @@ import Modal from "./Modal";
 import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import Button from "./Button";
 import Stack from "./Stack";
-import useUser from "hooks/useUser";
+import useUser from "components/context/UserContext";
 
 export default function SignOut() {
   const dialog = useDialogState();
-  const { signOut } = useUser();
+  const { signOut, isValidating } = useUser();
   function signOutAndClose() {
     signOut();
     dialog.hide();
   }
   return (
     <>
-      <DialogDisclosure as={Button} color="ui.black" {...dialog}>
+      <DialogDisclosure
+        as={Button}
+        color="ui.black"
+        loading={isValidating}
+        {...dialog}
+      >
         Sign Out
       </DialogDisclosure>
       <Modal

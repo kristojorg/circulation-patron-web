@@ -5,7 +5,7 @@ import { useDialogState, DialogDisclosure } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
 import Modal from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
-import { H2 } from "../components/Text";
+import { H2, Text } from "../components/Text";
 import FormLabel from "../components/form/FormLabel";
 import Select from "../components/Select";
 import Stack from "../components/Stack";
@@ -15,13 +15,14 @@ import SamlAuthButton from "auth/SamlAuthButton";
 import CleverButton from "auth/cleverAuthButton";
 import BasicAuthButton from "auth/AuthButton";
 import { AuthFormProvider } from "auth/AuthFormCotext";
-import useUser from "hooks/useUser";
+import useUser from "components/context/UserContext";
+import LoadingIndicator from "components/LoadingIndicator";
 
 const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, isLoading } = useUser();
 
   const [selectedMethod, setSelectedMethod] = React.useState<
     AppAuthMethod | undefined
@@ -45,20 +46,24 @@ const AuthForm: React.FC = ({ children }) => {
 
   /**
    * The options:
+   *  - We are authenticating the user, show a loading screen
    *  - A method is selected, show the form.
    *  - No auth methods available. Tell the user.
    *  - There is only one method. Show the form for that one.
    *  - There are 1-5 methods. Show a button for each.
    *  - There are >5 methods. Show a combobox selector.
    */
-  const selectionMode =
-    authMethods.length === 0
-      ? "no-auth"
-      : authMethods.length === 1
-      ? "single-auth"
-      : authMethods.length < 5
-      ? "buttons"
-      : "combobox";
+  const formStatus = isLoading
+    ? "loading"
+    : selectedMethod
+    ? "method-selected"
+    : authMethods.length === 0
+    ? "no-auth"
+    : authMethods.length === 1
+    ? "single-auth"
+    : authMethods.length < 5
+    ? "buttons"
+    : "combobox";
 
   return (
     <React.Fragment>
@@ -74,16 +79,18 @@ const AuthForm: React.FC = ({ children }) => {
             <H2>{catalogName}</H2>
             <h4>Login</h4>
           </div>
-          {selectedMethod ? (
+          {formStatus === "loading" ? (
+            <Loading />
+          ) : formStatus === "method-selected" && selectedMethod ? (
             <SignInForm
               method={selectedMethod}
               goBackToSelection={cancelGoBackToAuthSelection}
             />
-          ) : selectionMode === "no-auth" ? (
+          ) : formStatus === "no-auth" ? (
             <NoAuth />
-          ) : selectionMode === "single-auth" ? (
+          ) : formStatus === "single-auth" ? (
             <SignInForm method={authMethods[0]} />
-          ) : selectionMode === "combobox" ? (
+          ) : formStatus === "combobox" ? (
             <Combobox
               authMethods={authMethods}
               handleChangeMethod={handleChangeMethod}
@@ -116,6 +123,20 @@ const AuthForm: React.FC = ({ children }) => {
       <DialogDisclosure sx={{ display: "none" }} {...dialog} />
       <AuthFormProvider showForm={dialog.show}>{children}</AuthFormProvider>
     </React.Fragment>
+  );
+};
+
+const Loading: React.FC = () => {
+  return (
+    <Stack
+      sx={{
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <LoadingIndicator size={18} />
+      <Text>Logging in...</Text>
+    </Stack>
   );
 };
 
