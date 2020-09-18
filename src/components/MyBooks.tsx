@@ -33,7 +33,7 @@ function sortBooksByLoanExpirationDate(books: BookData[]) {
 }
 
 export const MyBooks: React.FC = () => {
-  const { isAuthenticated, loans, isValidating } = useUser();
+  const { isAuthenticated, loans, isLoading } = useUser();
   const { showForm } = useAuthFormContext();
 
   // show the auth form if we are unauthenticated
@@ -52,7 +52,7 @@ export const MyBooks: React.FC = () => {
 
       <BreadcrumbBar currentLocation="My Books" />
       <PageTitle>My Books</PageTitle>
-      {noBooks && isValidating ? (
+      {noBooks && isLoading ? (
         <PageLoader />
       ) : isAuthenticated && noBooks ? (
         <Empty />

@@ -1,5 +1,5 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
-import ApplicationError from "errors";
+import ApplicationError, { ServerError } from "errors";
 import { CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
 
@@ -16,13 +16,13 @@ async function fetchOPDS(
   const response = await fetch(url, {
     headers
   });
-  const text = await response.text();
-  // check for an error code in the status
+  // If the status code is not in the range 200-299,
+  // we still try to parse and throw it.
   if (!response.ok) {
-    throw new ApplicationError(
-      `Error fetching OPDS Data. Url: ${url} Response text: ${text}`
-    );
+    throw new ServerError(url, response);
   }
+
+  const text = await response.text();
 
   try {
     // parse the text into an opds feed or entry

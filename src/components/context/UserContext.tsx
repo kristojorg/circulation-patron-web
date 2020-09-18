@@ -5,6 +5,7 @@ import {
 } from "auth/credentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
+import { ServerError } from "errors";
 import { AppAuthMethod, BookData } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
@@ -34,17 +35,24 @@ const UserContext = React.createContext<UserState | undefined>(undefined);
 export const UserProvider: React.FC = ({ children }) => {
   const { shelfUrl, slug } = useLibraryContext();
   const credentials = getCredentials(slug);
-  const { data, mutate, isValidating } = useSWR(
+  const { data, mutate, error: fetchError, isValidating } = useSWR(
     [shelfUrl, credentials?.token, credentials?.methodType],
     fetchCollection,
     {
       // make this only retry if the response is not a 401
       shouldRetryOnError: false,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false
+      revalidateOnReconnect: false,
       // add an on error to clear credentials when we receive a 401
+      onError: err => {
+        if (err instanceof ServerError) {
+          clearCredentials(slug);
+        }
+      }
     }
   );
+
+  console.log(fetchError?.info);
 
   function signIn(token: string, method: AppAuthMethod) {
     setAuthCredentials(slug, { token, methodType: method.type });
@@ -95,6 +103,7 @@ export const UserProvider: React.FC = ({ children }) => {
     signIn,
     signOut,
     setBook
+    // error
   };
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };

@@ -9,7 +9,7 @@ import useUser from "components/context/UserContext";
 
 export default function SignOut() {
   const dialog = useDialogState();
-  const { signOut, isValidating } = useUser();
+  const { signOut, isLoading } = useUser();
   function signOutAndClose() {
     signOut();
     dialog.hide();
@@ -19,7 +19,7 @@ export default function SignOut() {
       <DialogDisclosure
         as={Button}
         color="ui.black"
-        loading={isValidating}
+        loading={isLoading}
         {...dialog}
       >
         Sign Out
