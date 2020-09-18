@@ -22,6 +22,7 @@ import {
   createSamlMethod
 } from "test-utils/fixtures";
 import Button from "components/Button";
+import { ArrowForward, ArrowRight, ChevronRight } from "icons";
 
 const methods: AppAuthMethod[] = [
   basicAuthMethod,
