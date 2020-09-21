@@ -4,29 +4,15 @@ import { AuthCredentials, OPDS1 } from "interfaces";
 import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
 
+/**
+ * This file manages extracting credentials from various places they might be stored,
+ * and syncing those places up with an internal react state. It currently searches
+ * for credentials stored in a browser cookie as well as any credentials passed in
+ * to the app via a query param (eg. for Clever or SAML auth after authenticating).
+ */
+
 type UrlAuthError = { error?: string };
 type CredentialResult = (Partial<AuthCredentials> & UrlAuthError) | undefined;
-
-function isValidCredentials(
-  result: CredentialResult
-): result is AuthCredentials {
-  return !!(
-    typeof result !== "undefined" &&
-    result?.methodType &&
-    result?.token
-  );
-}
-
-function useMemoizedUrlCredentials(router: NextRouter) {
-  const result = lookForUrlCredentials(router);
-  const { methodType, token, error } = result ?? {};
-  const memoizedCreds = React.useMemo(() => ({ methodType, token, error }), [
-    methodType,
-    token,
-    error
-  ]);
-  return memoizedCreds;
-}
 
 export default function useCredentials(slug: string | null) {
   const router = useRouter();
@@ -71,6 +57,19 @@ export default function useCredentials(slug: string | null) {
   };
 }
 
+function isValidCredentials(
+  result: CredentialResult
+): result is AuthCredentials {
+  return !!(
+    typeof result !== "undefined" &&
+    result?.methodType &&
+    result?.token
+  );
+}
+
+/**
+ * COOKIE CREDENDIALS
+ */
 /**
  * If you pass a librarySlug, the cookie will be scoped to the
  * library you are viewing. This is useful in a multi library setup
@@ -80,11 +79,6 @@ function cookieName(librarySlug: string | null): string {
   return `${AUTH_COOKIE_NAME}/${librarySlug}`;
 }
 
-/**
- * We do not parse this into an object here
- * because we want it to stay a string so that
- * it passes === if it doesn't change.
- */
 function getCredentials(
   librarySlug: string | null
 ): AuthCredentials | undefined {
@@ -109,23 +103,28 @@ export function generateToken(username: string, password: string) {
 }
 
 /**
- * Extracting Credentials from the URL after an external
- * login attempt
+ * URL CREDENTIALS
  */
-
-export function lookForUrlCredentials(router: NextRouter): CredentialResult {
-  // we only do this client side
-  if (IS_SERVER) return undefined;
-
+/**
+ * Extracting Credentials from the URL after an external
+ * login attempt. We memoize them so that our useEffect
+ * hook depending on this object does not run on every
+ * render, but only when the values in the object actually
+ * change.
+ */
+function useMemoizedUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
+  const result = IS_SERVER
+    ? undefined
+    : lookForCleverCredentials() ?? lookForSamlCredentials(router);
 
-  const clever = lookForCleverCredentials();
-  if (clever) return clever;
-
-  const saml = lookForSamlCredentials(router);
-  if (saml) return saml;
-
-  return undefined;
+  const { methodType, token, error } = result ?? {};
+  const memoizedCreds = React.useMemo(() => ({ methodType, token, error }), [
+    methodType,
+    token,
+    error
+  ]);
+  return memoizedCreds;
 }
 
 // check for clever credentials
@@ -160,9 +159,7 @@ function lookForCleverCredentials(): CredentialResult {
 }
 
 // check for saml credentials
-function lookForSamlCredentials(
-  router: NextRouter
-): AuthCredentials | undefined {
+function lookForSamlCredentials(router: NextRouter): CredentialResult {
   const { access_token: samlAccessToken } = router.query;
   if (samlAccessToken) {
     // clear the browser query
