@@ -17,6 +17,7 @@ type UserState = {
   signOut: () => void;
   // manually sets a book in the loans. For use after borrowing.
   setBook: (book: BookData) => void;
+  error: any;
 };
 
 const UserContext = React.createContext<UserState | undefined>(undefined);
@@ -33,26 +34,20 @@ export const UserProvider: React.FC = ({ children }) => {
   const { credentials, setCredentials, clearCredentials } = useCredentials(
     slug
   );
-  const { data, mutate, error, isValidating } = useSWR(
+  const { data, mutate, isValidating, error } = useSWR(
     // pass null if there are no credentials to tell SWR not to fetch at all.
     credentials
       ? [shelfUrl, credentials?.token, credentials?.methodType]
       : null,
-    async (shelfUrl, token) => {
-      if (shelfUrl) {
-        console.log("Fetching with", token);
-        return await fetchCollection(shelfUrl, token);
-      }
-    },
+    fetchCollection,
     {
-      // only retry if the response is not a 401
       shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       // clear credentials whenever we receive a 401
       onError: err => {
-        if (err instanceof ServerError && err?.info.status === 401) {
-          clearCredentials();
+        if (err instanceof ServerError && err?.status === 401) {
+          // clearCredentials();
         }
       }
     }

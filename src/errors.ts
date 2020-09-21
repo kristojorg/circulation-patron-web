@@ -40,14 +40,9 @@ export class AppSetupError extends ApplicationError {
 
 type ProblemDocument = {
   detail: string;
-  status: number;
   title: string;
   type?: string;
 };
-
-type InvalidCredentialsType = "http://librarysimplified.org/terms/problem/credentials-invalid";
-
-type ErrorType = "invalid-credentials" | "other";
 
 function isProblemDocument(
   details: ProblemDocument | OPDS1.AuthDocument
@@ -57,9 +52,9 @@ function isProblemDocument(
 export class ServerError extends ApplicationError {
   // a default problem document
   url: string;
+  status: number;
   info: ProblemDocument = {
     detail: "An unknown error server occurred.",
-    status: 500,
     title: "Server Error"
   };
   authDocument?: OPDS1.AuthDocument;
@@ -71,12 +66,12 @@ export class ServerError extends ApplicationError {
   ) {
     super("Server Error");
     this.url = url;
+    this.status = status;
     Object.setPrototypeOf(this, ServerError.prototype);
     if (status === 401 && !isProblemDocument(details)) {
-      // we get back an auth document instead of problem document
+      // 401 errors return auth document instead of problem document
       // we will construct our own problem document.
       this.info = {
-        status: 401,
         title: "No Authorized",
         detail: "You are not authorized for the requested resource."
       };

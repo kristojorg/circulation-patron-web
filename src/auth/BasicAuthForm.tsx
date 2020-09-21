@@ -2,6 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { useForm } from "react-hook-form";
+import { Text } from "components/Text";
 import Button from "components/Button";
 import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
@@ -9,6 +10,7 @@ import { OPDS1 } from "interfaces";
 import { generateToken } from "auth/credentials";
 
 import useUser from "components/context/UserContext";
+import { ServerError } from "errors";
 
 type FormData = {
   [key: string]: string;
@@ -20,7 +22,7 @@ type FormData = {
 const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
   method
 }) => {
-  const { signIn } = useUser();
+  const { signIn, error } = useUser();
 
   const { register, handleSubmit, errors } = useForm<FormData>();
 
@@ -35,17 +37,20 @@ const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
     signIn(token, method);
   });
 
+  const serverError = error instanceof ServerError ? error : undefined;
+  console.log(error, serverError);
   return (
     <form
       onSubmit={onSubmit}
       sx={{
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        maxWidth: 400
       }}
     >
-      {/* <span sx={{ color: "ui.error" }}>
-        {serverError && `Error: ${serverError}`}
-      </span> */}
+      <Text sx={{ color: "ui.error", alignItems: "center", display: "flex" }}>
+        {serverError && `${serverError.info.title}: ${serverError.info.detail}`}
+      </Text>
       <FormInput
         name={usernameInputName}
         label={usernameInputName}
