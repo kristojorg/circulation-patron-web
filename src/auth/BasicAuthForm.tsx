@@ -7,8 +7,7 @@ import Button from "components/Button";
 import FormInput from "components/form/FormInput";
 import { modalButtonStyles } from "components/Modal";
 import { OPDS1 } from "interfaces";
-import { generateToken } from "auth/credentials";
-
+import { generateToken } from "auth/useCredentials";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 

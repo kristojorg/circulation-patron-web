@@ -1,4 +1,4 @@
-import useCredentials from "auth/credentials";
+import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
