@@ -21,7 +21,7 @@ type FormData = {
 const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
   method
 }) => {
-  const { signIn, error } = useUser();
+  const { signIn, error, isLoading } = useUser();
 
   const { register, handleSubmit, errors } = useForm<FormData>();
 
@@ -37,7 +37,7 @@ const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
   });
 
   const serverError = error instanceof ServerError ? error : undefined;
-  console.log(error, serverError);
+
   return (
     <form
       onSubmit={onSubmit}
@@ -77,6 +77,8 @@ const BasicAuthForm: React.FC<{ method: OPDS1.BasicAuthMethod }> = ({
         sx={{
           ...modalButtonStyles
         }}
+        loading={isLoading}
+        loadingText="Signing in..."
       >
         Login
       </Button>

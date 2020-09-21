@@ -23,7 +23,7 @@ const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
-  const { isAuthenticated, isLoading } = useUser();
+  const { isAuthenticated } = useUser();
 
   /**
    * If the user becomes authenticated, we can hide the form
@@ -40,15 +40,14 @@ const AuthForm: React.FC = ({ children }) => {
    *  - There are 1-5 methods. Show a button for each.
    *  - There are >5 methods. Show a combobox selector.
    */
-  const formStatus = isLoading
-    ? "loading"
-    : authMethods.length === 0
-    ? "no-auth"
-    : authMethods.length === 1
-    ? "single-auth"
-    : authMethods.length < 5
-    ? "buttons"
-    : "combobox";
+  const formStatus =
+    authMethods.length === 0
+      ? "no-auth"
+      : authMethods.length === 1
+      ? "single-auth"
+      : authMethods.length < 5
+      ? "buttons"
+      : "combobox";
 
   return (
     <React.Fragment>
@@ -64,9 +63,7 @@ const AuthForm: React.FC = ({ children }) => {
             <H2>{catalogName}</H2>
             <h4>Login</h4>
           </div>
-          {formStatus === "loading" ? (
-            <Loading />
-          ) : formStatus === "no-auth" ? (
+          {formStatus === "no-auth" ? (
             <NoAuth />
           ) : formStatus === "single-auth" ? (
             <SignInForm method={authMethods[0]} />
