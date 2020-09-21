@@ -30,6 +30,7 @@ export default function SignOut() {
         role="alertdialog"
         hideOnClickOutside
         label="Sign Out"
+        showClose={false}
       >
         <p>Are you sure you want to sign out?</p>
         <Stack sx={{ justifyContent: "center" }}>
