@@ -5,66 +5,57 @@ import { IS_SERVER } from "utils/env";
 import { NextRouter, useRouter } from "next/router";
 
 /**
- * This file manages extracting credentials from various places they might be stored,
- * and syncing those places up with an internal react state. It currently searches
- * for credentials stored in a browser cookie as well as any credentials passed in
- * to the app via a query param (eg. for Clever or SAML auth after authenticating).
+ * This hook:
+ *  - Searches for credentials in cookies
+ *  - Syncs those cookies with an internal react state so that
+ *    changes to the credentials causes a re-render. Just
+ *    changing the cookie wouldn't do this.
+ *  - Searches for credentials embedded in the browser url. If
+ *    if finds a token, it extracts it and sets it as the current
+ *    credentials.
  */
-
-type UrlAuthError = { error?: string };
-type CredentialResult = (Partial<AuthCredentials> & UrlAuthError) | undefined;
 
 export default function useCredentials(slug: string | null) {
   const router = useRouter();
-  const [credentials, set] = React.useState<CredentialResult>(undefined);
-  const [error, setError] = React.useState<UrlAuthError | undefined>();
-  const urlCredentials = useMemoizedUrlCredentials(router);
+  const [credentialsState, setCredentialsState] = React.useState<
+    AuthCredentials | undefined
+  >(undefined);
 
+  // sync up cookie state with react state
   React.useEffect(() => {
-    const cookie = getCredentials(slug);
-    if (cookie) set(cookie);
+    const cookie = getCredentialsCookie(slug);
+    if (cookie) setCredentialsState(cookie);
   }, [slug]);
 
+  // set both cookie and state credentials
   const setCredentials = React.useCallback(
     (creds: AuthCredentials) => {
-      set(creds);
-      setAuthCredentials(slug, creds);
+      setCredentialsState(creds);
+      setCredentialsCookie(slug, creds);
     },
-    [set, slug]
+    [setCredentialsState, slug]
   );
 
+  // clear both cookie and state credentials
   const clear = React.useCallback(() => {
-    set(undefined);
-    clearCredentials(slug);
+    setCredentialsState(undefined);
+    clearCredentialsCookie(slug);
   }, [slug]);
 
-  // if you detect credentials or errors in the browser url,
-  // set them in the state
+  // use credentials from browser url if they exist
+  const { token: urlToken, methodType: urlMethodType } =
+    getUrlCredentials(router) ?? {};
   React.useEffect(() => {
-    if (isValidCredentials(urlCredentials)) {
-      return setCredentials(urlCredentials);
+    if (urlToken && urlMethodType) {
+      setCredentials({ token: urlToken, methodType: urlMethodType });
     }
-    if (urlCredentials.error) {
-      return setError(urlCredentials);
-    }
-  }, [urlCredentials, setCredentials]);
+  }, [urlToken, urlMethodType, setCredentials]);
 
   return {
-    credentials,
+    credentials: credentialsState,
     setCredentials,
-    clearCredentials: clear,
-    error
+    clearCredentials: clear
   };
-}
-
-function isValidCredentials(
-  result: CredentialResult
-): result is AuthCredentials {
-  return !!(
-    typeof result !== "undefined" &&
-    result?.methodType &&
-    result?.token
-  );
 }
 
 /**
@@ -79,21 +70,21 @@ function cookieName(librarySlug: string | null): string {
   return `${AUTH_COOKIE_NAME}/${librarySlug}`;
 }
 
-function getCredentials(
+function getCredentialsCookie(
   librarySlug: string | null
 ): AuthCredentials | undefined {
   const credentials = Cookie.get(cookieName(librarySlug));
   return credentials ? JSON.parse(credentials) : undefined;
 }
 
-function setAuthCredentials(
+function setCredentialsCookie(
   librarySlug: string | null,
   credentials: AuthCredentials
 ) {
   Cookie.set(cookieName(librarySlug), JSON.stringify(credentials));
 }
 
-function clearCredentials(librarySlug: string | null) {
+function clearCredentialsCookie(librarySlug: string | null) {
   Cookie.remove(cookieName(librarySlug));
 }
 
@@ -105,33 +96,17 @@ export function generateToken(username: string, password: string) {
 /**
  * URL CREDENTIALS
  */
-/**
- * Extracting Credentials from the URL after an external
- * login attempt. We memoize them so that our useEffect
- * hook depending on this object does not run on every
- * render, but only when the values in the object actually
- * change.
- */
-function useMemoizedUrlCredentials(router: NextRouter) {
+function getUrlCredentials(router: NextRouter) {
   /* TODO: throw error if samlAccessToken and cleverAccessToken exist at the same time as this is an invalid state that shouldn't be reached */
-  const result = IS_SERVER
+  return IS_SERVER
     ? undefined
     : lookForCleverCredentials() ?? lookForSamlCredentials(router);
-
-  const { methodType, token, error } = result ?? {};
-  const memoizedCreds = React.useMemo(() => ({ methodType, token, error }), [
-    methodType,
-    token,
-    error
-  ]);
-  return memoizedCreds;
 }
 
 // check for clever credentials
-function lookForCleverCredentials(): CredentialResult {
+function lookForCleverCredentials(): AuthCredentials | undefined {
   if (!IS_SERVER) {
     const accessTokenKey = "access_token=";
-    const errorKey = "error=";
     if (window?.location?.hash) {
       if (window.location.hash.indexOf(accessTokenKey) !== -1) {
         const hash = window.location.hash;
@@ -141,25 +116,15 @@ function lookForCleverCredentials(): CredentialResult {
           .split("&")[0];
         const token = `Bearer ${accessToken}`;
         return { token, methodType: OPDS1.CleverAuthType };
-      } else if (window.location.hash.indexOf(errorKey) !== -1) {
-        const hash = window.location.hash;
-        const errorStart = hash.indexOf(errorKey);
-        const error = hash.slice(errorStart + errorKey.length).split("&")[0];
-        const problemDetail = JSON.parse(
-          decodeURIComponent(error.replace(/\+/g, "%20"))
-        );
-        window.location.hash = "";
-        return {
-          error:
-            problemDetail?.title ?? "An unknown Clever Auth error occurred."
-        };
       }
     }
   }
 }
 
 // check for saml credentials
-function lookForSamlCredentials(router: NextRouter): CredentialResult {
+function lookForSamlCredentials(
+  router: NextRouter
+): AuthCredentials | undefined {
   const { access_token: samlAccessToken } = router.query;
   if (samlAccessToken) {
     // clear the browser query
