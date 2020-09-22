@@ -7,10 +7,6 @@ import userEvent from "@testing-library/user-event";
 import * as user from "components/context/UserContext";
 
 const useUserSpy = jest.spyOn(user, "default");
-/**
- *  - buttons trigger external when SAML or Clever
- *  - hides when you authenticate
- */
 
 const useDialogSpy = jest.spyOn(dialog, "useDialogState");
 const mockHide = jest.fn();
