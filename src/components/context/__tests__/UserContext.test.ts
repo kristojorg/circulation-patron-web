@@ -1,6 +1,12 @@
-import { getCredentials } from "../useAuth";
-import CleverAuthPlugin from "../../auth/cleverAuthPlugin";
 import { NextRouter } from "next/router";
+
+/**
+ * - calls fetch when a token is in the cookie
+ * - extracts and removes a token from the url
+ * - sign in sets a token and triggers a fetch
+ * - sign out clearns a token and clears data
+ * - status works properly
+ */
 
 describe("getCredentials", () => {
   const { location } = window;

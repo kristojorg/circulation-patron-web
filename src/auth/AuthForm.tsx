@@ -83,20 +83,6 @@ const AuthForm: React.FC = ({ children }) => {
   );
 };
 
-const Loading: React.FC = () => {
-  return (
-    <Stack
-      sx={{
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <LoadingIndicator size={18} />
-      <Text>Logging in...</Text>
-    </Stack>
-  );
-};
-
 /**
  * Renders a form if there is one, or a button, or tells
  * the user that the auth method is not supported.
