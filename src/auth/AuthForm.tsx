@@ -222,7 +222,7 @@ const Combobox: React.FC<{
     </div>
   );
 };
-("/");
+
 // there is no id on auth methods, so we have to use the type
 // or the href if it's saml
 function getIdForMethod(method: AppAuthMethod) {
