@@ -23,7 +23,7 @@ const AuthForm: React.FC = ({ children }) => {
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
   const { isAuthenticated } = useUser();
-
+  console.log(isAuthenticated);
   /**
    * If the user becomes authenticated, we can hide the form
    */

@@ -1,28 +1,25 @@
 import AuthForm from "auth/AuthForm";
 import { AppAuthMethod, OPDS1 } from "interfaces";
 import * as React from "react";
-import { render, fixtures, actions } from "test-utils";
+import { render, fixtures } from "test-utils";
 import * as dialog from "reakit/Dialog";
 import userEvent from "@testing-library/user-event";
+import * as user from "components/context/UserContext";
+
+const useUserSpy = jest.spyOn(user, "default");
 /**
- *  - renders properly
- *  - shows right format for number of methods
- *  - buttons allow selecting and going back
  *  - buttons trigger external when SAML or Clever
- *  - combobox allows selecting
- *  - handles no methods
  *  - hides when you authenticate
- *  - catches unauthenticated http request and shows overlay
  */
 
 const useDialogSpy = jest.spyOn(dialog, "useDialogState");
+const mockHide = jest.fn();
 useDialogSpy.mockReturnValue({
   visible: true,
   baseId: "id",
   animated: false,
-  modal: true
-  // eslint-disable-next-line camelcase
-  // unstable_idCountRef: React.create
+  modal: true,
+  hide: mockHide
 } as any);
 
 test("renders header and subheader", () => {
@@ -149,4 +146,23 @@ test("shows combobox with five auth methods configured", () => {
   expect(
     utils.getByRole("button", { name: "Login with SAML IdP 1" })
   ).toBeInTheDocument();
+});
+
+test("hides form when user becomes authenticated", async () => {
+  const utils = render(<AuthForm>child</AuthForm>, {
+    library: {
+      ...fixtures.libraryData,
+      authMethods: [fixtures.cleverAuthMethod]
+    }
+  });
+
+  // form is there
+  const loginButton = utils.getByRole("link", { name: "Log In with Clever" });
+  expect(loginButton).toBeInTheDocument();
+  expect(mockHide).toHaveBeenCalledTimes(0);
+
+  useUserSpy.mockReturnValueOnce({ isAuthenticated: true } as any);
+  utils.rerender(<AuthForm>child</AuthForm>);
+  // hide gets called
+  expect(mockHide).toHaveBeenCalledTimes(1);
 });
