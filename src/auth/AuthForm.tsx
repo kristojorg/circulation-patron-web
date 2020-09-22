@@ -34,7 +34,6 @@ const AuthForm: React.FC = ({ children }) => {
 
   /**
    * The options:
-   *  - We are authenticating the user, show a loading indicator
    *  - No auth methods available. Tell the user.
    *  - There is only one method. Show the form for that one.
    *  - There are 1-5 methods. Show a button for each.
@@ -83,28 +82,13 @@ const AuthForm: React.FC = ({ children }) => {
   );
 };
 
-const Loading: React.FC = () => {
-  return (
-    <Stack
-      sx={{
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <LoadingIndicator size={18} />
-      <Text>Logging in...</Text>
-    </Stack>
-  );
-};
-
 /**
  * Renders a form if there is one, or a button, or tells
  * the user that the auth method is not supported.
  */
 const SignInForm: React.FC<{
   method: AppAuthMethod;
-  goBackToSelection?: () => void;
-}> = ({ method, goBackToSelection: _ }) => {
+}> = ({ method }) => {
   switch (method.type) {
     case OPDS1.BasicAuthType:
       return <BasicAuthForm method={method} />;
