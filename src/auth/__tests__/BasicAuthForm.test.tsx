@@ -1,5 +1,5 @@
 import * as React from "react";
-import { fixtures, prettyDOM, render, waitFor } from "test-utils";
+import { fixtures, render, waitFor } from "test-utils";
 import BasicAuthForm from "auth/BasicAuthForm";
 import { OPDS1 } from "interfaces";
 import userEvent from "@testing-library/user-event";
