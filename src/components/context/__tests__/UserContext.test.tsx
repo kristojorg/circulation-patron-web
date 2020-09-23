@@ -48,15 +48,6 @@ beforeEach(() => {
     replace: jest.fn()
   } as any);
 });
-/**
- * - sign in sets a token and triggers a fetch
- * - status works properly
- *
- * - syncs cookies with internal state. IE a change:
- *    - flows to cookie
- *    - calls a rerender
- * - sets cookie scoped to library
- */
 
 test("fetches loans when credentials are present", () => {
   mockCookie.get.mockReturnValueOnce(str(credentials));
