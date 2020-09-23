@@ -2,7 +2,7 @@ import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, BookData, CollectionData } from "interfaces";
+import { AppAuthMethod, BookData } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 
