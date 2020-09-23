@@ -1,8 +1,8 @@
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
-import { fetchBook, fetchCollection } from "dataflow/opds1/fetch";
+import { fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, BookData, OPDS1 } from "interfaces";
+import { AppAuthMethod, BookData, CollectionData } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 
@@ -15,8 +15,9 @@ type UserState = {
   refetchLoans: () => void;
   signIn: (token: string, method: AppAuthMethod) => void;
   signOut: () => void;
-  borrowBook: (url: string) => Promise<BookData | OPDS1.ProblemDocument>;
+  setBook: (book: BookData) => void;
   error: any;
+  token?: string;
 };
 
 const UserContext = React.createContext<UserState | undefined>(undefined);
@@ -29,7 +30,7 @@ const UserContext = React.createContext<UserState | undefined>(undefined);
  * those change it will cause a refetch.
  */
 export const UserProvider: React.FC = ({ children }) => {
-  const { shelfUrl, slug, catalogUrl } = useLibraryContext();
+  const { shelfUrl, slug } = useLibraryContext();
   const { credentials, setCredentials, clearCredentials } = useCredentials(
     slug
   );
@@ -38,7 +39,7 @@ export const UserProvider: React.FC = ({ children }) => {
     credentials
       ? [shelfUrl, credentials?.token, credentials?.methodType]
       : null,
-    fetchCollection,
+    fetchLoans,
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
@@ -60,15 +61,10 @@ export const UserProvider: React.FC = ({ children }) => {
     clearCredentials();
     mutate();
   }
-  function borrowBook(url: string) {
-    try {
-      const book = await fetchBook(url, catalogUrl, credentials?.token);
-      mutate();
-      return book;
-    } catch (e) {
-      if (e instanceof ServerError) return e.info;
-      throw e;
-    }
+
+  function setBook(book: BookData) {
+    const newData: BookData[] = [...data, book];
+    mutate(newData);
   }
 
   /**
@@ -87,12 +83,13 @@ export const UserProvider: React.FC = ({ children }) => {
     status,
     isAuthenticated,
     isLoading,
-    loans: isAuthenticated ? data?.books ?? [] : undefined,
+    loans: isAuthenticated ? data ?? [] : undefined,
     refetchLoans: mutate,
     signIn,
     signOut,
     setBook,
-    error
+    error,
+    token: credentials?.token
   };
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 };
@@ -103,4 +100,11 @@ export default function useUser() {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;
+}
+
+// we only need the books out of a collection for loans,
+// so this is a utility to extract those.
+async function fetchLoans(url: string, token: string) {
+  const collection = await fetchCollection(url, token);
+  return collection.books;
 }

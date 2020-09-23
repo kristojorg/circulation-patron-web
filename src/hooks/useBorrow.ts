@@ -3,6 +3,8 @@ import { BookData, FulfillmentLink } from "interfaces";
 import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
+import { ServerError } from "errors";
+import useAuthFormContext from "auth/AuthFormCotext";
 
 export default function useBorrow(
   book: BookData,
@@ -10,9 +12,11 @@ export default function useBorrow(
   borrowLink: FulfillmentLink
 ) {
   const { catalogUrl } = useLibraryContext();
-  const { refetchLoans } = useUser();
+  const { setBook, token } = useUser();
+  const { showForm } = useAuthFormContext();
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | undefined>();
 
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
   const buttonLabel = isBorrow
@@ -24,12 +28,27 @@ export default function useBorrow(
 
   const borrowOrReserve = async (url: string) => {
     setLoading(true);
-    try {
-      await fetchBook(url, catalogUrl);
-      refetchLoans();
-    } catch (e) {
-      e?.info ? console.log(e.info) : console.log(e);
+    setError(undefined);
+    if (!token) {
+      // TODO: register a callback to call if the sign in works
+      showForm();
+      setError("You must be signed in to borrow this book.");
+      setLoading(false);
+      return;
     }
+    try {
+      const book = await fetchBook(url, catalogUrl, token);
+      setBook(book);
+    } catch (e) {
+      // TODO: Report error to bug catcher here.
+      if (e instanceof ServerError) {
+        console.log("ERR", e.info);
+        setError(e.info.detail);
+      } else {
+        setError("An error occurred while borrowing this book.");
+      }
+    }
+
     if (!isUnmounted.current) setLoading(false);
   };
 
@@ -44,6 +63,7 @@ export default function useBorrow(
     isLoading,
     loadingText,
     buttonLabel,
-    borrowOrReserve
+    borrowOrReserve,
+    error
   };
 }

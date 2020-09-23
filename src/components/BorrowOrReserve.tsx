@@ -11,11 +11,13 @@ const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
   borrowLink: FulfillmentLink;
 }> = ({ book, isBorrow, borrowLink }) => {
-  const { isLoading, loadingText, buttonLabel, borrowOrReserve } = useBorrow(
-    book,
-    isBorrow,
-    borrowLink
-  );
+  const {
+    isLoading,
+    loadingText,
+    buttonLabel,
+    borrowOrReserve,
+    error
+  } = useBorrow(book, isBorrow, borrowLink);
   return (
     <>
       <Button
@@ -26,7 +28,7 @@ const BorrowOrReserve: React.FC<{
       >
         <Text variant="text.body.bold">{buttonLabel}</Text>
       </Button>
-      {/* {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>} */}
+      {error && <Text sx={{ color: "ui.error" }}>Error: {error}</Text>}
     </>
   );
 };

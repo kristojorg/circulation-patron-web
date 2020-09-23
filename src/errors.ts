@@ -50,7 +50,7 @@ export class ServerError extends ApplicationError {
   info: OPDS1.ProblemDocument = {
     detail: "An unknown error server occurred.",
     title: "Server Error",
-    status: 
+    status: 418
   };
   authDocument?: OPDS1.AuthDocument;
 
@@ -68,7 +68,8 @@ export class ServerError extends ApplicationError {
       // we will construct our own problem document.
       this.info = {
         title: "No Authorized",
-        detail: "You are not authorized for the requested resource."
+        detail: "You are not authorized for the requested resource.",
+        status: 401
       };
       this.authDocument = details;
     } else if (isProblemDocument(details)) {

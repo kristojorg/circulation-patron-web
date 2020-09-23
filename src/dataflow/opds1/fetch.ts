@@ -87,9 +87,9 @@ export async function fetchCollection(
 export async function fetchBook(
   url: string,
   catalogUrl: string,
-  _token?: string
+  token?: string
 ): Promise<BookData> {
-  const entry = await fetchEntry(url);
+  const entry = await fetchEntry(url, token);
   const book = entryToBook(entry, catalogUrl);
   return book;
 }
