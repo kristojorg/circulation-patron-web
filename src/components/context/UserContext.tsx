@@ -58,6 +58,7 @@ export const UserProvider: React.FC = ({ children }) => {
     mutate();
   }
   function signOut() {
+    console.log("Signing out");
     clearCredentials();
     mutate();
   }
