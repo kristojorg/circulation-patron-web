@@ -119,7 +119,6 @@ function lookForCleverCredentials(
         const token = `Bearer ${accessToken}`;
 
         // clear the url hash
-        console.log("calling replace");
         router.replace(
           window.location.href.replace(window.location.hash, ""),
           undefined,
