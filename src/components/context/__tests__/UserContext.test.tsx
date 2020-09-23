@@ -1,12 +1,11 @@
 /* eslint-disable camelcase */
 import * as React from "react";
-import { AuthCredentials, BookData, CollectionData, OPDS1 } from "interfaces";
+import { AuthCredentials, BookData, OPDS1 } from "interfaces";
 import { act, fixtures, render, waitFor } from "test-utils";
 import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser from "components/context/UserContext";
 import * as fetch from "dataflow/opds1/fetch";
-import { sign } from "crypto";
 /**
  * This file tests both UserContext and useCredentials, as
  * the latter is only used within the former. It doesn't have
