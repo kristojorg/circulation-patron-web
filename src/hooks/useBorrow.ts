@@ -1,23 +1,19 @@
 import * as React from "react";
-import useTypedSelector from "./useTypedSelector";
-import { getErrorMsg } from "utils/book";
-import { useActions } from "owc/ActionsContext";
 import { BookData, FulfillmentLink } from "interfaces";
+import { fetchBook } from "dataflow/opds1/fetch";
+import useUser from "components/context/UserContext";
+import useLibraryContext from "components/context/LibraryContext";
 
 export default function useBorrow(
   book: BookData,
   isBorrow: boolean,
   borrowLink: FulfillmentLink
 ) {
+  const { catalogUrl } = useLibraryContext();
+  const { refetchLoans } = useUser();
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
-  const bookError = useTypedSelector(state => state.book?.error);
-  const errorStr = getErrorMsg(bookError);
-  const errorMsg =
-    book.url && bookError && bookError.url.startsWith(book.url)
-      ? errorStr
-      : undefined;
-  const { actions, dispatch } = useActions();
+
   const loadingText = isBorrow ? "Borrowing..." : "Reserving...";
   const buttonLabel = isBorrow
     ? borrowLink.indirectType ===
@@ -28,7 +24,12 @@ export default function useBorrow(
 
   const borrowOrReserve = async (url: string) => {
     setLoading(true);
-    await dispatch(actions.updateBook(url));
+    try {
+      await fetchBook(url, catalogUrl);
+      refetchLoans();
+    } catch (e) {
+      e?.info ? console.log(e.info) : console.log(e);
+    }
     if (!isUnmounted.current) setLoading(false);
   };
 
@@ -43,7 +44,6 @@ export default function useBorrow(
     isLoading,
     loadingText,
     buttonLabel,
-    borrowOrReserve,
-    errorMsg
+    borrowOrReserve
   };
 }

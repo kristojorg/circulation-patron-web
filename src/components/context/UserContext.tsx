@@ -1,8 +1,8 @@
 import useCredentials from "auth/useCredentials";
 import useLibraryContext from "components/context/LibraryContext";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import { fetchBook, fetchCollection } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
-import { AppAuthMethod, BookData } from "interfaces";
+import { AppAuthMethod, BookData, OPDS1 } from "interfaces";
 import * as React from "react";
 import useSWR from "swr";
 
@@ -12,11 +12,10 @@ type UserState = {
   status: Status;
   isAuthenticated: boolean;
   isLoading: boolean;
-  refetch: () => void;
+  refetchLoans: () => void;
   signIn: (token: string, method: AppAuthMethod) => void;
   signOut: () => void;
-  // manually sets a book in the loans. For use after borrowing.
-  setBook: (book: BookData) => void;
+  borrowBook: (url: string) => Promise<BookData | OPDS1.ProblemDocument>;
   error: any;
 };
 
@@ -30,7 +29,7 @@ const UserContext = React.createContext<UserState | undefined>(undefined);
  * those change it will cause a refetch.
  */
 export const UserProvider: React.FC = ({ children }) => {
-  const { shelfUrl, slug } = useLibraryContext();
+  const { shelfUrl, slug, catalogUrl } = useLibraryContext();
   const { credentials, setCredentials, clearCredentials } = useCredentials(
     slug
   );
@@ -61,23 +60,14 @@ export const UserProvider: React.FC = ({ children }) => {
     clearCredentials();
     mutate();
   }
-  function setBook(book: BookData) {
-    /**
-     * If there is already some loan data, add the new checked out
-     * book to the cache manually, and don't refetch loans.
-     * If there is no loan data yet, just call mutate to trigger a
-     * fresh refetch
-     */
-    if (data) {
-      mutate(
-        {
-          ...data,
-          books: [...data?.books, book]
-        },
-        false
-      );
-    } else {
+  function borrowBook(url: string) {
+    try {
+      const book = await fetchBook(url, catalogUrl, credentials?.token);
       mutate();
+      return book;
+    } catch (e) {
+      if (e instanceof ServerError) return e.info;
+      throw e;
     }
   }
 
@@ -98,7 +88,7 @@ export const UserProvider: React.FC = ({ children }) => {
     isAuthenticated,
     isLoading,
     loans: isAuthenticated ? data?.books ?? [] : undefined,
-    refetch: mutate,
+    refetchLoans: mutate,
     signIn,
     signOut,
     setBook,
