@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { DialogStateReturn, DialogBackdrop, Dialog } from "reakit";
-import Close from "icons/Close";
+import { Icon, IconNames } from "@nypl/design-system-react-components";
 import Button from "components/Button";
 
 export const modalButtonStyles = {
@@ -84,7 +84,11 @@ const Modal: React.FC<ModalProps> = ({
             onClick={hide}
             sx={{ position: "absolute", top: 2, right: 2 }}
           >
-            <Close sx={{ fontSize: 18 }} />
+            <Icon
+              decorative={false}
+              name={IconNames.close}
+              sx={{ fontSize: 18 }}
+            />
           </Button>
         )}
         {children}
