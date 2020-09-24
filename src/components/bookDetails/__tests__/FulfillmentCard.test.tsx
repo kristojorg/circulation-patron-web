@@ -27,7 +27,7 @@ const loadingBorrowState = {
 };
 
 describe("open-access", () => {
-  test.only("correct title and subtitle when not loaned", () => {
+  test("correct title and subtitle when not loaned", () => {
     const utils = render(<FulfillmentCard book={fixtures.book} />);
     expect(
       utils.getByText("This open-access book is available to keep forever.")
