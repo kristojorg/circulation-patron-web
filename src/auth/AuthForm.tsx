@@ -229,7 +229,11 @@ function getMethodForId(
   authMethods: AppAuthMethod[],
   id: string
 ): AppAuthMethod | undefined {
-  return authMethods.find(method => method.type === id || method.href === id);
+  return authMethods.find(
+    method =>
+      method.type === id ||
+      (method.type === OPDS1.SamlAuthType && method.href === id)
+  );
 }
 
 export default AuthForm;
