@@ -26,7 +26,7 @@ const credentials: AuthCredentials = {
 
 const str = JSON.stringify;
 
-function expectFetchWithToken(token: string, type: string) {
+function expectFetchWithToken(token: string) {
   expect(fetch.fetchCollection).toHaveBeenCalledWith("/shelf-url", token);
 }
 
@@ -54,7 +54,7 @@ test("fetches loans when credentials are present", () => {
   renderUserContext();
 
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken(credentials.token, OPDS1.BasicAuthType);
+  expectFetchWithToken(credentials.token);
 });
 
 test("does not fetch loans if no credentials are present", () => {
@@ -79,7 +79,7 @@ test("extracts clever tokens from the url", () => {
     str({ token: "Bearer fry6H3", methodType: OPDS1.CleverAuthType })
   );
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken("Bearer fry6H3", OPDS1.CleverAuthType);
+  expectFetchWithToken("Bearer fry6H3");
 
   // mock the router
   expect(mockReplace).toHaveBeenCalledTimes(1);
@@ -104,7 +104,7 @@ test("extracts SAML tokens from the url", () => {
   );
 
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken("Bearer saml-token", OPDS1.SamlAuthType);
+  expectFetchWithToken("Bearer saml-token");
 
   expect(mockReplace).toHaveBeenCalledWith(
     "http://test-domain.com/",
@@ -128,7 +128,7 @@ test("sign out clears cookies and data", async () => {
 
   // make sure fetch was called and you have the right data
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken(credentials.token, OPDS1.BasicAuthType);
+  expectFetchWithToken(credentials.token);
   await waitFor(() => expect(extractedLoans).toHaveLength(1));
 
   // now sign out
