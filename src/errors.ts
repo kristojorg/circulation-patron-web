@@ -67,7 +67,8 @@ export class ServerError extends ApplicationError {
       // we will construct our own problem document.
       this.info = {
         title: "No Authorized",
-        detail: "You are not authorized for the requested resource."
+        detail: "You are not authorized for the requested resource.",
+        status: 401
       };
       this.authDocument = details;
     } else if (isProblemDocument(details)) {
