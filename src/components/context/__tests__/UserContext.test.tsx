@@ -27,7 +27,7 @@ const credentials: AuthCredentials = {
 const str = JSON.stringify;
 
 function expectFetchWithToken(token: string, type: string) {
-  expect(fetch.fetchCollection).toHaveBeenCalledWith("/shelf-url", token, type);
+  expect(fetch.fetchCollection).toHaveBeenCalledWith("/shelf-url", token);
 }
 
 const useRouterSpy = jest.spyOn(router, "useRouter");
