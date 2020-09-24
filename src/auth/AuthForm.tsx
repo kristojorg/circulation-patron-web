@@ -74,7 +74,7 @@ const AuthForm: React.FC = ({ children }) => {
       {/* We render this to provide the dialog a focus target after it closes
           even though we don't open the dialog with a button
       */}
-      <DialogDisclosure sx={{ display: "none" }} {...dialog} />
+      {/* <DialogDisclosure sx={{ display: "none" }} {...dialog} /> */}
       <AuthFormProvider showForm={dialog.show}>{children}</AuthFormProvider>
     </React.Fragment>
   );
