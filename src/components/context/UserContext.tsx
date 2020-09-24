@@ -34,6 +34,7 @@ export const UserProvider: React.FC = ({ children }) => {
   const { credentials, setCredentials, clearCredentials } = useCredentials(
     slug
   );
+  console.log(credentials);
   const { data, mutate, isValidating, error } = useSWR(
     // pass null if there are no credentials to tell SWR not to fetch at all.
     credentials
@@ -63,7 +64,8 @@ export const UserProvider: React.FC = ({ children }) => {
   }
 
   function setBook(book: BookData) {
-    const newData: BookData[] = [...data, book];
+    const existing = data ?? [];
+    const newData: BookData[] = [...existing, book];
     mutate(newData);
   }
 

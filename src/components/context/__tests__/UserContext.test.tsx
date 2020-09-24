@@ -6,6 +6,8 @@ import Cookie from "js-cookie";
 import * as router from "next/router";
 import useUser from "components/context/UserContext";
 import * as fetch from "dataflow/opds1/fetch";
+import mockAuthStateOnce, { creds } from "test-utils/mockAuthState";
+import mockAuthenticatedOnce from "test-utils/mockAuthState";
 /**
  * This file tests both UserContext and useCredentials, as
  * the latter is only used within the former. It doesn't have
@@ -17,18 +19,13 @@ import * as fetch from "dataflow/opds1/fetch";
 const mockedFetchCollection = fetch.fetchCollection as jest.MockedFunction<
   typeof fetch.fetchCollection
 >;
-const mockCookie = Cookie as any;
-
-const credentials: AuthCredentials = {
-  token: "some-token",
-  methodType: OPDS1.BasicAuthType
-};
-
-const str = JSON.stringify;
 
 function expectFetchWithToken(token: string) {
   expect(fetch.fetchCollection).toHaveBeenCalledWith("/shelf-url", token);
 }
+
+const str = JSON.stringify;
+const mockCookie = Cookie as any;
 
 const useRouterSpy = jest.spyOn(router, "useRouter");
 
@@ -50,15 +47,15 @@ beforeEach(() => {
 });
 
 test("fetches loans when credentials are present", () => {
-  mockCookie.get.mockReturnValueOnce(str(credentials));
+  mockAuthenticatedOnce();
   renderUserContext();
 
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken(credentials.token);
+  expectFetchWithToken(creds.token);
 });
 
 test("does not fetch loans if no credentials are present", () => {
-  mockCookie.get.mockReturnValueOnce(str(null));
+  mockAuthenticatedOnce(null);
   renderUserContext();
   expect(fetchMock).toHaveBeenCalledTimes(0);
 });
@@ -114,7 +111,7 @@ test("extracts SAML tokens from the url", () => {
 });
 
 test("sign out clears cookies and data", async () => {
-  mockCookie.get.mockReturnValueOnce(str(credentials));
+  mockAuthenticatedOnce();
   mockedFetchCollection.mockResolvedValue(fixtures.loans);
   let extractedSignOut: any = null;
   let extractedLoans: BookData[] | undefined = undefined;
@@ -128,7 +125,7 @@ test("sign out clears cookies and data", async () => {
 
   // make sure fetch was called and you have the right data
   expect(fetch.fetchCollection).toHaveBeenCalledTimes(1);
-  expectFetchWithToken(credentials.token);
+  expectFetchWithToken(creds.token);
   await waitFor(() => expect(extractedLoans).toHaveLength(1));
 
   // now sign out
@@ -145,7 +142,7 @@ test("sign out clears cookies and data", async () => {
 });
 
 test("sign in sets cookie", () => {
-  mockCookie.get.mockReturnValueOnce(str(credentials));
+  mockAuthenticatedOnce();
   let extractedSignIn: any = null;
   function Extractor() {
     const { signIn } = useUser();
