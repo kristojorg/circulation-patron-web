@@ -2,19 +2,7 @@ import * as React from "react";
 import { render, fixtures, fireEvent } from "test-utils";
 import { MyBooks } from "../MyBooks";
 import { BookData } from "interfaces";
-import * as user from "components/context/UserContext";
-
-const useUserSpy = jest.spyOn(user, "default");
-
-function mockUser(
-  data: Partial<ReturnType<typeof user.default>> = {
-    isAuthenticated: true,
-    loans: [],
-    isLoading: false
-  }
-) {
-  useUserSpy.mockReturnValue(data as any);
-}
+import mockUser from "test-utils/mockUser";
 
 test("shows message and button when not authenticated", () => {
   const utils = render(<MyBooks />);
