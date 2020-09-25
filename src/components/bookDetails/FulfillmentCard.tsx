@@ -9,7 +9,7 @@ import {
   bookIsAudiobook
 } from "utils/book";
 import Button, { NavButton } from "../Button";
-import useDownloadButton from "owc/hooks/useDownloadButton";
+import useDownloadButton from "hooks/useDownloadButton";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -21,7 +21,7 @@ import useIsBorrowed from "hooks/useIsBorrowed";
 import {
   NEXT_PUBLIC_COMPANION_APP,
   NEXT_PUBLIC_AXIS_NOW_DECRYPT
-} from "../../utils/env";
+} from "utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
 import { BookData, MediaLink } from "interfaces";
 

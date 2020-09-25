@@ -1,6 +1,6 @@
 import { MediaLink, FulfillmentLink, OPDS1 } from "interfaces";
 import download from "downloadjs";
-import { generateFilename, typeMap } from "../utils/file";
+import { generateFilename, typeMap } from "../owc/utils/file";
 import { useActions } from "owc/ActionsContext";
 
 export function fixMimeType(
