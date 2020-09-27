@@ -8,7 +8,7 @@ import {
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import Button, { NavButton } from "../Button";
+import Button, { AnchorButton, NavButton } from "../Button";
 import useDownloadButton from "hooks/useDownloadButton";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
@@ -23,7 +23,8 @@ import {
   NEXT_PUBLIC_AXIS_NOW_DECRYPT
 } from "utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { BookData, MediaLink } from "interfaces";
+import { BookData, FulfillmentLink, MediaLink } from "interfaces";
+import { getFulfillmentProtocol } from "utils/fulfill";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -257,23 +258,42 @@ const AccessCard: React.FC<{
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
             {dedupedLinks.map(link => {
-              //Only AxisNow files can be read online, and all of those are encrypted.
-              if (
-                NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
-                NEXT_PUBLIC_AXIS_NOW_DECRYPT &&
-                link.type === "application/vnd.librarysimplified.axisnow+json"
-              ) {
-                return <ReadOnlineButton key={link.url} link={link} />;
-              }
-              return (
-                <DownloadButton key={link.url} link={link} title={title} />
-              );
+              return <FulfillButton link={link} key={link.url} title={title} />;
+              // //Only AxisNow files can be read online, and all of those are encrypted.
+              // if (
+              //   NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
+              //   NEXT_PUBLIC_AXIS_NOW_DECRYPT &&
+              //   link.type === "application/vnd.librarysimplified.axisnow+json"
+              // ) {
+              //   return <ReadOnlineButton key={link.url} link={link} />;
+              // }
+              // return (
+              //   <DownloadButton key={link.url} link={link} title={title} />
+              // );
             })}
           </Stack>
         </Stack>
       )}
     </>
   );
+};
+
+const FulfillButton: React.FC<{ link: MediaLink; title: string }> = ({
+  link,
+  title
+}) => {
+  const protocol = getFulfillmentProtocol(link);
+
+  switch (protocol.type) {
+    case "download":
+      return <DownloadButton protocol={protocol} title={title} />;
+    case "read-external":
+      return <div>Read external</div>;
+    case "read-internal":
+      return <ReadOnlineButton link={link} />;
+    case "unsupported":
+      return null;
+  }
 };
 
 const ReadOnlineButton: React.FC<{

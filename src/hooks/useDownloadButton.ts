@@ -47,6 +47,8 @@ export default function useDownloadButton(
   const fileExtension = typeMap[mimeTypeValue]?.extension ?? "";
 
   const fulfill = async () => {
+    const protocol = getFulfillmentProtocol(link);
+
     if (isReadOnlineLink(link)) {
       const action = actions.indirectFulfillBook(link.url, link.indirectType);
       const url = await dispatch(action);

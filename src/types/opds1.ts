@@ -32,21 +32,27 @@ export const HTMLMediaType = "text/html";
 export const AuthDocMediaType = "application/opds-authentication+json";
 
 /**
- * Book media types
+ * Indirect acquisition link types
+ * These are the types of links that might wrap a direct
+ * acquisition link.
  */
+export const OPDSEntryMediaType =
+  "application/atom+xml;type=entry;profile=opds-catalog";
+export const AdeptMediaType = "application/vnd.adobe.adept+xml";
 
+/**
+ * Direct acquisition link types
+ * These are the final types that resources can be.
+ */
 export const EpubMediaType = "application/epub+zip";
 export const KepubMediaType = "application/kepub+zip";
 export const PdfMediaType = "application/pdf";
-export const AdeptMediaType = "application/vnd.adobe.adept+xml";
 export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
 export const MobiPocketMediaType = "application/x-mobipocket-ebook";
 export const Mobi8Mediatype = "application/x-mobi8-ebook";
 export const AudiobookMediaType = "application/audiobook+json";
-export const AtomMediaType =
+export const ExternalReaderMediaType =
   'text/html;profile="http://librarysimplified.org/terms/profiles/streaming-media"';
-export const AtomXmlMediaType =
-  "application/atom+xml;type=entry;profile=opds-catalog";
 export const OverdriveAudiobookMediaType =
   "application/vnd.overdrive.circulation.api+json;profile=audiobook";
 export const OverdriveEbookMediaType =
@@ -55,7 +61,7 @@ export const AxisNowWebpubMediaType =
   "application/vnd.librarysimplified.axisnow+json";
 
 export type ReadOnlineMediaType =
-  | typeof AtomMediaType
+  | typeof ExternalReaderMediaType
   | typeof AxisNowWebpubMediaType;
 
 export type AnyBookMediaType =
@@ -68,7 +74,7 @@ export type AnyBookMediaType =
   | typeof MobiPocketMediaType
   | typeof Mobi8Mediatype
   | typeof AudiobookMediaType
-  | typeof AtomXmlMediaType
+  | typeof OPDSEntryIndirectMediaType
   | typeof OverdriveAudiobookMediaType
   | typeof OverdriveEbookMediaType;
 
