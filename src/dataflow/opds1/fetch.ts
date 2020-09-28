@@ -4,7 +4,7 @@ import { BookData, CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
 import { entryToBook } from "owc/OPDSDataAdapter";
 import fetchWithHeaders from "dataflow/fetch";
-import parseSearchData from "owc/OpenSearchDescriptionParser";
+import parseSearchData from "dataflow/opds1/parseSearchData";
 
 const parser = new OPDSParser();
 /**
