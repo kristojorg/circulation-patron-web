@@ -1,7 +1,6 @@
 import * as React from "react";
 import { LibraryData } from "interfaces";
 import { LibraryProvider } from "./LibraryContext";
-import { RecommendationsProvider } from "./RecommendationsContext";
 import { Provider as ReakitProvider } from "reakit";
 import { ThemeProvider } from "theme-ui";
 import makeTheme from "../../theme";
@@ -21,15 +20,13 @@ const AppContextProvider: React.FC<ProviderProps> = ({ children, library }) => {
   return (
     <ThemeProvider theme={theme}>
       <ReakitProvider>
-        <RecommendationsProvider>
-          <LibraryProvider library={library}>
-            <LinkUtilsProvider library={library}>
-              <UserProvider>
-                <AuthModal>{children}</AuthModal>
-              </UserProvider>
-            </LinkUtilsProvider>
-          </LibraryProvider>
-        </RecommendationsProvider>
+        <LibraryProvider library={library}>
+          <LinkUtilsProvider library={library}>
+            <UserProvider>
+              <AuthModal>{children}</AuthModal>
+            </UserProvider>
+          </LinkUtilsProvider>
+        </LibraryProvider>
       </ReakitProvider>
     </ThemeProvider>
   );

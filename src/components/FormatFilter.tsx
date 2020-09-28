@@ -5,6 +5,7 @@ import FormLabel from "./form/FormLabel";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
 import Select from "./Select";
+import useCollection from "hooks/useCollection";
 
 /**
  * This filter depends on the "Formats" facetGroup, which should have
@@ -15,14 +16,13 @@ import Select from "./Select";
  * labels must match the spelling and capitalization exactly.
  */
 const FormatFilter: React.FC = () => {
+  const { collection } = useCollection();
+
   const { buildCollectionLink } = useLinkUtils();
-  const isCollectionLoaded = useTypedSelector(
-    state => !!state.collection.data && !state.collection.isFetching
-  );
-  const formatFacetGroup = useTypedSelector(state =>
-    state.collection.data?.facetGroups?.find(
-      facetGroup => facetGroup.label === "Formats"
-    )
+  const isCollectionLoaded = false;
+
+  const formatFacetGroup = collection?.facetGroups?.find(
+    facetGroup => facetGroup.label === "Formats"
   );
 
   const ebookFacet = formatFacetGroup?.facets.find(

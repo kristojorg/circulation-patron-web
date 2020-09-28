@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useBreadCrumbs from "../hooks/useBreadcrumbs";
 import Link from "./Link";
 import List, { ListItem } from "./List";
 
@@ -9,7 +8,7 @@ const BreadcrumbBar: React.FC<{
   className?: string;
   currentLocation?: string;
 }> = ({ children, className, currentLocation }) => {
-  const breadcrumbs = useBreadCrumbs();
+  const breadcrumbs = [];
   const breadcrumbsWithAtLeastOne =
     breadcrumbs.length > 0 ? breadcrumbs : [{ text: " ", url: " " }];
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;

@@ -7,27 +7,13 @@ import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
-import useSWR from "swr";
-import useLibraryContext from "components/context/LibraryContext";
-import { useRouter } from "next/router";
-import extractParam from "dataflow/utils";
-import { fetchCollection } from "dataflow/opds1/fetch";
+import useCollection from "hooks/useCollection";
 
 export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
-  const { catalogUrl } = useLibraryContext();
-  const { query } = useRouter();
-  const collectionUrlParam = extractParam(query, "collectionUrl");
-  // use catalog url if you're at home
-  const collectionUrl = decodeURIComponent(collectionUrlParam ?? catalogUrl);
+  const { collection, isLoading } = useCollection();
 
-  const { data: collection, isValidating } = useSWR(
-    collectionUrl,
-    fetchCollection
-  );
-
-  const isLoading = !collection && isValidating;
   const hasLanes = collection?.lanes && collection.lanes.length > 0;
   const hasBooks = collection?.books && collection.books.length > 0;
   const pageTitle = title ?? `Collection: ${collection?.title ?? ""}`;

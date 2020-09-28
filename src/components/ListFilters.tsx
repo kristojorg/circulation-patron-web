@@ -1,10 +1,10 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useTypedSelector from "../hooks/useTypedSelector";
 import Select, { Label } from "./Select";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
+import useCollection from "hooks/useCollection";
 
 /**
  * This filter depends on the "Sort by" and "Availability" facet groups.
@@ -20,11 +20,11 @@ const ListFilters: React.FC = () => {
 };
 
 const FacetSelector: React.FC<{ facetLabel: string }> = ({ facetLabel }) => {
-  const facetGroup = useTypedSelector(state =>
-    state.collection.data?.facetGroups?.find(
-      facetGroup => facetGroup.label === facetLabel
-    )
+  const { collection } = useCollection();
+  const facetGroup = collection?.facetGroups?.find(
+    facetGroup => facetGroup.label === facetLabel
   );
+
   const linkUtils = useLinkUtils();
   if (!facetGroup) return null;
 
