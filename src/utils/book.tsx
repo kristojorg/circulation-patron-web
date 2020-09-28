@@ -38,16 +38,6 @@ export function queueString(book: BookData) {
   return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
 }
 
-export function dedupeLinks<T extends MediaLink>(links: T[]) {
-  return links.reduce<T[]>((uniqueArr, current) => {
-    const isDup = uniqueArr.find(
-      uniqueLink => uniqueLink.type === current.type
-    );
-
-    return isDup ? uniqueArr : [...uniqueArr, current];
-  }, []);
-}
-
 function hasBorrowRelation(book: BookData) {
   return typeof book.borrowUrl === "string";
 }

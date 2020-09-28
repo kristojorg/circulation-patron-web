@@ -1,4 +1,4 @@
-import { MediaLink, FulfillmentLink, OPDS1 } from "interfaces";
+import { MediaLink, OPDS1 } from "interfaces";
 import download from "downloadjs";
 import { generateFilename, typeMap } from "../owc/utils/file";
 import { useActions } from "owc/ActionsContext";
@@ -11,9 +11,7 @@ export function fixMimeType(
     : mimeType;
 }
 
-function isReadOnlineLink(
-  link: MediaLink | FulfillmentLink
-): link is FulfillmentLink {
+function isReadOnlineLink(link: MediaLink) {
   return (
     (link.type === "application/atom+xml;type=entry;profile=opds-catalog" &&
       (link as FulfillmentLink).indirectType === OPDS1.AtomMediaType) ||
@@ -30,7 +28,7 @@ type DownloadDetails = {
 };
 
 export default function useDownloadButton(
-  link: MediaLink | FulfillmentLink | undefined,
+  link: MediaLink | undefined,
   title: string
 ): DownloadDetails | null {
   const { actions, dispatch } = useActions();

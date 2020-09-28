@@ -51,6 +51,11 @@ export const AdeptMediaType = "application/vnd.adobe.adept+xml";
 // there was an issue with incorrect Adept media types being sent.
 export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
 
+export type IndirectAcquisitionType =
+  | typeof OPDSEntryMediaType
+  | typeof AdeptMediaType
+  | typeof IncorrectAdeptMediaType;
+
 /**
  * Direct Acquisition Types
  * These are the final types that resources can be.
@@ -72,21 +77,18 @@ export const AxisNowWebpubMediaType =
 
 export type ReadOnlineMediaType =
   | typeof ExternalReaderMediaType
-  | typeof AxisNowWebpubMediaType;
+  | typeof AxisNowWebpubMediaType
+  | typeof OverdriveEbookMediaType;
 
 export type AnyBookMediaType =
   | ReadOnlineMediaType
   | typeof EpubMediaType
   | typeof KepubMediaType
   | typeof PdfMediaType
-  | typeof AdeptMediaType
-  | typeof IncorrectAdeptMediaType
   | typeof MobiPocketMediaType
   | typeof Mobi8Mediatype
   | typeof AudiobookMediaType
-  | typeof OPDSEntryIndirectMediaType
-  | typeof OverdriveAudiobookMediaType
-  | typeof OverdriveEbookMediaType;
+  | typeof OverdriveAudiobookMediaType;
 
 export type AnyMediaType =
   | AnyBookMediaType

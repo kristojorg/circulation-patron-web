@@ -3,13 +3,11 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import {
   getFulfillmentState,
-  dedupeLinks,
   availabilityString,
   queueString,
   bookIsAudiobook
 } from "utils/book";
-import Button, { AnchorButton, NavButton } from "../Button";
-import useDownloadButton from "hooks/useDownloadButton";
+import Button, { NavButton } from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -18,13 +16,20 @@ import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
-import {
-  NEXT_PUBLIC_COMPANION_APP,
-  NEXT_PUBLIC_AXIS_NOW_DECRYPT
-} from "utils/env";
+import { NEXT_PUBLIC_COMPANION_APP } from "utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { BookData, FulfillmentLink, MediaLink } from "interfaces";
-import { getFulfillmentProtocol } from "utils/fulfill";
+import { BookData, MediaLink } from "interfaces";
+import {
+  dedupeLinks,
+  DownloadDetails,
+  getFulfillmentDetails,
+  ReadExternalDetails,
+  ReadInternalDetails
+} from "utils/fulfill";
+import downloadFile from "dataflow/download";
+import ApplicationError, { ServerError } from "errors";
+import useUser from "components/context/UserContext";
+import useLibraryContext from "components/context/LibraryContext";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -199,7 +204,6 @@ const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
       <Button size="lg" disabled aria-label="Reserved" role="button">
         <Text variant="text.body.bold">Reserved</Text>
       </Button>
-      {/* {errorMsg && <Text sx={{ color: "ui.error" }}>Error: {errorMsg}</Text>} */}
     </>
   );
 };
@@ -236,6 +240,7 @@ const AccessCard: React.FC<{
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
   const dedupedLinks = dedupeLinks(links);
+  const fulfillments = dedupedLinks.map(getFulfillmentDetails);
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
@@ -257,19 +262,27 @@ const AccessCard: React.FC<{
             If you would rather read on your computer, you can:
           </Text>
           <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
-            {dedupedLinks.map(link => {
-              return <FulfillButton link={link} key={link.url} title={title} />;
-              // //Only AxisNow files can be read online, and all of those are encrypted.
-              // if (
-              //   NEXT_PUBLIC_COMPANION_APP === "openebooks" &&
-              //   NEXT_PUBLIC_AXIS_NOW_DECRYPT &&
-              //   link.type === "application/vnd.librarysimplified.axisnow+json"
-              // ) {
-              //   return <ReadOnlineButton key={link.url} link={link} />;
-              // }
-              // return (
-              //   <DownloadButton key={link.url} link={link} title={title} />
-              // );
+            {fulfillments.map(details => {
+              switch (details.type) {
+                case "download":
+                  return (
+                    <DownloadButton
+                      details={details}
+                      title={title}
+                      key={details.url}
+                    />
+                  );
+                case "read-online-internal":
+                  return (
+                    <ReadOnlineInternal details={details} key={details.url} />
+                  );
+                case "read-online-external":
+                  return (
+                    <ReadOnlineExternal details={details} key={details.id} />
+                  );
+                case "unsupported":
+                  return null;
+              }
             })}
           </Stack>
         </Stack>
@@ -278,34 +291,63 @@ const AccessCard: React.FC<{
   );
 };
 
-const FulfillButton: React.FC<{ link: MediaLink; title: string }> = ({
-  link,
-  title
+const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
+  details
 }) => {
-  const protocol = getFulfillmentProtocol(link);
-
-  switch (protocol.type) {
-    case "download":
-      return <DownloadButton protocol={protocol} title={title} />;
-    case "read-external":
-      return <div>Read external</div>;
-    case "read-internal":
-      return <ReadOnlineButton link={link} />;
-    case "unsupported":
-      return null;
+  const { catalogUrl } = useLibraryContext();
+  const { token } = useUser();
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<null | string>(null);
+  async function open() {
+    setLoading(true);
+    setError(null);
+    try {
+      // the url may be behind indirection, so we fetch it with the
+      // provided function
+      const url = await details.getUrl(catalogUrl, token);
+      setLoading(false);
+      window.open(url, "__blank");
+    } catch (e) {
+      setLoading(false);
+      if (e instanceof ServerError) {
+        setError(`Error: ${e.info.detail}`);
+        return;
+      }
+      if (e instanceof Error) {
+        setError(`Error: ${e.message}`);
+        return;
+      }
+      console.error(e);
+      setError("An unknown error occurred trying to open the book");
+    }
   }
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        color="ui.gray.extraDark"
+        iconLeft={SvgExternalLink}
+        onClick={open}
+        loading={loading}
+        loadingText="Opening..."
+      >
+        {details.buttonLabel}
+      </Button>
+      {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
+    </>
+  );
 };
 
-const ReadOnlineButton: React.FC<{
-  link: MediaLink;
-}> = ({ link }) => {
-  const readerLink = `/read/${encodeURIComponent(link.url)}`;
+const ReadOnlineInternal: React.FC<{
+  details: ReadInternalDetails;
+}> = ({ details }) => {
   return (
     <NavButton
       variant="ghost"
       color="ui.gray.extraDark"
       iconLeft={SvgExternalLink}
-      href={readerLink}
+      href={details.url}
     >
       Read Online
     </NavButton>
@@ -313,21 +355,45 @@ const ReadOnlineButton: React.FC<{
 };
 
 const DownloadButton: React.FC<{
-  link: MediaLink;
+  details: DownloadDetails;
   title: string;
-}> = ({ link, title }) => {
-  const downloadDetails = useDownloadButton(link, title);
-  if (!downloadDetails) return null;
-  const { fulfill, downloadLabel } = downloadDetails;
+}> = ({ details, title }) => {
+  const { buttonLabel } = details;
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const { token } = useUser();
+
+  async function fulfill() {
+    setLoading(true);
+    setError(null);
+    try {
+      await downloadFile(details.url, title, details.mediaType, token);
+    } catch (e) {
+      setLoading(false);
+      if (e instanceof ServerError) {
+        setError(`Error: ${e.info.detail}`);
+        return;
+      }
+      console.error(e);
+      setError(`Error: An unknown error occurred while downloading the file.`);
+    }
+    setLoading(false);
+  }
+
   return (
-    <Button
-      onClick={fulfill}
-      variant="ghost"
-      color="ui.gray.extraDark"
-      iconLeft={SvgDownload}
-    >
-      {downloadLabel}
-    </Button>
+    <>
+      <Button
+        onClick={fulfill}
+        variant="ghost"
+        color="ui.gray.extraDark"
+        iconLeft={SvgDownload}
+        loading={loading}
+        loadingText="Downloading..."
+      >
+        {buttonLabel}
+      </Button>
+      {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
+    </>
   );
 };
 
