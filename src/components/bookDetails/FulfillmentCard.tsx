@@ -26,10 +26,8 @@ import {
   ReadExternalDetails,
   ReadInternalDetails
 } from "utils/fulfill";
-import downloadFile from "dataflow/download";
-import { ServerError } from "errors";
-import useUser from "components/context/UserContext";
-import useLibraryContext from "components/context/LibraryContext";
+import useDownloadButton from "hooks/useDownloadButton";
+import useReadOnlineButton from "hooks/useReadOnlineButton";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -297,33 +295,7 @@ const AccessCard: React.FC<{
 const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
   details
 }) => {
-  const { catalogUrl } = useLibraryContext();
-  const { token } = useUser();
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<null | string>(null);
-  async function open() {
-    setLoading(true);
-    setError(null);
-    try {
-      // the url may be behind indirection, so we fetch it with the
-      // provided function
-      const url = await details.getUrl(catalogUrl, token);
-      setLoading(false);
-      window.open(url, "__blank");
-    } catch (e) {
-      setLoading(false);
-      if (e instanceof ServerError) {
-        setError(`Error: ${e.info.detail}`);
-        return;
-      }
-      if (e instanceof Error) {
-        setError(`Error: ${e.message}`);
-        return;
-      }
-      console.error(e);
-      setError("An unknown error occurred trying to open the book");
-    }
-  }
+  const { open, loading, error } = useReadOnlineButton(details);
 
   return (
     <>
@@ -362,31 +334,12 @@ const DownloadButton: React.FC<{
   title: string;
 }> = ({ details, title }) => {
   const { buttonLabel } = details;
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const { token } = useUser();
-
-  async function fulfill() {
-    setLoading(true);
-    setError(null);
-    try {
-      await downloadFile(details.url, title, details.mediaType, token);
-    } catch (e) {
-      setLoading(false);
-      if (e instanceof ServerError) {
-        setError(`Error: ${e.info.detail}`);
-        return;
-      }
-      console.error(e);
-      setError(`Error: An unknown error occurred while downloading the file.`);
-    }
-    setLoading(false);
-  }
+  const { download, error, loading } = useDownloadButton(details, title);
 
   return (
     <>
       <Button
-        onClick={fulfill}
+        onClick={download}
         variant="ghost"
         color="ui.gray.extraDark"
         iconLeft={SvgDownload}
