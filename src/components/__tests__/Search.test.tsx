@@ -1,41 +1,15 @@
 import * as React from "react";
-import { render, fixtures, fireEvent, actions } from "../../test-utils";
+import { render, fixtures, fireEvent } from "test-utils";
 import Search from "../Search";
-import merge from "deepmerge";
 import userEvent from "@testing-library/user-event";
-import { mockPush } from "../../test-utils/mockNextRouter";
-
-test("fetches search description", async () => {
-  const mockedFetchSearchDescription = jest.spyOn(
-    actions,
-    "fetchSearchDescription"
-  );
-  const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: {
-            url: "/search-url"
-          }
-        }
-      }
-    })
-  });
-
-  expect(mockedFetchSearchDescription).toHaveBeenCalledTimes(1);
-  expect(mockedFetchSearchDescription).toHaveBeenCalledWith("/search-url");
-  expect(utils.dispatch).toHaveBeenCalledTimes(1);
-});
+import { mockPush } from "test-utils/mockNextRouter";
 
 test("doesn't render if there is no searchData in the store", () => {
   const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: undefined
-        }
-      }
-    })
+    library: {
+      ...fixtures.libraryData,
+      searchData: null
+    }
   });
   expect(utils.container).toBeEmptyDOMElement();
 });
@@ -43,18 +17,15 @@ test("doesn't render if there is no searchData in the store", () => {
 test("searching calls history.push with url", async () => {
   const mockedTemplate = jest.fn().mockReturnValue("templatereturn");
   const utils = render(<Search />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        data: {
-          search: {
-            url: "/search-url",
-            searchData: {
-              template: mockedTemplate
-            }
-          }
-        }
+    library: {
+      ...fixtures.libraryData,
+      searchData: {
+        template: mockedTemplate,
+        description: "search desc",
+        shortName: "search shortname",
+        url: "/search-url"
       }
-    })
+    }
   });
   const searchButton = utils.getByText("Search");
   const input = utils.getByLabelText("Enter search keyword or keywords");
