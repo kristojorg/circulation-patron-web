@@ -19,7 +19,6 @@ import {
   LinkData,
   FacetGroupData,
   SearchData,
-  FulfillmentLink,
   MediaLink,
   OPDS1
 } from "interfaces";
@@ -46,7 +45,7 @@ const resolve = (base: string, relative: string) =>
   new URL(relative, base).toString();
 
 function buildFulfillmentLink(feedUrl: string) {
-  return (link: OPDSAcquisitionLink): FulfillmentLink | undefined => {
+  return (link: OPDSAcquisitionLink): MediaLink | undefined => {
     const indirects = link.indirectAcquisitions;
     const first = indirects[0];
     const indirectType = first?.type as string | undefined;
@@ -157,7 +156,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     borrowUrl = resolve(feedUrl, borrowLink.href);
   }
 
-  const allBorrowLinks: (FulfillmentLink | MediaLink)[] = entry.links
+  const allBorrowLinks: MediaLink[] = entry.links
     .filter(isAcquisitionLink)
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.BORROW_REL;
