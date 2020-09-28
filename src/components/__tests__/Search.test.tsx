@@ -4,7 +4,7 @@ import Search from "../Search";
 import userEvent from "@testing-library/user-event";
 import { mockPush } from "test-utils/mockNextRouter";
 
-test("doesn't render if there is no searchData in the store", () => {
+test("doesn't render if there is no searchData in the library context", () => {
   const utils = render(<Search />, {
     library: {
       ...fixtures.libraryData,
