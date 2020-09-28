@@ -1,17 +1,28 @@
 import * as React from "react";
 import Collection from "components/Collection";
-import { NextPage, GetServerSideProps } from "next";
+import { GetStaticPaths, InferGetStaticPropsType } from "next";
 import LayoutPage from "components/LayoutPage";
-import withAppProps, { AppProps } from "dataflow/withAppProps";
+import getStaticCollection from "dataflow/getStaticCollection";
 
-const CollectionPage: NextPage<AppProps> = ({ library, error }) => {
+export const getStaticProps = getStaticCollection;
+
+const CollectionPage = ({
+  library,
+  error,
+  collection
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <LayoutPage library={library} error={error}>
-      <Collection />
+      <Collection collection={collection} />
     </LayoutPage>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = withAppProps();
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: true
+  };
+};
 
 export default CollectionPage;

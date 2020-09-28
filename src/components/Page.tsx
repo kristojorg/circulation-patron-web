@@ -4,6 +4,8 @@ import getOrCreateStore from "../dataflow/getOrCreateStore";
 import Head from "next/head";
 import Error from "components/Error";
 import { AppProps } from "dataflow/withAppProps";
+import { useRouter } from "next/router";
+import { PageLoader } from "components/LoadingIndicator";
 
 /* Page without Header and Footer should wrap pages that should not have sitewide navigation */
 
@@ -11,6 +13,12 @@ const Page: React.FC<AppProps> = props => {
   /**
    * If there was no library or initialState provided, render the error page
    */
+
+  const isFallback = useRouter().isFallback;
+
+  if (isFallback) {
+    return <PageLoader />;
+  }
 
   if (props.error || !props.library) {
     return (

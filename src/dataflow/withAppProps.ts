@@ -1,6 +1,5 @@
 import { LibraryData, AppConfigFile } from "../interfaces";
-import { GetServerSideProps } from "next";
-import { ParsedUrlQuery } from "querystring";
+import { GetStaticProps } from "next";
 import {
   getCatalogRootUrl,
   fetchCatalog,
@@ -13,17 +12,7 @@ import { CONFIG_FILE } from "utils/env";
 import { getAuthDocHref } from "utils/auth";
 import { findSearchLink } from "dataflow/opds1/parse";
 import { fetchSearchData } from "dataflow/opds1/fetch";
-
-const getLibraryFromParams = (
-  query: ParsedUrlQuery | undefined
-): string | undefined => {
-  const libraryQuery: string | string[] | undefined = query?.library;
-  return libraryQuery
-    ? typeof libraryQuery === "string"
-      ? libraryQuery
-      : libraryQuery[0]
-    : undefined;
-};
+import extractParam from "dataflow/utils";
 
 export type AppProps = {
   library?: LibraryData;
@@ -35,9 +24,9 @@ export type AppProps = {
   configFile?: AppConfigFile | null;
 };
 
-export default function withAppProps(
-  pageGetServerSideProps?: GetServerSideProps
-): GetServerSideProps<AppProps> {
+export default function withAppProps<T>(
+  pageGetStaticProps?: (library: LibraryData) => GetStaticProps<T>
+): GetStaticProps<AppProps> {
   return async ctx => {
     /**
      * Determine the catalog url
@@ -45,22 +34,23 @@ export default function withAppProps(
      * Fetch the auth document provided in it
      */
     try {
-      const librarySlug = getLibraryFromParams(ctx.params);
+      const librarySlug = extractParam(ctx.params, "library");
       const catalogUrl = await getCatalogRootUrl(librarySlug);
       const catalog = await fetchCatalog(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);
       const authDocument = await fetchAuthDocument(authDocHref);
       const searchDataUrl = findSearchLink(catalog)?.href;
-      const searchData = await fetchSearchData(searchDataUrl);
+      // const searchData = await fetchSearchData(searchDataUrl);
       const library = buildLibraryData(
         authDocument,
         catalogUrl,
         librarySlug,
-        catalog,
-        searchData
+        catalog
       );
       // fetch the static props for the page
-      const pageResult = (await pageGetServerSideProps?.(ctx)) ?? { props: {} };
+      const pageResult = (await pageGetStaticProps?.(library)(ctx)) ?? {
+        props: {}
+      };
       return {
         ...pageResult,
         props: {
