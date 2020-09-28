@@ -27,21 +27,29 @@ import MediumIndicator from "components/MediumIndicator";
 import SimplyELogo from "components/SimplyELogo";
 import IosBadge from "components/storeBadges/IosBadge";
 import GooglePlayBadge from "components/storeBadges/GooglePlayBadge";
-
 import { NEXT_PUBLIC_COMPANION_APP } from "../../utils/env";
+import { useRouter } from "next/router";
+import extractParam from "dataflow/utils";
+import useSWR from "swr";
+import { fetchBook } from "dataflow/opds1/fetch";
+import useUser from "components/context/UserContext";
+import { ServerError } from "errors";
+import { ProblemDocument } from "types/opds1";
 
-export const BookDetails: React.FC<{
-  setCollectionAndBook: SetCollectionAndBook;
-}> = ({ setCollectionAndBook }) => {
-  // set the collection and book
-  useSetCollectionAndBook(setCollectionAndBook);
+export const BookDetails: React.FC<> = () => {
+  const { query } = useRouter();
+  const bookUrl = extractParam(query, "bookUrl");
+  const { data, error } = useSWR(bookUrl ?? null, fetchBook);
+  const { loans } = useUser();
 
-  const book = useNormalizedBook();
-
-  const error = useTypedSelector(state => state.book.error);
+  // use the loans version if it exists
+  const book = loans?.find(loanedBook => data?.id === loanedBook.id) ?? data;
 
   if (error) {
-    return <Error error={error} />;
+    if (error instanceof ServerError) {
+      return <Error info={error.info} />;
+    }
+    return <Error />;
   }
 
   if (!book) return <PageLoader />;
@@ -146,13 +154,7 @@ const SimplyECallout: React.FC<{ className?: "string" }> = ({ className }) => {
   );
 };
 
-const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
-  let detail: string;
-  try {
-    detail = JSON.parse(error.response).detail;
-  } catch {
-    detail = error.response;
-  }
+const Error: React.FC<{ info?: ProblemDocument }> = ({ info }) => {
   return (
     <section
       aria-label="Book details"
@@ -174,11 +176,11 @@ const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
         </p>
         <div>
           <span sx={{ fontWeight: "bold" }}>Error Code: </span>
-          {error.status ?? "unknown"}
+          {info?.status ?? "unknown"}
         </div>
         <div>
           <span sx={{ fontWeight: "bold" }}>Error Message: </span>
-          {detail}
+          {info?.detail ?? "An Unknown fetch error occurred."}
         </div>
         <NavButton sx={{ mt: 3 }} href="/">
           Return Home
@@ -188,12 +190,4 @@ const Error: React.FC<{ error: FetchErrorData }> = ({ error }) => {
   );
 };
 
-const Connected = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-  mergeRootProps
-)(BookDetails);
-
-// am doing this because typescript throws an error when trying to use
-// redux ConnectedComponent inside of Route
-export default Connected;
+export default BookDetails;
