@@ -1,6 +1,5 @@
 import { SearchData } from "interfaces";
 import * as xml2js from "xml2js";
-import * as url from "url";
 
 const xmlParser = new xml2js.Parser({ xmlns: true });
 
@@ -20,17 +19,12 @@ export default function parseSearchData(
           const description = root["Description"][0]["_"];
           const shortName = root["ShortName"][0]["_"];
           const templateString = root["Url"][0]["$"].template.value;
-          const template = (s: string) => {
-            return url.resolve(
-              descriptionUrl,
-              templateString.replace("{searchTerms}", s)
-            );
-          };
+
           resolve({
             url: descriptionUrl,
             description,
             shortName,
-            template
+            template: templateString
           });
         }
       }

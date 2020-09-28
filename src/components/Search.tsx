@@ -30,7 +30,11 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const searchTerms = encodeURIComponent(value);
-    const url = searchData?.template(searchTerms);
+    const url = createSearchUrl(
+      searchData.template,
+      searchData.url,
+      searchTerms
+    );
     if (!url) return;
     const link = linkUtils.buildCollectionLink(url);
     Router.push(link.href, link.as);
@@ -73,5 +77,16 @@ const Search: React.FC<SearchProps> = ({ className, ...props }) => {
     </form>
   );
 };
+
+function createSearchUrl(
+  templateString: string,
+  searchUrl: string,
+  query: string
+) {
+  return new URL(
+    templateString.replace("{searchTerms}", query),
+    searchUrl
+  ).toString();
+}
 
 export default Search;

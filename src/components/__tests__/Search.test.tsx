@@ -15,15 +15,14 @@ test("doesn't render if there is no searchData in the library context", () => {
 });
 
 test("searching calls history.push with url", async () => {
-  const mockedTemplate = jest.fn().mockReturnValue("templatereturn");
   const utils = render(<Search />, {
     library: {
       ...fixtures.libraryData,
       searchData: {
-        template: mockedTemplate,
+        template: "/search/{searchTerms}",
         description: "search desc",
         shortName: "search shortname",
-        url: "/search-url"
+        url: "http://search-url"
       }
     }
   });
@@ -34,11 +33,9 @@ test("searching calls history.push with url", async () => {
   fireEvent.click(searchButton);
 
   // assert
-  expect(mockedTemplate).toHaveBeenCalledTimes(1);
-  expect(mockedTemplate).toHaveBeenCalledWith("my%20search");
   expect(mockPush).toHaveBeenCalledTimes(1);
   expect(mockPush).toHaveBeenCalledWith(
     "/collection/[collectionUrl]",
-    "/collection/templatereturn"
+    "/collection/http%3A%2F%2Fsearch-url%2Fsearch%2Fmy%2520search"
   );
 });

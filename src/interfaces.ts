@@ -177,10 +177,10 @@ export interface CollectionData {
 }
 
 export interface SearchData {
-  url?: string;
+  url: string;
   description: string;
   shortName: string;
-  template: (searchTerms: string) => string;
+  template: string;
 }
 
 export interface LinkData {

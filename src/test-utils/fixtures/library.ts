@@ -33,7 +33,7 @@ export const libraryData: LibraryData = {
     url: "/search-url",
     description: "search-description",
     shortName: "search shortname",
-    template: () => "/parsed-search-url"
+    template: "/search/{searchTerms}"
   }
 };
 
