@@ -27,7 +27,7 @@ import {
   ReadInternalDetails
 } from "utils/fulfill";
 import downloadFile from "dataflow/download";
-import ApplicationError, { ServerError } from "errors";
+import { ServerError } from "errors";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 
@@ -240,7 +240,12 @@ const AccessCard: React.FC<{
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
   const dedupedLinks = dedupeLinks(links);
-  const fulfillments = dedupedLinks.map(getFulfillmentDetails);
+  const fulfillments = dedupedLinks
+    .map(getFulfillmentDetails)
+    .filter(details => details.type !== "unsupported");
+
+  const isFulfillable = fulfillments.length > 0;
+
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
     NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
@@ -256,7 +261,7 @@ const AccessCard: React.FC<{
           <Text>{subtitle}</Text>
         </Stack>
       </Stack>
-      {!isAudiobook && (
+      {!isAudiobook && isFulfillable && (
         <Stack direction="column" sx={{ mt: 3 }}>
           <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
             If you would rather read on your computer, you can:
@@ -280,8 +285,6 @@ const AccessCard: React.FC<{
                   return (
                     <ReadOnlineExternal details={details} key={details.id} />
                   );
-                case "unsupported":
-                  return null;
               }
             })}
           </Stack>

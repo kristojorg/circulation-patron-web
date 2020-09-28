@@ -1,6 +1,6 @@
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
-import { EmptyObject, MediaLink, OPDS1 } from "interfaces";
+import { MediaLink, OPDS1 } from "interfaces";
 import { typeMap } from "owc/utils/file";
 import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
 
@@ -9,11 +9,9 @@ import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
  *  - What UX should be presented to the user
  *  - How to actually go about fulfilling that UX
  *
- * This is determined by the specific acquisition links and any
- * layers of indirection the final content is wrapped in.
- *
- * We need a general solution, where if we see an indirect type
- * on any resource, we know how to handle it.
+ * This is determined by the final content type, and any layers of
+ * indirection it is wrapped in. This file is an attempt to centralize
+ * the logic of dealing with different media types and layers of indirection.
  */
 export type DownloadDetails = {
   id: string;
@@ -38,10 +36,6 @@ export type UnsupportedDetails = {
   type: "unsupported";
 };
 
-/**
- * This is how the user perceives the fulfillment, not necessarily how
- * we perform the fulfillment.
- */
 export type FulfillmentDetails =
   | DownloadDetails
   | ReadExternalDetails
