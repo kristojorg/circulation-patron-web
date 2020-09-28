@@ -1,25 +1,15 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData, SetCollectionAndBook } from "../../interfaces";
+import { BookData } from "interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./Recommendations";
-import {
-  mapDispatchToProps,
-  mapStateToProps,
-  mergeRootProps
-} from "owc/mergeRootProps";
-import { FetchErrorData } from "owc/interfaces";
-import { connect } from "react-redux";
-import useSetCollectionAndBook from "../../hooks/useSetCollectionAndBook";
 import { PageLoader } from "../LoadingIndicator";
 import FulfillmentCard from "./FulfillmentCard";
 import BreadcrumbBar from "../BreadcrumbBar";
 import { truncateString } from "../../utils/string";
-import useNormalizedBook from "../../hooks/useNormalizedBook";
 import DetailField from "../BookMetaDetail";
 import ReportProblem from "./ReportProblem";
-import useTypedSelector from "../../hooks/useTypedSelector";
 import { NavButton } from "../Button";
 import Head from "next/head";
 import { H1, H2, H3, Text } from "components/Text";
@@ -36,7 +26,7 @@ import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 import { ProblemDocument } from "types/opds1";
 
-export const BookDetails: React.FC<> = () => {
+export const BookDetails: React.FC = () => {
   const { query } = useRouter();
   const bookUrl = extractParam(query, "bookUrl");
   const { data, error } = useSWR(bookUrl ?? null, fetchBook);

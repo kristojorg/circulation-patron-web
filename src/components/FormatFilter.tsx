@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import useTypedSelector from "../hooks/useTypedSelector";
 import FormLabel from "./form/FormLabel";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";

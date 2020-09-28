@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useActions } from "owc/ActionsContext";
 import useTypedSelector from "./useTypedSelector";
 
 const useInfiniteScroll = () => {

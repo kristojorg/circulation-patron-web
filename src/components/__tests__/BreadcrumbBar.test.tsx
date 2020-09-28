@@ -1,29 +1,7 @@
 import * as React from "react";
-import { render, fixtures } from "test-utils";
+import { render } from "test-utils";
 import BreadcrumbBar from "../BreadcrumbBar";
-import merge from "deepmerge";
-import { State } from "owc/state";
-import { CollectionData } from "interfaces";
 import computeBreadcrumbs from "../../computeBreadcrumbs";
-
-const collectionData: CollectionData = {
-  id: "id",
-  url: "url",
-  title: "title",
-  lanes: [],
-  books: [],
-  navigationLinks: [],
-  catalogRootLink: {
-    url: "/root-url/",
-    text: "root link"
-  }
-};
-
-const stateWithCrumbs: State = merge(fixtures.initialState, {
-  collection: {
-    data: collectionData
-  }
-});
 
 const breadcrumbs = [
   {

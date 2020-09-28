@@ -1,8 +1,7 @@
 import OPDSParser, { OPDSFeed, OPDSEntry } from "opds-feed-parser";
 import ApplicationError, { ServerError } from "errors";
 import { BookData, CollectionData } from "interfaces";
-import { feedToCollection } from "dataflow/opds1/parse";
-import { entryToBook } from "owc/OPDSDataAdapter";
+import { entryToBook, feedToCollection } from "dataflow/opds1/parse";
 import fetchWithHeaders from "dataflow/fetch";
 import parseSearchData from "dataflow/opds1/parseSearchData";
 

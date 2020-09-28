@@ -2,7 +2,6 @@ import * as React from "react";
 import { render, fixtures } from "test-utils";
 import { Collection } from "../Collection";
 import merge from "deepmerge";
-import { State } from "owc/state";
 import { LaneData } from "interfaces";
 
 const setCollectionAndBook = jest.fn().mockResolvedValue({});
@@ -16,22 +15,19 @@ beforeEach(() => {
 });
 
 test("calls setCollectionAndBook", () => {
-  render(<Collection setCollectionAndBook={setCollectionAndBook} />);
+  render(<Collection />);
 
   expect(setCollectionAndBook).toHaveBeenCalledTimes(1);
 });
 
 test("displays loader", () => {
-  const utils = render(
-    <Collection setCollectionAndBook={setCollectionAndBook} />,
-    {
-      initialState: merge(fixtures.initialState, {
-        collection: {
-          isFetching: true
-        }
-      })
-    }
-  );
+  const utils = render(<Collection />, {
+    initialState: merge(fixtures.initialState, {
+      collection: {
+        isFetching: true
+      }
+    })
+  });
   expect(
     utils.getByRole("heading", { name: "Loading..." })
   ).toBeInTheDocument();
@@ -51,12 +47,9 @@ test("displays lanes when present", () => {
       }
     }
   });
-  const utils = render(
-    <Collection setCollectionAndBook={setCollectionAndBook} />,
-    {
-      initialState
-    }
-  );
+  const utils = render(<Collection />, {
+    initialState
+  });
 
   // expect there to be a lane with books
   const laneTitle = utils.getByText("my lane");
@@ -81,12 +74,9 @@ test("prefers lanes over books", () => {
       }
     }
   });
-  const utils = render(
-    <Collection setCollectionAndBook={setCollectionAndBook} />,
-    {
-      initialState
-    }
-  );
+  const utils = render(<Collection />, {
+    initialState
+  });
 
   // expect the lane title to be rendered, indicating it chose
   // lanes over books
@@ -103,12 +93,9 @@ test("renders books in list view if no lanes", () => {
       }
     }
   });
-  const utils = render(
-    <Collection setCollectionAndBook={setCollectionAndBook} />,
-    {
-      initialState
-    }
-  );
+  const utils = render(<Collection />, {
+    initialState
+  });
 
   const list = utils.getByTestId("listview-list");
   expect(list).toBeInTheDocument();
@@ -127,12 +114,9 @@ test("renders empty state if no lanes or books", () => {
       }
     }
   });
-  const utils = render(
-    <Collection setCollectionAndBook={setCollectionAndBook} />,
-    {
-      initialState
-    }
-  );
+  const utils = render(<Collection />, {
+    initialState
+  });
 
   expect(utils.getByText("This collection is empty.")).toBeInTheDocument();
 });

@@ -5,14 +5,9 @@ import ContextProvider from "../components/context/ContextProvider";
 import Adapter from "enzyme-adapter-react-16";
 import { configure } from "enzyme";
 import library from "./fixtures/library";
-import buildStore from "owc/store";
-import { State } from "owc/state";
 import { LibraryData } from "../interfaces";
 import "./mockScrollTo";
 import * as fixtures from "./fixtures";
-import ActionsCreator from "owc/actions";
-import DataFetcher from "owc/DataFetcher";
-import { adapter } from "owc/OPDSDataAdapter";
 import serializer from "jest-emotion";
 import { MockNextRouterContextProvider } from "./mockNextRouter";
 import { NextRouter } from "next/router";
@@ -34,50 +29,23 @@ configure({ adapter: new Adapter() });
 const mockCreateObjectURL = jest.fn();
 (global as any)["URL"].createObjectURL = mockCreateObjectURL;
 
-/**
- * We create the actions and fetcher here so that they can
- * be imported by our test file and spied on using:
- * jest.spyOn(actions, "fetchSearchDescription")
- * and then asserted against
- */
-export const fetcher = new DataFetcher({ adapter });
-export const actions = new ActionsCreator(fetcher);
-
 type CustomRenderOptions = Parameters<typeof render>[1] & {
   router?: Partial<NextRouter>;
-  initialState?: State;
   library?: LibraryData;
   colors?: { primary: string; secondary: string };
 };
 const customRender = (ui: any, options?: CustomRenderOptions) => {
-  const store = buildStore(options?.initialState);
-
-  // spy on dispatch by default
-  const origDispatch = store.dispatch;
-  const mockDispatch: jest.Mock<typeof origDispatch> = jest
-    .fn()
-    .mockImplementation(origDispatch);
-  store.dispatch = mockDispatch as typeof origDispatch;
-
   const AllTheProviders: React.FC = ({ children }) => {
     return (
       <MockNextRouterContextProvider router={options?.router}>
-        <ContextProvider
-          library={options?.library ?? library}
-          store={store}
-          fetcher={fetcher}
-          actions={actions}
-        >
+        <ContextProvider library={options?.library ?? library}>
           {children}
         </ContextProvider>
       </MockNextRouterContextProvider>
     );
   };
   return {
-    ...render(ui, { wrapper: AllTheProviders, ...options }),
-    // we pass our mocks along so they can be used in assertions
-    store,
-    dispatch: mockDispatch
+    ...render(ui, { wrapper: AllTheProviders, ...options })
   };
 };
 

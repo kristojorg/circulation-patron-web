@@ -223,13 +223,6 @@ export type VariantProp<VType> = Exclude<
 /**
  * Utils
  */
-export type SetCollectionAndBook = (
-  collectionUrl: string,
-  bookUrl: string | undefined
-) => Promise<{
-  collectionData: CollectionData;
-  bookData: BookData;
-}>;
 
 type PickAndRequire<T, K extends keyof T> = { [P in K]-?: NonNullable<T[P]> };
 
