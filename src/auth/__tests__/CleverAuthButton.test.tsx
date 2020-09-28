@@ -1,6 +1,6 @@
 import * as React from "react";
 import { fixtures } from "test-utils";
-import CleverButton from "../cleverAuthButton";
+import CleverButton from "../CleverAuthButton";
 /**
  * we import reder from testing library because we don't need our
  * context-wrapping version in test-utils
