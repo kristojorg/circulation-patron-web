@@ -4,7 +4,7 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import useLibraryContext from "components/context/LibraryContext";
 import { ServerError } from "errors";
-import useAuthFormContext from "auth/AuthFormCotext";
+import useAuthModalContext from "auth/AuthModalCotext";
 
 export default function useBorrow(
   book: BookData,
@@ -13,7 +13,7 @@ export default function useBorrow(
 ) {
   const { catalogUrl } = useLibraryContext();
   const { setBook, token } = useUser();
-  const { showForm } = useAuthFormContext();
+  const { showForm } = useAuthModalContext();
   const isUnmounted = React.useRef(false);
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | undefined>();
