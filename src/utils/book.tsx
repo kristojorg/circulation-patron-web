@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BookData, FetchErrorData, BookMedium, MediaLink } from "interfaces";
+import { BookData, FetchErrorData, BookMedium } from "interfaces";
 import { BookFulfillmentState } from "interfaces";
 
 import { Book, Headset } from "../icons";
