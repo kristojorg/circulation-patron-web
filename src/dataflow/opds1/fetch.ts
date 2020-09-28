@@ -4,6 +4,7 @@ import { BookData, CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
 import { entryToBook } from "owc/OPDSDataAdapter";
 import fetchWithHeaders from "dataflow/fetch";
+import OpenSearchDescriptionParser from "owc/OpenSearchDescriptionParser";
 
 const parser = new OPDSParser();
 /**
@@ -109,4 +110,23 @@ export function createBookUrl(catalogUrl: string, bookUrl: string) {
 
 export function stripUndefined(json: any) {
   return JSON.parse(JSON.stringify(json));
+}
+
+/**
+ * Fetches the search description for the catalog root, used for the global
+ * search bar
+ */
+export async function fetchSearchDescription(url?: string) {
+  if (!url) return;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    const details = await response.json();
+    throw new ServerError(url, response.status, details);
+  }
+
+  const text = await response.text();
+  const parser = new OpenSearchDescriptionParser();
+  const description = await parser.parse(text, url);
+  return description;
 }

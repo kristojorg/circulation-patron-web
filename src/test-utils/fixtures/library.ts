@@ -28,7 +28,15 @@ export const libraryData: LibraryData = {
   ],
   libraryLinks: {},
   shelfUrl: "/shelf-url",
-  authMethods: [basicAuthMethod, createSamlMethod(0), cleverAuthMethod]
+  authMethods: [basicAuthMethod, createSamlMethod(0), cleverAuthMethod],
+  searchDescription: {
+    url: "/search-url",
+    searchData: {
+      description: "search-description",
+      shortName: "search shortname",
+      template: () => "/parsed-search-url"
+    }
+  }
 };
 
 export default libraryData;

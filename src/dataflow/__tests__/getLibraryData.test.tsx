@@ -269,7 +269,8 @@ describe("buildLibraryData", () => {
       headerLinks: [],
       shelfUrl: null,
       authMethods: [],
-      libraryLinks: {}
+      libraryLinks: {},
+      searchDescription: null
     });
   });
 
