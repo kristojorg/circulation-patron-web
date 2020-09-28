@@ -8,10 +8,7 @@ import {
 import { mergeBook } from "test-utils/fixtures";
 import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
-import { FetchErrorData } from "owc/interfaces";
 import userEvent from "@testing-library/user-event";
-import { State } from "owc/state";
-import * as useBorrow from "hooks/useBorrow";
 import _download from "downloadjs";
 import * as env from "utils/env";
 import { mockAuthenticated } from "test-utils/mockAuthState";
@@ -200,8 +197,7 @@ describe("ready to borrow (two links)", () => {
     allBorrowLinks: [
       {
         url: "/epub-borrow-link",
-        type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/vnd.adobe.adept+xml"
+        type: "application/atom+xml;type=entry;profile=opds-catalog"
       },
       {
         indirectType: "application/vnd.librarysimplified.axisnow+json",
@@ -388,13 +384,11 @@ describe("available to download", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip",
-        indirectType: "indirect"
+        type: "application/epub+zip"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf",
-        indirectType: "indirect"
+        type: "application/pdf"
       }
     ],
     availability: {
@@ -408,8 +402,7 @@ describe("available to download", () => {
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/vnd.librarysimplified.axisnow+json",
-        indirectType: "something-indirect"
+        type: "application/vnd.librarysimplified.axisnow+json"
       }
     ],
     availability: {

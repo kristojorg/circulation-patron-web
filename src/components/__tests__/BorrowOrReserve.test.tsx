@@ -9,8 +9,7 @@ import { ServerError } from "errors";
 
 const borrowLink: MediaLink = {
   url: "/epub-borrow-link",
-  type: "application/atom+xml;type=entry;profile=opds-catalog",
-  indirectType: "application/vnd.adobe.adept+xml"
+  type: "application/atom+xml;type=entry;profile=opds-catalog"
 };
 test("shows correct button for borrowable book", () => {
   const utils = render(
