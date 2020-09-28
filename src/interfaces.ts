@@ -81,7 +81,7 @@ export interface LibraryData {
   libraryLinks: LibraryLinks;
   authMethods: AppAuthMethod[];
   shelfUrl: string | null;
-  searchDescription: SearchData | null;
+  searchData: SearchData | null;
 }
 
 /**
@@ -179,11 +179,9 @@ export interface CollectionData {
 
 export interface SearchData {
   url?: string;
-  searchData?: {
-    description: string;
-    shortName: string;
-    template: (searchTerms: string) => string;
-  };
+  description: string;
+  shortName: string;
+  template: (searchTerms: string) => string;
 }
 
 export interface LinkData {

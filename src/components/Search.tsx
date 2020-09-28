@@ -8,6 +8,7 @@ import Router from "next/router";
 import useTypedSelector from "../hooks/useTypedSelector";
 import useLinkUtils from "./context/LinkUtilsContext";
 import SvgSearch from "icons/Search";
+import useLibraryContext from "components/context/LibraryContext";
 
 interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -21,7 +22,7 @@ interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
  */
 const Search: React.FC<SearchProps> = ({ className, ...props }) => {
   const [value, setValue] = React.useState("");
-  const searchData = useTypedSelector(state => state?.collection?.data?.search);
+  const { searchData } = useLibraryContext();
   const { actions, dispatch } = useActions();
   const linkUtils = useLinkUtils();
 

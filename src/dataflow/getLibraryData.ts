@@ -184,7 +184,7 @@ export function buildLibraryData(
   catalogUrl: string,
   librarySlug: string | undefined,
   catalog: OPDSFeed,
-  searchDescription?: SearchData
+  searchData?: SearchData
 ): LibraryData {
   const logoUrl = authDoc.links?.find(link => link.rel === "logo")?.href;
   const headerLinks =
@@ -208,7 +208,7 @@ export function buildLibraryData(
     headerLinks,
     libraryLinks,
     authMethods,
-    searchDescription: searchDescription ?? null
+    searchData: searchData ?? null
   };
 }
 

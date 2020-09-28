@@ -12,7 +12,7 @@ import getConfigFile from "./getConfigFile";
 import { CONFIG_FILE } from "utils/env";
 import { getAuthDocHref } from "utils/auth";
 import { findSearchLink } from "dataflow/opds1/parse";
-import { fetchSearchDescription } from "dataflow/opds1/fetch";
+import { fetchSearchData } from "dataflow/opds1/fetch";
 
 const getLibraryFromParams = (
   query: ParsedUrlQuery | undefined
@@ -50,16 +50,14 @@ export default function withAppProps(
       const catalog = await fetchCatalog(catalogUrl);
       const authDocHref = getAuthDocHref(catalog);
       const authDocument = await fetchAuthDocument(authDocHref);
-      const searchDescriptionUrl = findSearchLink(catalog)?.href;
-      const searchDescription = await fetchSearchDescription(
-        searchDescriptionUrl
-      );
+      const searchDataUrl = findSearchLink(catalog)?.href;
+      const searchData = await fetchSearchData(searchDataUrl);
       const library = buildLibraryData(
         authDocument,
         catalogUrl,
         librarySlug,
         catalog,
-        searchDescription
+        searchData
       );
       // fetch the static props for the page
       const pageResult = (await pageGetServerSideProps?.(ctx)) ?? { props: {} };
