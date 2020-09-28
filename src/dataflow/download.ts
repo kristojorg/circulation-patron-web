@@ -16,7 +16,7 @@ export default async function downloadFile(
   }
 
   /**
-   * If this the response errored after a redirect, try again
+   * If the response errored after a redirect, try again
    * without the Authorization header, as it causes errors when
    * redirected to Amazon S3
    */
