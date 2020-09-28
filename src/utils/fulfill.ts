@@ -9,10 +9,15 @@ import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
  *  - What UX should be presented to the user
  *  - How to actually go about fulfilling that UX
  *
- * This is determined by the final content type, and any layers of
- * indirection it is wrapped in. This file is an attempt to centralize
- * the logic of dealing with different media types and layers of indirection.
+ * Both of these are determinded by a combination of the final content type
+ * and any layers of indirection the media is wrapped in. This file is an
+ * attempt to centralize the logic of dealing with different media types
+ * and layers of indirection.
+ *
+ * This file is based on:
+ * https://docs.google.com/document/d/1dli5mgTbVaURN_B2AtUmPhgpaFUVqOqrzsaoFvCXnkA/edit?pli=1#
  */
+
 export type DownloadDetails = {
   id: string;
   type: "download";
@@ -42,10 +47,6 @@ export type FulfillmentDetails =
   | ReadInternalDetails
   | UnsupportedDetails;
 
-/**
- * Mapping links to fulfillment protocols based on
- * https://docs.google.com/document/d/1dli5mgTbVaURN_B2AtUmPhgpaFUVqOqrzsaoFvCXnkA/edit?pli=1#
- */
 export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
   const contentType = fixMimeType(link.indirectType ?? link.type);
   // if there is a layer of indirection, we have an initial type
@@ -129,6 +130,10 @@ const getReaderUrl = (
   return url;
 };
 
+/**
+ * There is or was an error in the CM where it sent us incorrectly formatted
+ * Adobe media types.
+ */
 export function fixMimeType(
   mimeType: OPDS1.IndirectAcquisitionType | OPDS1.AnyBookMediaType
 ) {
