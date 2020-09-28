@@ -48,12 +48,12 @@ function buildFulfillmentLink(feedUrl: string) {
   return (link: OPDSAcquisitionLink): MediaLink | undefined => {
     const indirects = link.indirectAcquisitions;
     const first = indirects[0];
-    const indirectType = first?.type as string | undefined;
+    const indirectType = first?.type as OPDS1.AnyBookMediaType | undefined;
     // it is possible that it doesn't exist in the array of indirects
     if (!indirectType) return;
     return {
       url: resolve(feedUrl, link.href),
-      type: link.type as OPDS1.AnyBookMediaType,
+      type: link.type as OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType,
       indirectType
     };
   };

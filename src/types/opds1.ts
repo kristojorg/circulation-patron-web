@@ -80,8 +80,7 @@ export type ReadOnlineMediaType =
   | typeof AxisNowWebpubMediaType
   | typeof OverdriveEbookMediaType;
 
-export type AnyBookMediaType =
-  | ReadOnlineMediaType
+export type DownloadMediaType =
   | typeof EpubMediaType
   | typeof KepubMediaType
   | typeof PdfMediaType
@@ -89,6 +88,8 @@ export type AnyBookMediaType =
   | typeof Mobi8Mediatype
   | typeof AudiobookMediaType
   | typeof OverdriveAudiobookMediaType;
+
+export type AnyBookMediaType = ReadOnlineMediaType | DownloadMediaType;
 
 export type AnyMediaType =
   | AnyBookMediaType
