@@ -270,7 +270,7 @@ describe("buildLibraryData", () => {
       shelfUrl: null,
       authMethods: [],
       libraryLinks: {},
-      searchDescription: null
+      searchData: null
     });
   });
 

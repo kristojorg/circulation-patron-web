@@ -168,7 +168,6 @@ export interface CollectionData {
   books: BookData[];
   navigationLinks: LinkData[];
   facetGroups?: FacetGroupData[];
-  search?: SearchData;
   nextPageUrl?: string;
   catalogRootLink?: LinkData | null;
   parentLink?: LinkData | null;

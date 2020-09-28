@@ -4,7 +4,7 @@ import { BookData, CollectionData } from "interfaces";
 import { feedToCollection } from "dataflow/opds1/parse";
 import { entryToBook } from "owc/OPDSDataAdapter";
 import fetchWithHeaders from "dataflow/fetch";
-import OpenSearchDescriptionParser from "owc/OpenSearchDescriptionParser";
+import parseSearchData from "owc/OpenSearchDescriptionParser";
 
 const parser = new OPDSParser();
 /**
@@ -126,7 +126,6 @@ export async function fetchSearchData(url?: string) {
   }
 
   const text = await response.text();
-  const parser = new OpenSearchDescriptionParser();
-  const data = await parser.parse(text, url);
+  const data = await parseSearchData(text, url);
   return data;
 }

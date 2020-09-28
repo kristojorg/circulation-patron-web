@@ -18,7 +18,6 @@ import {
   BookData,
   LinkData,
   FacetGroupData,
-  SearchData,
   BookAvailability,
   OPDS1,
   MediaLink
@@ -296,7 +295,6 @@ export function feedToCollection(
     books: BookData[];
   }[] = [];
   let facetGroups: FacetGroupData[] = [];
-  let search: SearchData | undefined = undefined;
   let nextPageUrl: string | undefined = undefined;
   let catalogRootLink: OPDSLink | undefined = undefined;
   let parentLink: OPDSLink | undefined = undefined;
@@ -340,13 +338,6 @@ export function feedToCollection(
 
   if (feed.links) {
     facetLinks = feed.links.filter(isFacetLink);
-
-    const searchLink = feed.links.find(link => {
-      return link instanceof SearchLink;
-    });
-    if (searchLink) {
-      search = { url: resolve(feedUrl, searchLink.href) };
-    }
 
     const nextPageLink = feed.links.find(link => {
       return link.rel === "next";
@@ -405,7 +396,6 @@ export function feedToCollection(
     books,
     navigationLinks,
     facetGroups,
-    search,
     nextPageUrl,
     catalogRootLink: OPDSLinkToLinkData(feedUrl, catalogRootLink),
     parentLink: OPDSLinkToLinkData(feedUrl, parentLink),
