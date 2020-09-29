@@ -22,7 +22,7 @@ const PageTitle: React.FC<{ collection?: CollectionData }> = ({
       }}
     >
       <H1 sx={{ m: 0 }}>{children}</H1>
-      <FormatFilter collection={collection} />
+      {collection && <FormatFilter collection={collection} />}
     </Stack>
   );
 };
