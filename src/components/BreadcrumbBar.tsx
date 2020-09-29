@@ -3,12 +3,13 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import Link from "./Link";
 import List, { ListItem } from "./List";
+import { LinkData } from "interfaces";
 
 const BreadcrumbBar: React.FC<{
   className?: string;
   currentLocation?: string;
-}> = ({ children, className, currentLocation }) => {
-  const breadcrumbs = [];
+  breadcrumbs: LinkData[];
+}> = ({ children, className, currentLocation, breadcrumbs }) => {
   const breadcrumbsWithAtLeastOne =
     breadcrumbs.length > 0 ? breadcrumbs : [{ text: " ", url: " " }];
   const lastItem = currentLocation ?? breadcrumbs.pop()?.text;

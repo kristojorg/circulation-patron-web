@@ -8,6 +8,7 @@ import PageTitle from "./PageTitle";
 import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
 import useCollection from "hooks/useCollection";
+import computeBreadcrumbs from "computeBreadcrumbs";
 
 export const Collection: React.FC<{
   title?: string;
@@ -18,6 +19,7 @@ export const Collection: React.FC<{
   const hasBooks = collection?.books && collection.books.length > 0;
   const pageTitle = title ?? `Collection: ${collection?.title ?? ""}`;
 
+  const breadcrumbs = computeBreadcrumbs(collection);
   return (
     <div
       sx={{
@@ -30,7 +32,7 @@ export const Collection: React.FC<{
       <Head>
         <title>{pageTitle}</title>
       </Head>
-      <BreadcrumbBar />
+      <BreadcrumbBar breadcrumbs={breadcrumbs} />
       <PageTitle>{pageTitle}</PageTitle>
       {isLoading ? (
         <PageLoader />

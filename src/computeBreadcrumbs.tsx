@@ -14,10 +14,7 @@ const urlComparator = (
   return !!(url1 && url2) && url1 === url2;
 };
 
-const computeBreadcrumbs = (
-  collection: CollectionData,
-  history: LinkData[]
-): LinkData[] => {
+const computeBreadcrumbs = (collection?: CollectionData): LinkData[] => {
   let links: LinkData[] = [];
 
   if (
@@ -39,7 +36,7 @@ const computeBreadcrumbs = (
       text: collection.title
     });
   } else {
-    links = hierarchyComputeBreadcrumbs(collection, history, urlComparator);
+    links = hierarchyComputeBreadcrumbs(collection, urlComparator);
   }
 
   return links;
@@ -55,7 +52,6 @@ export default computeBreadcrumbs;
  * */
 export function hierarchyComputeBreadcrumbs(
   collection: CollectionData,
-  history: LinkData[],
   comparator?: (url1: string, url2: string) => boolean
 ): LinkData[] {
   const links: LinkData[] = [];
