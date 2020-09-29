@@ -22,13 +22,6 @@ import { BookData, CollectionData, LaneData, RequiredKeys } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { useSWRInfinite } from "swr";
 
-/**
- * In a collection you can:
- *  - See lanes view
- *  - See List/Gallery view
- *    - Switch between list and gallery in this case
- */
-
 const ListLoadingIndicator = () => (
   <div
     sx={{
@@ -40,7 +33,7 @@ const ListLoadingIndicator = () => (
       p: 3
     }}
   >
-    <LoadingIndicator /> Loading more books...
+    <LoadingIndicator /> Loading...
   </div>
 );
 
