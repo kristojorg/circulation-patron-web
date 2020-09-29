@@ -10,7 +10,6 @@ import {
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
-import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { H2, Text } from "./Text";
 import * as DS from "@nypl/design-system-react-components";
 import MediumIndicator from "components/MediumIndicator";
@@ -19,7 +18,9 @@ import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
 import Stack from "./Stack";
 import BorrowOrReserve from "./BorrowOrReserve";
-import { BookData, LaneData, RequiredKeys } from "interfaces";
+import { BookData, CollectionData, LaneData, RequiredKeys } from "interfaces";
+import { fetchCollection } from "dataflow/opds1/fetch";
+import { useSWRInfinite } from "swr";
 
 /**
  * In a collection you can:
@@ -46,11 +47,51 @@ const ListLoadingIndicator = () => (
 type BookWithUrl = RequiredKeys<BookData, "url">;
 const hasUrl = (book: BookData): book is BookWithUrl => !!book.url;
 
-export const ListView: React.FC<{
-  books: BookData[];
-}> = ({ books }) => {
-  // this hook will refetch the page when we reach the bottom of the screen
-  const { listRef, isFetchingPage } = useInfiniteScroll();
+export const ListView: React.FC<{ firstPageUrl: string }> = ({
+  firstPageUrl
+}) => {
+  function getKey(pageIndex: number, previousData: CollectionData) {
+    // first page, no previous data
+    if (pageIndex === 0) return firstPageUrl;
+    // reached the end
+    if (!previousData.nextPageUrl) return null;
+    // otherwise return the next page url
+    return previousData.nextPageUrl;
+  }
+  const { data, size, setSize } = useSWRInfinite(getKey, fetchCollection);
+
+  const isFetchingMore = size > (data?.length ?? 0);
+
+  // extract the books from the array of collections in data
+  const books =
+    data?.reduce(
+      (total, current) => [...total, ...(current.books ?? [])],
+      []
+    ) ?? [];
+
+  const listRef = React.useRef<HTMLUListElement>(null);
+
+  // detect when we are at scroll bottom
+  React.useEffect(() => {
+    const isAtBottom = () => {
+      if (!listRef.current) return false;
+      const endOfList =
+        listRef.current.clientHeight + listRef.current.offsetTop;
+      // the 2 here indicates we are within one window height of scroll bottom
+      const scrollBottom = window.scrollY + 2 * window.innerHeight;
+
+      return scrollBottom >= endOfList;
+    };
+
+    const handleScroll = () => {
+      if (isAtBottom() && !isFetchingMore) {
+        // increase the index when we are at scroll bottom
+        setSize(size => size + 1);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [setSize, isFetchingMore]);
 
   return (
     <React.Fragment>
@@ -59,7 +100,7 @@ export const ListView: React.FC<{
           <BookListItem key={book.id} book={book} />
         ))}
       </ul>
-      {isFetchingPage && <ListLoadingIndicator />}
+      {isFetchingMore && <ListLoadingIndicator />}
     </React.Fragment>
   );
 };

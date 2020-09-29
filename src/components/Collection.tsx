@@ -12,7 +12,7 @@ import useCollection from "hooks/useCollection";
 export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
-  const { collection, isLoading } = useCollection();
+  const { collection, isLoading, url } = useCollection();
 
   const hasLanes = collection?.lanes && collection.lanes.length > 0;
   const hasBooks = collection?.books && collection.books.length > 0;
@@ -37,7 +37,7 @@ export const Collection: React.FC<{
       ) : hasLanes ? (
         <LanesView lanes={collection?.lanes ?? []} />
       ) : hasBooks ? (
-        <ListView books={collection?.books ?? []} />
+        <ListView firstPageUrl={url} />
       ) : (
         <div
           sx={{

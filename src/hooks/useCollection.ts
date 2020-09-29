@@ -20,6 +20,7 @@ export default function useCollection() {
 
   return {
     isLoading,
-    collection
+    collection,
+    url: collectionUrl
   };
 }
