@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { ListView } from "./BookList";
+import { BookList } from "./BookList";
 import Head from "next/head";
 import BreadcrumbBar from "./BreadcrumbBar";
 import { H3 } from "./Text";
@@ -62,7 +62,7 @@ export const MyBooks: React.FC = () => {
 const LoansContent: React.FC<{ books: BookData[] }> = ({ books }) => {
   return (
     <React.Fragment>
-      <ListView books={books} />
+      <BookList books={books} />
     </React.Fragment>
   );
 };

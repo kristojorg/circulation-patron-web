@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { PageLoader } from "../components/LoadingIndicator";
-import { ListView, LanesView } from "./BookList";
+import { InfiniteBookList, LanesView } from "./BookList";
 import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
@@ -37,7 +37,7 @@ export const Collection: React.FC<{
       ) : hasLanes ? (
         <LanesView lanes={collection?.lanes ?? []} />
       ) : hasBooks ? (
-        <ListView firstPageUrl={url} />
+        <InfiniteBookList firstPageUrl={url} />
       ) : (
         <div
           sx={{

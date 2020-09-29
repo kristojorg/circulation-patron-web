@@ -40,7 +40,7 @@ const ListLoadingIndicator = () => (
 type BookWithUrl = RequiredKeys<BookData, "url">;
 const hasUrl = (book: BookData): book is BookWithUrl => !!book.url;
 
-export const ListView: React.FC<{ firstPageUrl: string }> = ({
+export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
   firstPageUrl
 }) => {
   function getKey(pageIndex: number, previousData: CollectionData) {
@@ -86,6 +86,16 @@ export const ListView: React.FC<{ firstPageUrl: string }> = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [setSize, isFetchingMore]);
 
+  return (
+    <BookList books={books} listRef={listRef} isFetchingMore={isFetchingMore} />
+  );
+};
+
+export const BookList: React.FC<{
+  books: BookData[];
+  listRef?: React.RefObject<HTMLUListElement>;
+  isFetchingMore?: boolean;
+}> = ({ books, listRef, isFetchingMore = false }) => {
   return (
     <React.Fragment>
       <ul ref={listRef} sx={{ px: 5 }} data-testid="listview-list">
