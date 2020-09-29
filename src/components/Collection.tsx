@@ -33,7 +33,7 @@ export const Collection: React.FC<{
         <title>{pageTitle}</title>
       </Head>
       <BreadcrumbBar breadcrumbs={breadcrumbs} />
-      <PageTitle>{pageTitle}</PageTitle>
+      <PageTitle collection={collection}>{pageTitle}</PageTitle>
       {isLoading ? (
         <PageLoader />
       ) : hasLanes ? (

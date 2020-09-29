@@ -5,7 +5,6 @@ import FormLabel from "./form/FormLabel";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
 import Select from "./Select";
-import useCollection from "hooks/useCollection";
 
 /**
  * This filter depends on the "Formats" facetGroup, which should have
@@ -15,9 +14,9 @@ import useCollection from "hooks/useCollection";
  * It can optionally have an additional "All" facet. Note that the facet
  * labels must match the spelling and capitalization exactly.
  */
-const FormatFilter: React.FC = () => {
-  const { collection } = useCollection();
-
+const FormatFilter: React.FC<{ collection: CollectionData }> = ({
+  collection
+}) => {
   const { buildCollectionLink } = useLinkUtils();
   const isCollectionLoaded = false;
 
