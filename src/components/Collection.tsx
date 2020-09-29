@@ -14,7 +14,6 @@ export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
   const { collection, isLoading, url } = useCollection();
-
   const hasLanes = collection?.lanes && collection.lanes.length > 0;
   const hasBooks = collection?.books && collection.books.length > 0;
   const pageTitle = title ?? `Collection: ${collection?.title ?? ""}`;

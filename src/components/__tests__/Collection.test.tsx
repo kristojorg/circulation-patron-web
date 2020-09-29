@@ -3,8 +3,7 @@ import { render, fixtures } from "test-utils";
 import { Collection } from "../Collection";
 import merge from "deepmerge";
 import { LaneData } from "interfaces";
-
-const setCollectionAndBook = jest.fn().mockResolvedValue({});
+import mockCollection, { useCollectionSpy } from "test-utils/mockCollection";
 
 beforeEach(() => {
   /**
@@ -14,20 +13,19 @@ beforeEach(() => {
   jest.useFakeTimers();
 });
 
-test("calls setCollectionAndBook", () => {
+test("calls useCollection", () => {
+  mockCollection();
   render(<Collection />);
 
-  expect(setCollectionAndBook).toHaveBeenCalledTimes(1);
+  expect(useCollectionSpy).toHaveBeenCalledTimes(1);
 });
 
 test("displays loader", () => {
-  const utils = render(<Collection />, {
-    initialState: merge(fixtures.initialState, {
-      collection: {
-        isFetching: true
-      }
-    })
+  mockCollection({
+    isLoading: true,
+    collection: undefined
   });
+  const utils = render(<Collection />);
   expect(
     utils.getByRole("heading", { name: "Loading..." })
   ).toBeInTheDocument();
@@ -39,17 +37,17 @@ test("displays lanes when present", () => {
     url: "/link-to-lane",
     books: fixtures.makeBooks(10)
   };
-  const initialState: State = merge(fixtures.initialState, {
+  mockCollection({
     collection: {
-      data: {
-        books: [],
-        lanes: [laneData]
-      }
+      id: "id",
+      url: "url",
+      title: "title",
+      navigationLinks: [],
+      books: [],
+      lanes: [laneData]
     }
   });
-  const utils = render(<Collection />, {
-    initialState
-  });
+  const utils = render(<Collection />);
 
   // expect there to be a lane with books
   const laneTitle = utils.getByText("my lane");
@@ -66,17 +64,17 @@ test("prefers lanes over books", () => {
     url: "/link-to-lane",
     books: fixtures.makeBooks(10)
   };
-  const initialState: State = merge(fixtures.initialState, {
+  mockCollection({
     collection: {
-      data: {
-        books: fixtures.makeBooks(10),
-        lanes: [laneData]
-      }
+      id: "id",
+      url: "url",
+      title: "title",
+      navigationLinks: [],
+      books: fixtures.makeBooks(2),
+      lanes: [laneData]
     }
   });
-  const utils = render(<Collection />, {
-    initialState
-  });
+  const utils = render(<Collection />);
 
   // expect the lane title to be rendered, indicating it chose
   // lanes over books
@@ -85,38 +83,36 @@ test("prefers lanes over books", () => {
 });
 
 test("renders books in list view if no lanes", () => {
-  const initialState: State = merge(fixtures.initialState, {
+  mockCollection({
+    isLoading: false,
     collection: {
-      data: {
-        books: fixtures.makeBooks(10),
-        lanes: null
-      }
+      id: "id",
+      url: "url",
+      title: "title",
+      navigationLinks: [],
+      books: fixtures.makeBooks(2),
+      lanes: []
     }
   });
-  const utils = render(<Collection />, {
-    initialState
-  });
+  const utils = render(<Collection />);
 
   const list = utils.getByTestId("listview-list");
   expect(list).toBeInTheDocument();
-  expect(utils.getByText(fixtures.makeBook(0).title)).toBeInTheDocument();
-  expect(
-    utils.getByText(fixtures.makeBook(0).authors.join(", "))
-  ).toBeInTheDocument();
 });
 
 test("renders empty state if no lanes or books", () => {
-  const initialState: State = merge(fixtures.initialState, {
+  mockCollection({
+    isLoading: false,
     collection: {
-      data: {
-        books: [],
-        lanes: null
-      }
+      id: "id",
+      url: "url",
+      title: "title",
+      navigationLinks: [],
+      books: [],
+      lanes: []
     }
   });
-  const utils = render(<Collection />, {
-    initialState
-  });
+  const utils = render(<Collection />);
 
   expect(utils.getByText("This collection is empty.")).toBeInTheDocument();
 });
