@@ -3,7 +3,6 @@ import { render, fixtures } from "../../test-utils";
 import merge from "deepmerge";
 import { FacetGroupData, CollectionData } from "interfaces";
 import PageTitle from "components/PageTitle";
-import { State } from "owc/state";
 import userEvent from "@testing-library/user-event";
 import { mockPush } from "test-utils/mockNextRouter";
 
@@ -29,7 +28,6 @@ const formatsFacet: FacetGroupData = {
 };
 
 const collectionData: CollectionData = {
-  ...fixtures.initialState.collection.data,
   facetGroups: [formatsFacet],
   title: "my lane",
   url: "/link-to-lane",
@@ -44,13 +42,6 @@ const collectionData: CollectionData = {
     }
   ]
 };
-
-const stateWithFacets: State = merge<State>(fixtures.initialState, {
-  collection: {
-    ...fixtures.initialState.collection,
-    data: collectionData
-  }
-});
 
 describe("Format filters", () => {
   test("Format filters not rendered when not in state", () => {

@@ -33,7 +33,7 @@ const ListLoadingIndicator = () => (
       p: 3
     }}
   >
-    <LoadingIndicator /> Loading...
+    <LoadingIndicator /> Loading ...
   </div>
 );
 
