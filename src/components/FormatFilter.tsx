@@ -5,6 +5,7 @@ import FormLabel from "./form/FormLabel";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
 import Select from "./Select";
+import { CollectionData } from "interfaces";
 
 /**
  * This filter depends on the "Formats" facetGroup, which should have
