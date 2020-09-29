@@ -4,23 +4,27 @@ import * as React from "react";
 import Select, { Label } from "./Select";
 import Router from "next/router";
 import useLinkUtils from "./context/LinkUtilsContext";
-import useCollection from "hooks/useCollection";
+import { CollectionData } from "interfaces";
 
 /**
  * This filter depends on the "Sort by" and "Availability" facet groups.
  * They must be named exactly that in the CM in order to show up here.
  */
-const ListFilters: React.FC = () => {
+const ListFilters: React.FC<{ collection: CollectionData }> = ({
+  collection
+}) => {
   return (
     <div sx={{ display: "flex", alignItems: "center" }}>
-      <FacetSelector facetLabel="Sort by" />
-      <FacetSelector facetLabel="Availability" />
+      <FacetSelector collection={collection} facetLabel="Sort by" />
+      <FacetSelector collection={collection} facetLabel="Availability" />
     </div>
   );
 };
 
-const FacetSelector: React.FC<{ facetLabel: string }> = ({ facetLabel }) => {
-  const { collection } = useCollection();
+const FacetSelector: React.FC<{
+  facetLabel: string;
+  collection: CollectionData;
+}> = ({ facetLabel, collection }) => {
   const facetGroup = collection?.facetGroups?.find(
     facetGroup => facetGroup.label === facetLabel
   );
