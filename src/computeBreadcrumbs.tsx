@@ -51,7 +51,7 @@ export default computeBreadcrumbs;
  * hierarchy, so this may not make sense for some feeds.
  * */
 export function hierarchyComputeBreadcrumbs(
-  collection: CollectionData,
+  collection?: CollectionData,
   comparator?: (url1: string, url2: string) => boolean
 ): LinkData[] {
   const links: LinkData[] = [];

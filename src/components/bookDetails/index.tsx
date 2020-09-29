@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData, LinkData } from "interfaces";
+import { BookData } from "interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./Recommendations";
 import { PageLoader } from "../LoadingIndicator";
@@ -25,22 +25,8 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 import { ProblemDocument } from "types/opds1";
-import useLibraryContext from "components/context/LibraryContext";
-
-function computeBookBreadcrumbs(
-  catalogUrl: string,
-  catalogName: string
-): LinkData[] {
-  const home: LinkData = {
-    url: catalogUrl,
-    id: catalogUrl,
-    text: catalogName
-  };
-  return [home];
-}
 
 export const BookDetails: React.FC = () => {
-  const { catalogUrl, catalogName } = useLibraryContext();
   const { query } = useRouter();
   const bookUrl = extractParam(query, "bookUrl");
   const { data, error } = useSWR(bookUrl ?? null, fetchBook);
@@ -57,16 +43,12 @@ export const BookDetails: React.FC = () => {
 
   if (!book) return <PageLoader />;
 
-  const breadcrumbs = computeBookBreadcrumbs(catalogUrl, catalogName);
   return (
     <section aria-label="Book details">
       <Head>
         <title>{book.title}</title>
       </Head>
-      <BreadcrumbBar
-        breadcrumbs={breadcrumbs}
-        currentLocation={truncateString(book.title, 60, false)}
-      />
+      <BreadcrumbBar currentLocation={truncateString(book.title, 60, false)} />
       <div sx={{ maxWidth: 1100, mx: "auto" }}>
         <div
           sx={{

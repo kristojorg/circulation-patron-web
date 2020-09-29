@@ -4,15 +4,21 @@ import * as React from "react";
 import Link from "./Link";
 import List, { ListItem } from "./List";
 import { LinkData } from "interfaces";
+import useLibraryContext from "components/context/LibraryContext";
 
 const BreadcrumbBar: React.FC<{
   className?: string;
   currentLocation?: string;
-  breadcrumbs: LinkData[];
+  breadcrumbs?: LinkData[];
 }> = ({ children, className, currentLocation, breadcrumbs }) => {
+  const { catalogUrl, catalogName } = useLibraryContext();
+
   const breadcrumbsWithAtLeastOne =
-    breadcrumbs.length > 0 ? breadcrumbs : [{ text: " ", url: " " }];
-  const lastItem = currentLocation ?? breadcrumbs.pop()?.text;
+    (breadcrumbs?.length ?? 0) > 0
+      ? breadcrumbs
+      : [{ text: catalogName, url: catalogUrl }];
+
+  const lastItem = currentLocation ?? breadcrumbs?.pop()?.text;
   return (
     <div
       className={className}
