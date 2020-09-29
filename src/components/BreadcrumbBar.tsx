@@ -14,7 +14,7 @@ const BreadcrumbBar: React.FC<{
   const { catalogUrl, catalogName } = useLibraryContext();
 
   const breadcrumbsWithAtLeastOne =
-    (breadcrumbs?.length ?? 0) > 0
+    breadcrumbs && breadcrumbs.length > 0
       ? breadcrumbs
       : [{ text: catalogName, url: catalogUrl }];
 
