@@ -1,6 +1,5 @@
 import * as React from "react";
 import { render, fixtures } from "../../test-utils";
-import merge from "deepmerge";
 import { FacetGroupData, CollectionData } from "interfaces";
 import PageTitle from "components/PageTitle";
 import userEvent from "@testing-library/user-event";
@@ -27,7 +26,7 @@ const formatsFacet: FacetGroupData = {
   ]
 };
 
-const collectionData: CollectionData = {
+const collection: CollectionData = {
   facetGroups: [formatsFacet],
   title: "my lane",
   url: "/link-to-lane",
@@ -52,18 +51,14 @@ describe("Format filters", () => {
     expect(utils.queryByLabelText("Audiobooks")).toBeFalsy();
   });
   test("Format filters are visible in PageTitle w/ facets", () => {
-    const utils = render(<PageTitle>Child</PageTitle>, {
-      initialState: stateWithFacets
-    });
+    const utils = render(<PageTitle collection={collection}>Child</PageTitle>);
     expect(utils.getByRole("option", { name: "All" })).toBeTruthy();
     expect(utils.getByRole("option", { name: "eBooks" })).toBeTruthy();
     expect(utils.getByRole("option", { name: "Audiobooks" })).toBeTruthy();
   });
 
   test("format filters navigate to respective urls", async () => {
-    const utils = render(<PageTitle>Child</PageTitle>, {
-      initialState: stateWithFacets
-    });
+    const utils = render(<PageTitle collection={collection}>Child</PageTitle>);
 
     const select = utils.getByRole("combobox", {
       name: "Format"

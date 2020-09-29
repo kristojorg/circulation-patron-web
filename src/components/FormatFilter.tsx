@@ -19,7 +19,6 @@ const FormatFilter: React.FC<{ collection: CollectionData }> = ({
   collection
 }) => {
   const { buildCollectionLink } = useLinkUtils();
-  const isCollectionLoaded = false;
 
   const formatFacetGroup = collection?.facetGroups?.find(
     facetGroup => facetGroup.label === "Formats"
@@ -35,7 +34,6 @@ const FormatFilter: React.FC<{ collection: CollectionData }> = ({
     facet => facet.label === "All"
   );
 
-  if (!isCollectionLoaded) return null;
   if (!ebookFacet || !audiobookFacet) {
     // in order to display the format selector, you must have an audiobook and ebook filter set
     // up in the CM
