@@ -9,7 +9,7 @@ import { fetchCollection } from "dataflow/opds1/fetch";
 import useSWR from "swr";
 
 const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
-  const relatedUrl = getRelatedUrl(book);
+  const relatedUrl = book.relatedUrl;
 
   const { data: recommendations, isValidating } = useSWR(
     relatedUrl,
@@ -53,19 +53,6 @@ const Recommendations: React.FC<{ book: BookData }> = ({ book }) => {
       </ul>
     </section>
   );
-};
-
-const getRelatedUrl = (book: BookData): null | string => {
-  if (!book) return null;
-
-  const links = book.raw.link;
-  if (!links) return null;
-
-  const relatedLink = links.find((link: any) => link.$.rel.value === "related");
-
-  if (!relatedLink) return null;
-
-  return relatedLink.$.href.value;
 };
 
 export default Recommendations;

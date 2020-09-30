@@ -52,6 +52,9 @@ function isSearchLink(link: OPDSLink): link is SearchLink {
 function isDefined<T>(value: T | undefined): value is T {
   return typeof value !== "undefined";
 }
+function isRelatedLink(link: OPDSLink) {
+  return link.rel === "related";
+}
 
 /**
  * Utils
@@ -147,6 +150,9 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
       };
     });
 
+  const relatedLinks = entry.links.filter(isRelatedLink);
+  const relatedLink = relatedLinks.length > 0 ? relatedLinks[0] : null;
+
   const borrowLink = entry.links.find(link => {
     return (
       isAcquisitionLink(link) && link.rel === OPDSAcquisitionLink.BORROW_REL
@@ -205,6 +211,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     categories: categories,
     language: entry.language,
     url: detailUrl,
+    relatedUrl: relatedLink?.href ?? null,
     raw: entry.unparsed
   };
 }
