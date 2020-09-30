@@ -1,7 +1,6 @@
 import * as React from "react";
 import { render, fixtures, waitForElementToBeRemoved } from "test-utils";
 import { mergeBook } from "test-utils/fixtures";
-import merge from "deepmerge";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
@@ -88,15 +87,8 @@ describe("open-access", () => {
         }
       ]
     });
-    const stateWithDuplicateFormatLoan = merge(fixtures.initialState, {
-      loans: {
-        url: "/loans",
-        books: [bookWithDuplicateFormat]
-      }
-    });
-    const utils = render(<FulfillmentCard book={bookWithDuplicateFormat} />, {
-      initialState: stateWithDuplicateFormatLoan
-    });
+
+    const utils = render(<FulfillmentCard book={bookWithDuplicateFormat} />);
 
     const downloadButton = utils.getAllByText("Download PDF");
     expect(downloadButton).toHaveLength(1);
