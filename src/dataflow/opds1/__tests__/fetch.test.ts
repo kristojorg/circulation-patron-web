@@ -17,13 +17,15 @@ describe("fetchOPDS", () => {
    * - parses response text into opds feed
    * - throws application error if it cannot parse
    */
-  test("fetches with headers", () => {
-    fetchOPDS("/some-url");
+  test("fetches with headers", async () => {
+    fetchMock.once(rawOpdsEntry);
+    await fetchOPDS("/some-url");
     expect(fetchMock).toHaveBeenCalledWith("/some-url", {
       headers: { "X-Requested-With": "XMLHttpRequest" }
     });
 
-    fetchOPDS("/some-url", "some-token");
+    fetchMock.once(rawOpdsEntry);
+    await fetchOPDS("/some-url", "some-token");
     expect(fetchMock).toHaveBeenCalledWith("/some-url", {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -108,6 +110,13 @@ describe("fetchBook", () => {
 
 describe("fetchSearchData", () => {
   test("fetches url", async () => {
+    fetchMock.once(`
+    <OpenSearchDescription>
+      <Description>d</Description>
+      <ShortName>s</ShortName>
+      <Url template="http://example.com/{searchTerms}" />
+    </OpenSearchDescription>
+    `);
     fetchSearchData("http://search");
     expect(fetchMock).toHaveBeenCalledWith("http://search");
   });
