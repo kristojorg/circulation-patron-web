@@ -18,7 +18,7 @@ import useUser from "components/context/UserContext";
 import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
 
-const AuthForm: React.FC = ({ children }) => {
+const AuthModal: React.FC = ({ children }) => {
   const dialog = useDialogState();
   const { hide } = dialog;
   const { catalogName, authMethods } = useLibraryContext();
@@ -236,4 +236,4 @@ function getMethodForId(
   );
 }
 
-export default AuthForm;
+export default AuthModal;
