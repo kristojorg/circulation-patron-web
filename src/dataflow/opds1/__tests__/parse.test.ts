@@ -51,7 +51,7 @@ describe("OPDSDataAdapter", () => {
     });
 
     const entry = factory.entry({
-      id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
+      id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr91",
       title: "The Mayan Secrets",
       authors: [
         factory.contributor({ name: "Clive Cussler" }),
