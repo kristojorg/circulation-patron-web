@@ -154,7 +154,7 @@ const Buttons: React.FC<{
             case OPDS1.BasicAuthType:
               return (
                 <Button
-                  key={method.type}
+                  key={getIdForMethod(method)}
                   sx={{ ...modalButtonStyles }}
                   onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
                 >
@@ -162,9 +162,13 @@ const Buttons: React.FC<{
                 </Button>
               );
             case OPDS1.SamlAuthType:
-              return <SamlAuthButton method={method} key={method.type} />;
+              return (
+                <SamlAuthButton method={method} key={getIdForMethod(method)} />
+              );
             case OPDS1.CleverAuthType:
-              return <CleverButton method={method} key={method.type} />;
+              return (
+                <CleverButton method={method} key={getIdForMethod(method)} />
+              );
             default:
               return null;
           }
@@ -210,7 +214,7 @@ const Combobox: React.FC<{
         onChange={e => handleChangeMethod(e.target.value)}
       >
         {authMethods?.map(method => (
-          <option key={method.type} value={getIdForMethod(method)}>
+          <option key={getIdForMethod(method)} value={getIdForMethod(method)}>
             {method.description}
           </option>
         ))}
