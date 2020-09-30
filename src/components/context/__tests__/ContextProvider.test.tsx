@@ -2,9 +2,9 @@ import * as React from "react";
 import { shallow } from "enzyme";
 import { renderHook } from "@testing-library/react-hooks";
 import AppContextProvider from "../ContextProvider";
-import { LibraryData } from "../../../interfaces";
+import { LibraryData } from "interfaces";
 import useLibraryContext from "../LibraryContext";
-import { MockNextRouterContextProvider } from "../../../test-utils/mockNextRouter";
+import { MockNextRouterContextProvider } from "test-utils/mockNextRouter";
 import * as modal from "components/Modal";
 
 // react portals not supported by hooks testing library
