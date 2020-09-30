@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, fixtures, actions, waitFor } from "test-utils";
+import { render, fixtures, waitFor } from "test-utils";
 import { CollectionData } from "interfaces";
 import { RecommendationsStateContext } from "components/context/RecommendationsContext";
 import Recommendations from "../Recommendations";
