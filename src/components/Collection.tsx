@@ -7,13 +7,29 @@ import Head from "next/head";
 import PageTitle from "./PageTitle";
 import { Text } from "./Text";
 import BreadcrumbBar from "./BreadcrumbBar";
-import useCollection from "hooks/useCollection";
 import computeBreadcrumbs from "computeBreadcrumbs";
+import useLibraryContext from "components/context/LibraryContext";
+import { fetchCollection } from "dataflow/opds1/fetch";
+import extractParam from "dataflow/utils";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 
 export const Collection: React.FC<{
   title?: string;
 }> = ({ title }) => {
-  const { collection, isLoading, url } = useCollection();
+  const { catalogUrl } = useLibraryContext();
+  const { query } = useRouter();
+  const collectionUrlParam = extractParam(query, "collectionUrl");
+  // use catalog url if you're at home
+  const collectionUrl = decodeURIComponent(collectionUrlParam ?? catalogUrl);
+
+  const { data: collection, isValidating } = useSWR(
+    collectionUrl,
+    fetchCollection
+  );
+
+  const isLoading = !collection && isValidating;
+
   const hasLanes = collection?.lanes && collection.lanes.length > 0;
   const hasBooks = collection?.books && collection.books.length > 0;
   const pageTitle = title ?? `Collection: ${collection?.title ?? ""}`;
@@ -38,7 +54,7 @@ export const Collection: React.FC<{
       ) : hasLanes ? (
         <LanesView lanes={collection?.lanes ?? []} />
       ) : hasBooks ? (
-        <InfiniteBookList firstPageUrl={url} />
+        <InfiniteBookList firstPageUrl={collectionUrl} />
       ) : (
         <div
           sx={{
