@@ -34,7 +34,11 @@ test("properly extracts links", () => {
     privacy,
     terms,
     about,
-    website
+    website,
+    {
+      rel: "authenticate",
+      href: "/not-to-be-used"
+    }
   ];
 
   const data = parseLinks(links);
