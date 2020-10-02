@@ -15,6 +15,16 @@ export { OPDS1 };
 /**
  * INTERNAL APP MODEL
  */
+export type AppConfig = {
+  catalog: CatalogRootUrl | LibraryRegistryUrl | CatalogConfig;
+  supportedMedia: Record<OPDS1.AnyBookMediaType, MediaSupportLevel>;
+};
+type CatalogRootUrl = string;
+type LibraryRegistryUrl = string;
+type CatalogConfig = {
+  [key: string]: CatalogRootUrl;
+};
+type MediaSupportLevel = "Preferred" | "Allowed" | "Unsupported" | "Hidden";
 
 export interface ComplaintData {
   type: string;
