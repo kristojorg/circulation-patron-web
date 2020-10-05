@@ -13,7 +13,7 @@ const BasicAuthButton: React.FC<{
 
   return (
     <Button
-      aria-label={`Login to ${description}`}
+      aria-label={`Login with ${description ?? "Basic Auth"}`}
       type="submit"
       onClick={() => onClick(method.type)}
       sx={{
@@ -21,11 +21,7 @@ const BasicAuthButton: React.FC<{
         backgroundImage: `url(${imageUrl})`
       }}
     >
-      {imageUrl
-        ? ""
-        : method.description
-        ? `Login with ${method.description}`
-        : "Login with Basic Auth"}
+      {imageUrl ? "" : `Login with ${description ?? "Basic Auth"}`}
     </Button>
   );
 };
