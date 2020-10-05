@@ -19,8 +19,8 @@ import fetchWithHeaders from "dataflow/fetch";
 
 export default async function reader(
   bookUrl: string,
-  catalogName: string,
   token: string,
+  catalogName: string,
   decryptorParams?: any
 ) {
   const element = document.getElementById("viewer");
