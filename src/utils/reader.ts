@@ -1,5 +1,4 @@
 import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "../utils/env";
-
 import {
   SepiaTheme,
   SerifFont,
