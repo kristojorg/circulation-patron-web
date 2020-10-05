@@ -3,11 +3,14 @@ import React from "react";
 import reader from "utils/reader";
 import { useRouter } from "next/router";
 import useLibraryContext from "./context/LibraryContext";
+import useUser from "components/context/UserContext";
+import fetchWithHeaders from "dataflow/fetch";
 
 const initializeReader = async (
   entryUrl: string,
   catalogName: string,
-  useDecryptor: boolean
+  useDecryptor: boolean,
+  token: string
 ) => {
   if (useDecryptor) {
     const loadDecryptor = async (webpubManifestUrl: any) => {
@@ -18,7 +21,10 @@ const initializeReader = async (
       );
       if (Decryptor) {
         try {
-          const fulfillmentData = await fetch(webpubManifestUrl);
+          const fulfillmentData = await fetchWithHeaders(
+            webpubManifestUrl,
+            token
+          );
           const data = await fulfillmentData.json();
           //If a status thrown, there is an error
           if (data.status) {
@@ -32,22 +38,31 @@ const initializeReader = async (
     };
 
     const decryptorParams = await loadDecryptor(entryUrl);
-    return await reader(entryUrl, catalogName, decryptorParams);
+    return await reader(entryUrl, token, catalogName, decryptorParams);
   }
 
-  return await reader(entryUrl, catalogName);
+  return await reader(entryUrl, token, catalogName);
 };
 
 const BookPage = () => {
   const library = useLibraryContext();
   const router = useRouter();
   const { bookUrl } = router.query;
+  const { token } = useUser();
 
   const { catalogName } = library;
 
   React.useEffect(() => {
-    initializeReader(`${bookUrl}`, catalogName, NEXT_PUBLIC_AXIS_NOW_DECRYPT);
-  });
+    if (token)
+      initializeReader(
+        `${bookUrl}`,
+        catalogName,
+        NEXT_PUBLIC_AXIS_NOW_DECRYPT,
+        token
+      );
+  }, [token, bookUrl, catalogName]);
+
+  if (!token) return <div>You need to be logged in to view this page.</div>;
 
   return (
     <>
