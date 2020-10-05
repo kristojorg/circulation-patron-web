@@ -17,7 +17,7 @@ import {
 } from "library-simplified-webpub-viewer";
 import fetchWithHeaders from "dataflow/fetch";
 
-export default async function (
+export default async function reader(
   bookUrl: string,
   catalogName: string,
   token: string,
