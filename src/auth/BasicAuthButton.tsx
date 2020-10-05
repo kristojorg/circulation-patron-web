@@ -21,7 +21,11 @@ const BasicAuthButton: React.FC<{
         backgroundImage: `url(${imageUrl})`
       }}
     >
-      {!imageUrl ? "Login" : ""}
+      {imageUrl
+        ? ""
+        : method.description
+        ? `Login with ${method.description}`
+        : "Login with Basic Auth"}
     </Button>
   );
 };

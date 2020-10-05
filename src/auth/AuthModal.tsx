@@ -3,7 +3,7 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { useDialogState } from "reakit/Dialog";
 import useLibraryContext from "../components/context/LibraryContext";
-import Modal, { modalButtonStyles } from "../components/Modal";
+import Modal from "../components/Modal";
 import ClientOnly from "../components/ClientOnly";
 import { H2, Text } from "../components/Text";
 import FormLabel from "../components/form/FormLabel";
@@ -17,6 +17,7 @@ import { AuthModalProvider } from "auth/AuthModalContext";
 import useUser from "components/context/UserContext";
 import Button from "components/Button";
 import ExternalLink from "components/ExternalLink";
+import BasicAuthButton from "auth/BasicAuthButton";
 
 const AuthForm: React.FC = ({ children }) => {
   const dialog = useDialogState();
@@ -153,13 +154,11 @@ const Buttons: React.FC<{
           switch (method.type) {
             case OPDS1.BasicAuthType:
               return (
-                <Button
+                <BasicAuthButton
                   key={method.type}
-                  sx={{ ...modalButtonStyles }}
+                  method={method}
                   onClick={() => handleChangeMethod(OPDS1.BasicAuthType)}
-                >
-                  Login with {method.description ?? "Basic Auth"}
-                </Button>
+                />
               );
             case OPDS1.SamlAuthType:
               return <SamlAuthButton method={method} key={method.type} />;
