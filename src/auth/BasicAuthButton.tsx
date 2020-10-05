@@ -10,10 +10,11 @@ const BasicAuthButton: React.FC<{
 }> = ({ method, onClick }) => {
   const { description, links } = method;
   const imageUrl = links?.find(link => link.rel === "logo")?.href;
+  const name = description ?? "Basic Auth";
 
   return (
     <Button
-      aria-label={`Login with ${description ?? "Basic Auth"}`}
+      aria-label={`Login with ${name}`}
       type="submit"
       onClick={() => onClick(method.type)}
       sx={{
@@ -21,7 +22,7 @@ const BasicAuthButton: React.FC<{
         backgroundImage: `url(${imageUrl})`
       }}
     >
-      {imageUrl ? "" : `Login with ${description ?? "Basic Auth"}`}
+      {imageUrl ? "" : `Login with ${name}`}
     </Button>
   );
 };
