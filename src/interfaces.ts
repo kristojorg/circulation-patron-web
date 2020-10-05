@@ -17,7 +17,7 @@ export { OPDS1 };
  */
 
 // app config
-export type AppConfig = {
+export type NewAppConfig = {
   supportedMedia: Record<OPDS1.AnyBookMediaType, MediaSupportLevel>;
 };
 type MediaSupportLevel = "Preferred" | "Allowed" | "Unsupported" | "Hidden";
@@ -27,7 +27,7 @@ export interface ComplaintData {
   detail?: string;
 }
 
-export type CatalogConfigFile = {
+export type AppConfigFile = {
   [library: string]: string | undefined;
 };
 
