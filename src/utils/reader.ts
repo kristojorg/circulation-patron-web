@@ -17,10 +17,10 @@ import {
 import fetchWithHeaders from "dataflow/fetch";
 import ApplicationError from "errors";
 
-export default async function (
+export default async function reader(
   bookUrl: string,
-  catalogName: string,
   token: string,
+  catalogName: string,
   decryptorParams?: any
 ) {
   const element = document.getElementById("viewer");
