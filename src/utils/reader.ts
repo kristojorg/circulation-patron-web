@@ -15,10 +15,12 @@ import {
   ColumnsPaginatedBookView,
   ScrollingBookView
 } from "library-simplified-webpub-viewer";
+import fetchWithHeaders from "dataflow/fetch";
 
 export default async function (
   bookUrl: string,
   catalogName: string,
+  token: string,
   decryptorParams?: any
 ) {
   const element = document.getElementById("viewer");
@@ -26,7 +28,7 @@ export default async function (
   const containerHref = webpubBookUrl.href.endsWith("container.xml")
     ? webpubBookUrl.href
     : "";
-  const response = await fetch(containerHref);
+  const response = await fetchWithHeaders(containerHref, token);
   const text = await response.text();
   const xml = new window.DOMParser().parseFromString(text, "text/html");
   const rootfile = xml.getElementsByTagName("rootfile")[0]
