@@ -2,8 +2,8 @@
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
 import { SystemStyleObject } from "@styled-system/css";
-import { APP_CONFIG } from "config";
 import Link from "next/link";
+import { getLibrarySlugs } from "dataflow/getLibraryData";
 
 const statusCodes: { [code: number]: string } = {
   400: "Bad Request",
@@ -27,9 +27,7 @@ const ErrorComponent = ({
     ? statusCodes[statusCode]
     : "An unexpected error has occurred";
 
-  const libraryMap =
-    typeof APP_CONFIG.libraries === "string" ? undefined : config?.libraries;
-  const libraries = libraryMap ? Object.keys(libraryMap) : undefined;
+  const libraries = getLibrarySlugs();
 
   return (
     <>
@@ -84,6 +82,8 @@ const LibraryList: React.FC<{ libraries: string[] }> = ({ libraries }) => {
               }}
               href={`/${lib}`}
             >
+              {/* nextjs passes the href when cloning the element */}
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a>/{lib}</a>
             </Link>
           </li>

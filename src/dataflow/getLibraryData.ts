@@ -215,7 +215,7 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
  * Attempts to create an array of all the libraries available with the
  * current env settings.
  */
-export async function getLibrarySlugs() {
+export function getLibrarySlugs() {
   const libraries = APP_CONFIG.libraries;
   if (typeof libraries === "string") {
     console.warn(
