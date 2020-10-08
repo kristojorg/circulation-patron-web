@@ -9,7 +9,7 @@ import { NavButton } from "./Button";
 import SvgPhone from "icons/Phone";
 import IosBadge from "./storeBadges/IosBadge";
 import GooglePlayBadge from "./storeBadges/GooglePlayBadge";
-import config from "config/load-config";
+import { config } from "config";
 
 const Footer: React.FC<{ className?: string }> = ({ className }) => {
   const library = useLibraryContext();

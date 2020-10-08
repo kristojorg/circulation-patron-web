@@ -338,6 +338,6 @@ describe("getLibrarySlugs", () => {
     mockConfig({
       libraries: "http://reg-base.com"
     });
-    expect(await getLibrarySlugs()).toEqual([]);
+    expect(await getLibrarySlugs()).toEqual(null);
   });
 });
