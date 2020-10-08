@@ -1,8 +1,8 @@
+import { config } from "config";
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import { MediaLink, OPDS1 } from "interfaces";
 import { typeMap } from "utils/file";
-import { NEXT_PUBLIC_AXIS_NOW_DECRYPT } from "utils/env";
 
 /**
  * Fulfilling a book requires a couple pieces of information:
@@ -87,7 +87,7 @@ export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
 
     case OPDS1.AxisNowWebpubMediaType:
       // you can only read these if you can decrypt them.
-      if (!NEXT_PUBLIC_AXIS_NOW_DECRYPT) {
+      if (!config.axisNowDecrypt) {
         return { type: "unsupported" };
       }
       return {

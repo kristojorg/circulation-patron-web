@@ -1,7 +1,8 @@
 import * as React from "react";
-import { mockShowAuthModal, render, setEnv } from "test-utils";
+import { mockShowAuthModal, render } from "test-utils";
 import WebpubViewer from "components/WebpubViewer";
 import { PageNotFoundError } from "errors";
+import mockConfig from "test-utils/mockConfig";
 
 jest.mock("utils/reader", () => ({
   __esModule: true,
@@ -37,10 +38,7 @@ test("renders viewer div", () => {
 });
 
 test("fetches params with token if run with NEXT_PUBLIC_AXIS_NOW_DECRYPT", async () => {
-  setEnv({
-    NEXT_PUBLIC_AXIS_NOW_DECRYPT: true
-  });
-
+  mockConfig({ axisNowDecrypt: true });
   render(<WebpubViewer />, {
     router: { query: { bookUrl: "http://some-book.com" } }
   });

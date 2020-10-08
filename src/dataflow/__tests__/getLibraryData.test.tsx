@@ -9,7 +9,7 @@ import {
 import fetchMock from "jest-fetch-mock";
 import ApplicationError, { PageNotFoundError } from "errors";
 import rawCatalog from "test-utils/fixtures/raw-opds-feed";
-import { fixtures, setEnv } from "test-utils";
+import { fixtures } from "test-utils";
 import { OPDS1, OPDS2 } from "interfaces";
 import { getAuthDocHref } from "utils/auth";
 import mockConfig from "test-utils/mockConfig";
@@ -46,7 +46,7 @@ describe("fetchCatalog", () => {
   });
 });
 
-describe.only("getCatalogRootUrl", () => {
+describe("getCatalogRootUrl", () => {
   test("throws PageNotFoundError if no entry found in config file for library", async () => {
     mockConfig({ libraries: { hello: "what" } });
     const promise = getCatalogRootUrl("not there slug");
@@ -75,7 +75,7 @@ describe.only("getCatalogRootUrl", () => {
     });
 
     test("Throws ApplicationError if it doesn't find a catalogRootUrl", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       const missingCatalogRootUrl: OPDS2.LibraryRegistryFeed = {
         ...fixtures.opds2.feedWithCatalog,
         catalogs: [
@@ -98,7 +98,7 @@ describe.only("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if the LibraryRegistryFeed doesn't have a CatalogEntry", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       fetchMock.mockResponses(
         JSON.stringify(fixtures.opds2.feedWithoutCatalog),
         JSON.stringify(fixtures.opds2.feedWithoutCatalog)
@@ -111,7 +111,7 @@ describe.only("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if it can't fetch the catalog entry", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       fetchMock.mockResponseOnce(
         JSON.stringify(fixtures.opds2.feedWithoutCatalog)
       );
@@ -123,7 +123,7 @@ describe.only("getCatalogRootUrl", () => {
     });
 
     test("Throws an ApplicationError if the registry doesn't contain a template link", async () => {
-      setEnv({ REGISTRY_BASE: "reg-base" });
+      mockConfig({ libraries: "reg-base" });
       const missingTemplateLink: OPDS2.LibraryRegistryFeed = {
         ...fixtures.opds2.feedWithoutCatalog,
         links: []
@@ -324,27 +324,20 @@ describe("getAuthDocHref", () => {
 });
 
 describe("getLibrarySlugs", () => {
-  test("returns an empty array if running with CIRCULATION_MANAGER_BASE", async () => {
-    setEnv({ CIRCULATION_MANAGER_BASE: "some base" });
-    expect(await getLibrarySlugs()).toEqual([]);
-  });
-
-  test("returns keys of config file", async () => {
-    setEnv({ CONFIG_FILE: "some-config-file" });
+  test("returns keys of libraries in config file", async () => {
+    mockConfig({
+      libraries: {
+        somelibrary: "/somewhere",
+        anotherlib: "/another"
+      }
+    });
     expect(await getLibrarySlugs()).toEqual(["somelibrary", "anotherlib"]);
   });
 
   test("returns an empty array when using a library registry", async () => {
-    setEnv({ REGISTRY_BASE: "some-registry" });
+    mockConfig({
+      libraries: "http://reg-base.com"
+    });
     expect(await getLibrarySlugs()).toEqual([]);
-  });
-
-  test("throws ApplicationError if env improperly set", async () => {
-    setEnv({});
-    const promise = getLibrarySlugs();
-    expect(promise).rejects.toThrowError(ApplicationError);
-    expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Unable to get library slugs for current setup."`
-    );
   });
 });
