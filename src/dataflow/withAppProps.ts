@@ -11,7 +11,6 @@ import { getAuthDocHref } from "utils/auth";
 import { findSearchLink } from "dataflow/opds1/parse";
 import { fetchSearchData } from "dataflow/opds1/fetch";
 import extractParam from "dataflow/utils";
-import config from "config";
 
 export type AppProps = {
   library?: LibraryData;

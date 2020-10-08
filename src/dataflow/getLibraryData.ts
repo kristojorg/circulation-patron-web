@@ -6,14 +6,9 @@ import {
   SearchData
 } from "interfaces";
 import OPDSParser, { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
-import {
-  CIRCULATION_MANAGER_BASE,
-  REGISTRY_BASE,
-  CONFIG_FILE
-} from "utils/env";
-import ApplicationError, { PageNotFoundError, AppSetupError } from "errors";
+import ApplicationError, { PageNotFoundError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
-import config from "config";
+import { config } from "config";
 
 /**
  * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
@@ -109,7 +104,8 @@ export async function getCatalogRootUrl(librarySlug: string): Promise<string> {
   // we have a dictionary of libraries
   // just get the url from the dictionary
 
-  const catalogRootUrl = libraries[librarySlug];
+  const catalogRootUrl =
+    librarySlug in libraries ? libraries[librarySlug] : undefined;
   if (typeof catalogRootUrl !== "string") {
     throw new PageNotFoundError(
       `No catalog root url is configured for the library: ${librarySlug}.`
@@ -220,21 +216,13 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
  * current env settings.
  */
 export async function getLibrarySlugs() {
-  if (CIRCULATION_MANAGER_BASE) return [];
-
-  if (CONFIG_FILE) {
-    const configFile = await getConfigFile(CONFIG_FILE);
-    const slugs = Object.keys(configFile);
-    return slugs;
+  const libraries = config.libraries;
+  if (typeof libraries === "string") {
+    console.warn(
+      "Cannot retrive library slugs for a Library Registry based setup."
+    );
+    return null;
   }
-
-  if (REGISTRY_BASE) {
-    /**
-     * We don't do any static generation when running with a
-     * library registry. Therefore, we return an empty array
-     */
-    return [];
-  }
-
-  throw new ApplicationError("Unable to get library slugs for current setup.");
+  const slugs = Object.keys(libraries);
+  return slugs;
 }

@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
 import { SystemStyleObject } from "@styled-system/css";
-import config from "config";
+import { config } from "config";
 import Link from "next/link";
 
 const statusCodes: { [code: number]: string } = {

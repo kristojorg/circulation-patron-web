@@ -25,6 +25,7 @@
     ".eslintrc.js",
     "**/*.tsx",
     "next.config.js",
-    "src/config/load-config.js"
+    "src/config/load-config.js",
+    "src/config/fetch-config.js"
   ]
 }
