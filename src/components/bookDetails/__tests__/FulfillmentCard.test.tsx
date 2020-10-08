@@ -4,7 +4,7 @@ import { mergeBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
-import * as env from "utils/env";
+import mockConfig from "test-utils/mockConfig";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
@@ -356,7 +356,7 @@ describe("reserved", () => {
 });
 
 describe("available to download", () => {
-  beforeEach(() => ((env.NEXT_PUBLIC_COMPANION_APP as string) = "simplye"));
+  beforeEach(() => mockConfig({ companionApp: "simplye" }));
 
   const downloadableBook = mergeBook({
     openAccessLinks: undefined,
@@ -391,8 +391,7 @@ describe("available to download", () => {
   });
 
   test("constructs link to viewer for OpenAxis Books", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
-    (env.NEXT_PUBLIC_AXIS_NOW_DECRYPT as boolean) = true;
+    mockConfig({ companionApp: "openebooks", axisNowDecrypt: true });
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
     const readerLink = utils.getByRole("link", {
       name: /Read Online/i
@@ -409,7 +408,7 @@ describe("available to download", () => {
   });
 
   test("correct title and subtitle when COMPANION_APP is set to openebooks", () => {
-    (env.NEXT_PUBLIC_COMPANION_APP as string) = "openebooks";
+    mockConfig({ companionApp: "openebooks" });
     const utils = render(<FulfillmentCard book={downloadableBook} />);
     expect(
       utils.getByText("You have this book on loan until Thu Jun 18 2020.")

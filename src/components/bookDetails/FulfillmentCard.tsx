@@ -16,7 +16,6 @@ import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
-import { NEXT_PUBLIC_COMPANION_APP } from "utils/env";
 import BorrowOrReserve from "components/BorrowOrReserve";
 import { BookData, MediaLink } from "interfaces";
 import {
@@ -28,6 +27,7 @@ import {
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
+import { config } from "config";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -246,7 +246,7 @@ const AccessCard: React.FC<{
 
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
-    NEXT_PUBLIC_COMPANION_APP === "openebooks" ? "Open eBooks" : "SimplyE";
+    config.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
 
   return (
     <>
