@@ -1,5 +1,5 @@
 import * as configModule from "config";
-import AppConfig from "config/load-config";
+import { AppConfig } from "interfaces";
 
 export default function mockConfig(custom: Partial<AppConfig>) {
   (configModule.config as any) = {
