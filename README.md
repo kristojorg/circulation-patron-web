@@ -31,12 +31,12 @@ The main app configuration is done in the [config file](#configuration-file), bu
 
 Setting via the command line:
 ```
-> CONFIG_FILE=xxx npm run start
+> CONFIG_FILE=config.yml npm run start
 ```
 
 Setting in a `.env.local` file:
 ```
-CONFIG_FILE=xxx
+CONFIG_FILE=config.yml
 ```
 The app can then be run with `npm run start`, and it will pick up the env from your env file.
 
@@ -204,8 +204,8 @@ This command will download the image from NYPL's Docker Hub repo, and then run i
 ```
 docker run -d --name patronweb -p 3000:3000\
   --restart=unless-stopped \
-  -e "CONFIG_FILE=/config/cm_libraries.txt" \
-  -v $PATH_TO_LOCAL_VOLUME:/config \
+  -e "CONFIG_FILE=/config_volume/config.yml" \
+  -v $PATH_TO_LOCAL_VOLUME:/config_volume \
   nypl/patronweb
 ```
 
