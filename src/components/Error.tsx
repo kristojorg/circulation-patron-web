@@ -1,9 +1,9 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
-import Router from "next/router";
 import { SystemStyleObject } from "@styled-system/css";
-import { AppConfigFile } from "interfaces";
+import config from "config";
+import Link from "next/link";
 
 const statusCodes: { [code: number]: string } = {
   400: "Bad Request",
@@ -15,19 +15,22 @@ const statusCodes: { [code: number]: string } = {
 const ErrorComponent = ({
   statusCode = 404,
   title,
-  detail,
-  configFile
+  detail
 }: {
   statusCode?: number | null;
   title?: string;
   detail?: string;
-  configFile?: AppConfigFile | null;
 }) => {
   const errorTitle = title
     ? title
     : statusCode
     ? statusCodes[statusCode]
     : "An unexpected error has occurred";
+
+  const libraryMap =
+    typeof config.libraries === "string" ? undefined : config?.libraries;
+  const libraries = libraryMap ? Object.keys(libraryMap) : undefined;
+
   return (
     <>
       <H1 sx={{ fontSize: 3, textAlign: `center` }}>
@@ -41,7 +44,7 @@ const ErrorComponent = ({
       <p sx={{ textAlign: `center` }}>
         {detail && `${detail}`} <br />
       </p>
-      {configFile && <LibraryList configFile={configFile} />}
+      {libraries && <LibraryList libraries={libraries} />}
     </>
   );
 };
@@ -63,23 +66,15 @@ const buttonBase: SystemStyleObject = {
   bg: "transparent"
 };
 
-const LibraryList: React.FC<{ configFile: AppConfigFile }> = ({
-  configFile
-}) => {
-  const libraries = Object.keys(configFile);
-
-  const loadPage = async (lib: string) => {
-    await Router.push("/[library]", `/${lib}`);
-    Router.reload();
-  };
-
+const LibraryList: React.FC<{ libraries: string[] }> = ({ libraries }) => {
   return (
     <div>
       <h3>Did you mean to visit one of these?</h3>
       <ul>
         {libraries.map(lib => (
           <li key={lib}>
-            <button
+            <Link
+              replace
               sx={{
                 ...buttonBase,
                 display: "block",
@@ -87,10 +82,10 @@ const LibraryList: React.FC<{ configFile: AppConfigFile }> = ({
                 textDecoration: "underline",
                 cursor: "pointer"
               }}
-              onClick={() => loadPage(lib)}
+              href={`/${lib}`}
             >
-              /{lib}
-            </button>
+              <a>/{lib}</a>
+            </Link>
           </li>
         ))}
       </ul>

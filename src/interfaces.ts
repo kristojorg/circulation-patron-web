@@ -16,7 +16,6 @@ export { OPDS1 };
  * INTERNAL APP MODEL
  */
 
-// processed app config
 export type AppConfig = {
   mediaSupport: MediaSupportConfig;
   libraries: LibraryRegistryBase | LibrariesConfig;
@@ -34,10 +33,10 @@ export type IndirectMediaSupport = Partial<
   Record<OPDS1.IndirectAcquisitionType, DirectMediaSupport>
 >;
 
-export type MediaSupportLevel = "show" | "redirect" | "redirect-then-show";
+export type MediaSupportLevel = "show" | "redirect" | "redirect-and-show";
 
 export type LibraryRegistryBase = string;
-export type LibrariesConfig = Record<string, string>;
+export type LibrariesConfig = Record<string, string | undefined>;
 
 export interface ComplaintData {
   type: string;
