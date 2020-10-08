@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import { H1 } from "./Text";
 import { SystemStyleObject } from "@styled-system/css";
-import { config } from "config";
+import { APP_CONFIG } from "config";
 import Link from "next/link";
 
 const statusCodes: { [code: number]: string } = {
@@ -28,7 +28,7 @@ const ErrorComponent = ({
     : "An unexpected error has occurred";
 
   const libraryMap =
-    typeof config.libraries === "string" ? undefined : config?.libraries;
+    typeof APP_CONFIG.libraries === "string" ? undefined : config?.libraries;
   const libraries = libraryMap ? Object.keys(libraryMap) : undefined;
 
   return (

@@ -1,4 +1,4 @@
-import { config } from "config";
+import { APP_CONFIG } from  "config";
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
 import { MediaLink, OPDS1 } from "interfaces";
@@ -87,7 +87,7 @@ export function getFulfillmentDetails(link: MediaLink): FulfillmentDetails {
 
     case OPDS1.AxisNowWebpubMediaType:
       // you can only read these if you can decrypt them.
-      if (!config.axisNowDecrypt) {
+      if (!APP_CONFIG.axisNowDecrypt) {
         return { type: "unsupported" };
       }
       return {

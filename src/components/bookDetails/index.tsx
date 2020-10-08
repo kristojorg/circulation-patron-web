@@ -24,7 +24,7 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import useUser from "components/context/UserContext";
 import { ServerError } from "errors";
 import { ProblemDocument } from "types/opds1";
-import { config } from "config";
+import { APP_CONFIG } from "config";
 
 export const BookDetails: React.FC = () => {
   const { query } = useRouter();
@@ -61,7 +61,7 @@ export const BookDetails: React.FC = () => {
           <div sx={{ flex: ["1 1 auto", 0.33], mr: [0, 4], mb: [3, 0] }}>
             <BookCover book={book} sx={{ maxWidth: [180, "initial"] }} />
 
-            {config.companionApp === "simplye" && (
+            {APP_CONFIG.companionApp === "simplye" && (
               <SimplyECallout sx={{ display: ["none", "block"] }} />
             )}
           </div>

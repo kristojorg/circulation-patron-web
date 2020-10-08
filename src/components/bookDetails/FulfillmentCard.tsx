@@ -27,7 +27,7 @@ import {
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
-import { config } from "config";
+import { APP_CONFIG } from "config";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
@@ -246,7 +246,7 @@ const AccessCard: React.FC<{
 
   const isAudiobook = bookIsAudiobook(book);
   const companionApp =
-    config.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
+    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
 
   return (
     <>

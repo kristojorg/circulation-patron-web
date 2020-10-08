@@ -8,7 +8,7 @@ import {
 import OPDSParser, { OPDSFeed, OPDSShelfLink } from "opds-feed-parser";
 import ApplicationError, { PageNotFoundError } from "errors";
 import { flattenSamlMethod } from "utils/auth";
-import { config } from "config";
+import { APP_CONFIG } from "config";
 
 /**
  * Fetches an OPDSFeed with a given catalogUrl. Parses it into an OPDSFeed and
@@ -89,7 +89,7 @@ function findCatalogRootUrl(catalog: OPDS2.CatalogEntry) {
  * Interprets the app config to return the catalog root url.
  */
 export async function getCatalogRootUrl(librarySlug: string): Promise<string> {
-  const libraries = config.libraries;
+  const libraries = APP_CONFIG.libraries;
 
   // we have a library registry url
   if (typeof libraries === "string") {
@@ -216,7 +216,7 @@ function parseLinks(links: OPDS1.AuthDocumentLink[] | undefined): LibraryLinks {
  * current env settings.
  */
 export async function getLibrarySlugs() {
-  const libraries = config.libraries;
+  const libraries = APP_CONFIG.libraries;
   if (typeof libraries === "string") {
     console.warn(
       "Cannot retrive library slugs for a Library Registry based setup."
