@@ -1,14 +1,7 @@
 import { AppSetupError } from "./../errors";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
-import {
-  AppConfig,
-  DirectMediaSupport,
-  IndirectMediaSupport,
-  LibrariesConfig,
-  LibraryRegistryBase,
-  MediaSupportConfig
-} from "interfaces";
+import { AppConfig } from "interfaces";
 import YAML from "yaml";
 
 /**
@@ -50,40 +43,15 @@ async function fetchConfigFile(configFileUrl: string): Promise<AppConfig> {
 function parseConfigText(raw: string): AppConfig {
   const config = YAML.parse(raw);
 
-  // specifically set defaults for a couple values
+  // specifically set defaults for a couple values.
   const companionApp =
     config.companion_app === "openebooks" ? "openebooks" : "simplye";
   const axisNowDecrypt = config.axisnow_decrypt === true;
 
+  // otherwise assume the file is properly structured.
   return {
     ...config,
     axisNowDecrypt,
     companionApp
   };
-}
-
-function extractString(value: any): string | null {
-  if (typeof value === "string") return value;
-  return null;
-}
-
-function parseLibraries(value: any): LibraryRegistryBase | LibrariesConfig {
-  if (typeof value === "undefined") {
-    throw new AppSetupError(
-      "You must define a value for `libraries` in your config file"
-    );
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  // otherwise it should be an object with keys
-  const keys = Object.keys(value);
-  return keys.reduce((map, key) => {
-    if (typeof key !== "string" || typeof value[key] !== "string") {
-      throw new AppSetupError(
-        "Config File `libraries` key is improperly defined."
-      );
-    }
-    return { ...map, [key]: value };
-  }, {});
 }
