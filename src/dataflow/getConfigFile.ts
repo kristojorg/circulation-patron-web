@@ -1,15 +1,23 @@
 import { AppSetupError } from "./../errors";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
-import { AppConfigFile } from "interfaces";
+import {
+  AppConfig,
+  DirectMediaSupport,
+  IndirectMediaSupport,
+  LibrariesConfig,
+  LibraryRegistryBase,
+  MediaSupportConfig
+} from "interfaces";
+import YAML from "yaml";
 
 /**
  * Reads a config file either from local path or
  * http request, parses it, and returns it as an object
  */
-export default async function getConfigFile(
+export default async function getAppConfig(
   configFileSetting: string
-): Promise<AppConfigFile> {
+): Promise<AppConfig> {
   if (configFileSetting.startsWith("http")) {
     return await fetchConfigFile(configFileSetting);
   }
@@ -25,7 +33,7 @@ export default async function getConfigFile(
  * Fetches a config file from the network, parses it into
  * an object and returns it
  */
-async function fetchConfigFile(configFileUrl: string): Promise<AppConfigFile> {
+async function fetchConfigFile(configFileUrl: string): Promise<AppConfig> {
   try {
     const response = await fetch(configFileUrl);
     const text = await response.text();
@@ -39,16 +47,43 @@ async function fetchConfigFile(configFileUrl: string): Promise<AppConfigFile> {
 /**
  * Parses the raw text of a config file into an object.
  */
-function parseConfigText(raw: string): AppConfigFile {
-  return raw
-    .split("\n")
-    .map(v => v.trim())
-    .filter(line => line !== "")
-    .reduce((config, line) => {
-      if (line.charAt(0) !== "#") {
-        const [path, circManagerUrl] = line.split("|");
-        return { ...config, [path]: circManagerUrl };
-      }
-      return config;
-    }, {});
+function parseConfigText(raw: string): AppConfig {
+  const config = YAML.parse(raw);
+
+  // specifically set defaults for a couple values
+  const companionApp =
+    config.companion_app === "openebooks" ? "openebooks" : "simplye";
+  const axisNowDecrypt = config.axisnow_decrypt === true;
+
+  return {
+    ...config,
+    axisNowDecrypt,
+    companionApp
+  };
+}
+
+function extractString(value: any): string | null {
+  if (typeof value === "string") return value;
+  return null;
+}
+
+function parseLibraries(value: any): LibraryRegistryBase | LibrariesConfig {
+  if (typeof value === "undefined") {
+    throw new AppSetupError(
+      "You must define a value for `libraries` in your config file"
+    );
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  // otherwise it should be an object with keys
+  const keys = Object.keys(value);
+  return keys.reduce((map, key) => {
+    if (typeof key !== "string" || typeof value[key] !== "string") {
+      throw new AppSetupError(
+        "Config File `libraries` key is improperly defined."
+      );
+    }
+    return { ...map, [key]: value };
+  }, {});
 }
