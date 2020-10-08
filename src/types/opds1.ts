@@ -50,6 +50,10 @@ export const OPDSEntryMediaType =
 export const AdeptMediaType = "application/vnd.adobe.adept+xml";
 // there was an issue with incorrect Adept media types being sent.
 export const IncorrectAdeptMediaType = "vnd.adobe/adept+xml";
+// this is not yet supported, but the description is here:
+// https://github.com/NYPL-Simplified/Simplified/wiki/OPDSForDistributors#bearer-token-propagation
+export const BearerTokenMediaType =
+  "application/vnd.librarysimplified.bearer-token+json";
 
 export type IndirectAcquisitionType =
   | typeof OPDSEntryMediaType

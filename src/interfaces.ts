@@ -16,20 +16,33 @@ export { OPDS1 };
  * INTERNAL APP MODEL
  */
 
-// app config
-export type NewAppConfig = {
-  supportedMedia: Record<OPDS1.AnyBookMediaType, MediaSupportLevel>;
+// processed app config
+export type AppConfig = {
+  mediaSupport: MediaSupportConfig;
+  libraries: LibraryRegistryBase | LibrariesConfig;
+  companionApp: "simplye" | "openebooks";
+  axisNowDecrypt: boolean;
+  bugsnagApiKey: string | null;
+  gtmId: string | null;
 };
-type MediaSupportLevel = "Preferred" | "Allowed" | "Unsupported" | "Hidden";
+
+export type MediaSupportConfig = DirectMediaSupport & IndirectMediaSupport;
+export type DirectMediaSupport = Partial<
+  Record<OPDS1.AnyBookMediaType, MediaSupportLevel>
+>;
+export type IndirectMediaSupport = Partial<
+  Record<OPDS1.IndirectAcquisitionType, DirectMediaSupport>
+>;
+
+export type MediaSupportLevel = "show" | "redirect" | "redirect-then-show";
+
+export type LibraryRegistryBase = string;
+export type LibrariesConfig = Record<string, string>;
 
 export interface ComplaintData {
   type: string;
   detail?: string;
 }
-
-export type AppConfigFile = {
-  [library: string]: string | undefined;
-};
 
 export type BookFulfillmentState =
   | "AVAILABLE_OPEN_ACCESS"
