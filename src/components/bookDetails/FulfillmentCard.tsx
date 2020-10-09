@@ -357,12 +357,8 @@ const ReadOnlineInternal: React.FC<{
   isPrimaryAction: boolean;
 }> = ({ details, isPrimaryAction }) => {
   return (
-    <NavButton
-      {...getButtonStyles(isPrimaryAction)}
-      iconLeft={SvgExternalLink}
-      href={details.url}
-    >
-      Read Online
+    <NavButton {...getButtonStyles(isPrimaryAction)} href={details.url}>
+      Read
     </NavButton>
   );
 };
