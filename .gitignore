@@ -29,7 +29,7 @@ yarn-error.log*
 .yalc
 yalc.lock
 wallaby.js
-config.yml
+/config/
 .vscode/
 
 .vercel
