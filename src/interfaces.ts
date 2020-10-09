@@ -209,7 +209,7 @@ export type AnyBook =
 export interface LaneData {
   title: string;
   url: string;
-  books: BookData[];
+  books: AnyBook[];
 }
 
 export interface FacetData {
@@ -228,7 +228,7 @@ export interface CollectionData {
   url: string;
   title: string;
   lanes: LaneData[];
-  books: BookData[];
+  books: AnyBook[];
   navigationLinks: LinkData[];
   facetGroups?: FacetGroupData[];
   nextPageUrl?: string;

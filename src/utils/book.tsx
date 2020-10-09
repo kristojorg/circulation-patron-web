@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   AnyBook,
-  AnyBook,
   BookMedium,
   BorrowableBook,
   FulfillableBook,
@@ -9,9 +8,7 @@ import {
   ReservableBook,
   ReservedBook
 } from "interfaces";
-import { BookFulfillmentState } from "interfaces";
 import { Book, Headset } from "../icons";
-import { DEFAULT_AVAILABILITY } from "utils/constants";
 
 export function getAuthors(book: AnyBook, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
@@ -31,9 +28,6 @@ export function getAuthors(book: AnyBook, lim?: number): string[] {
 }
 
 export function availabilityString(book: AnyBook) {
-  if (book.openAccessLinks && book.openAccessLinks.length > 0)
-    return "This open-access book is available to keep forever.";
-
   const availableCopies = book.copies?.available;
   const totalCopies = book.copies?.total;
   return typeof availableCopies === "number" && typeof totalCopies === "number"

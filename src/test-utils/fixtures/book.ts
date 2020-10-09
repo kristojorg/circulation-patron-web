@@ -6,8 +6,10 @@ export const mergeBook = (input: Partial<AnyBook>) =>
     arrayMerge: (a, b) => b
   });
 
-export function makeBook(i: number) {
+export function makeBook(i: number): AnyBook {
   return {
+    status: "borrowable",
+    borrowUrl: "/borrow",
     id: `Book Id ${i}`,
     url: `/book-url-${i}`,
     title: `Book Title ${i}`,
@@ -34,6 +36,7 @@ export function makeBooks(
 }
 
 export const book: AnyBook = {
+  status: "borrowable",
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
   relatedUrl: "http://related-url",
   url: "http://test-book-url",
@@ -44,20 +47,6 @@ export const book: AnyBook = {
     "&lt;b&gt;Sam and Remi Fargo race for treasure&#8212;and survival&#8212;in this lightning-paced new adventure from #1&lt;i&gt; New York Times&lt;/i&gt; bestselling author Clive Cussler.&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Husband-and-wife team Sam and Remi Fargo are in Mexico when they come upon a remarkable discovery&#8212;the mummified remainsof a man clutching an ancient sealed pot. Within the pot is a Mayan book larger than any known before.&lt;br /&gt;&lt;br /&gt;The book contains astonishing information about the Mayans, their cities, and about mankind itself. The secrets are so powerful that some people would do anything to possess them&#8212;as the Fargos are about to find out. Many men and women are going to die for that book.",
   imageUrl: "https://dlotdqc6pnwqb.cloudfront.net/3M/crrmnr9/cover.jpg",
   borrowUrl: "borrow url",
-  allBorrowLinks: [
-    {
-      url: "/epub-borrow-link",
-      type: "application/atom+xml;type=entry;profile=opds-catalog",
-      indirectType: "application/epub+zip"
-    }
-  ],
-  openAccessLinks: [
-    { url: "/epub-open-access-link", type: "application/epub+zip" },
-    {
-      url: "/pdf-open-access-link",
-      type: "application/pdf"
-    }
-  ],
   publisher: "Penguin Publishing Group",
   published: "February 29, 2016",
   categories: ["Children", "10-12", "Fiction", "Adventure", "Fantasy"],

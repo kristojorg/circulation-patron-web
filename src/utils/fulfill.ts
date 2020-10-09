@@ -1,7 +1,12 @@
 import { APP_CONFIG } from "config";
 import { fetchBook } from "dataflow/opds1/fetch";
 import ApplicationError from "errors";
-import { FulfillmentLink, MediaSupportLevel, OPDS1 } from "interfaces";
+import {
+  FulfillableBook,
+  FulfillmentLink,
+  MediaSupportLevel,
+  OPDS1
+} from "interfaces";
 import { typeMap } from "utils/file";
 
 /**
@@ -123,7 +128,7 @@ const constructGetUrl = (
    * from within an entry
    */
   if (indirectionType === OPDS1.OPDSEntryMediaType) {
-    const book = await fetchBook(url, catalogUrl, token);
+    const book = (await fetchBook(url, catalogUrl, token)) as FulfillableBook;
     const resolvedUrl = book.fulfillmentLinks?.find(
       link => link.contentType === contentType
     )?.url;

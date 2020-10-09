@@ -50,20 +50,6 @@ test("truncates authors", () => {
   expect(utils.queryByText("one, two, three")).toBeFalsy();
 });
 
-test("doesn't render book if it has no url", () => {
-  const utils = render(
-    <BookList
-      books={[
-        {
-          ...fixtures.book,
-          url: undefined
-        }
-      ]}
-    />
-  );
-  expect(utils.queryByText("The Mayan Secrets")).not.toBeInTheDocument();
-});
-
 jest.mock("swr");
 const useSWRInfiniteMock = useSWRInfinite as jest.MockedFunction<
   typeof useSWRInfinite
