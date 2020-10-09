@@ -127,7 +127,7 @@ export type BookAvailability =
   | "unavailable"
   | "reserved"
   | "ready";
-export interface BookData {
+export interface Book {
   id: string;
   title: string;
   series?: {
@@ -139,9 +139,6 @@ export interface BookData {
   subtitle?: string;
   summary?: string;
   imageUrl?: string;
-  openAccessLinks?: FulfillmentLink[];
-  borrowUrl: string | null;
-  fulfillmentLinks?: FulfillmentLink[];
   availability?: {
     status: BookAvailability;
     since?: string;
@@ -163,6 +160,48 @@ export interface BookData {
   relatedUrl: string | null;
   raw?: any;
 }
+
+export interface BorrowableBook extends Book {
+  status: "borrowable";
+  borrowUrl: string;
+}
+
+/**
+ * This means it is on hold and can now be borrowed
+ * before the hold expires
+ */
+export interface OnHoldBook extends Book {
+  status: "on-hold";
+  borrowUrl: string;
+}
+
+export interface ReservableBook extends Book {
+  status: "reservable";
+  reserveUrl: string;
+}
+
+export interface ReservedBook extends Book {
+  status: "reserved";
+  revokeUrl: string | null;
+}
+
+export interface FulfillableBook extends Book {
+  status: "fulfillable";
+  fulfillmentLinks: FulfillmentLink[];
+  revokeUrl: string | null;
+}
+
+export interface UnsupportedBook extends Book {
+  status: "unsupported";
+}
+
+export type AnyBook =
+  | BorrowableBook
+  | OnHoldBook
+  | ReservableBook
+  | ReservedBook
+  | FulfillableBook
+  | UnsupportedBook;
 
 /**
  * INTERNAL COLLECTION MODEL

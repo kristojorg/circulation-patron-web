@@ -16,12 +16,13 @@ import {
 import {
   CollectionData,
   LaneData,
-  BookData,
+  Book,
   LinkData,
   FacetGroupData,
   BookAvailability,
   OPDS1,
-  FulfillmentLink
+  FulfillmentLink,
+  AnyBook
 } from "interfaces";
 import { IncorrectAdeptMediaType } from "types/opds1";
 import { getAppSupportLevel } from "utils/fulfill";
@@ -139,7 +140,7 @@ if (typeof window === "undefined") {
  * Converters
  */
 
-export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
+export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const authors = entry.authors.map(author => {
     return author.name;
   });
@@ -179,7 +180,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
 
   const borrowLink = getBorrowLink(acquisitionLinks);
   const { availability, holds, copies } = borrowLink ?? {};
-  const borrowUrl = borrowLink?.href ?? null;
 
   const openAccessLinks: FulfillmentLink[] = acquisitionLinks
     .filter(link => {
@@ -204,7 +204,10 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     .map(buildFulfillmentLink(feedUrl))
     .filter(isDefined);
 
-  return {
+  const revokeUrl =
+    entry.links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
+
+  const book: Book = {
     id: entry.id,
     title: entry.title,
     series: entry.series,
@@ -213,9 +216,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     subtitle: entry.subtitle,
     summary: entry.summary.content && sanitizeHtml?.(entry.summary.content),
     imageUrl: imageUrl,
-    openAccessLinks: openAccessLinks,
-    fulfillmentLinks: fulfillmentLinks,
-    borrowUrl,
     availability: {
       ...availability,
       // we type cast status because our internal types
@@ -231,6 +231,59 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     url: detailUrl,
     relatedUrl: relatedLink?.href ?? null,
     raw: entry.unparsed
+  };
+
+  // it's a fulfillable book
+  if (fulfillmentLinks.length > 0) {
+    // include open access links in the fulfillment links
+    const allFulfillmentLinks = [...fulfillmentLinks, ...openAccessLinks];
+    return {
+      ...book,
+      status: "fulfillable",
+      fulfillmentLinks: allFulfillmentLinks,
+      revokeUrl
+    };
+  }
+
+  // it's a reserved book
+  if (availability?.status === "reserved") {
+    return {
+      ...book,
+      status: "reserved",
+      revokeUrl
+    };
+  }
+  // it's a reservable book
+  if (borrowLink && borrowLink.availability.status === "unavailable") {
+    return {
+      ...book,
+      status: "reservable",
+      reserveUrl: borrowLink.href
+    };
+  }
+
+  // it is on hold and ready to borrow
+  if (borrowLink && borrowLink.availability.status === "ready") {
+    return {
+      ...book,
+      status: "on-hold",
+      borrowUrl: borrowLink.href
+    };
+  }
+
+  // it's a borrowable book
+  if (borrowLink && borrowLink.availability.status === "available") {
+    return {
+      ...book,
+      status: "borrowable",
+      borrowUrl: borrowLink.href
+    };
+  }
+
+  // it is unsupported
+  return {
+    status: "unsupported",
+    ...book
   };
 }
 
@@ -271,12 +324,12 @@ function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
   return null;
 }
 
-function dedupeBooks(books: BookData[]): BookData[] {
+function dedupeBooks(books: AnyBook[]): AnyBook[] {
   // using Map because it preserves key order
   const bookIndex = books.reduce((index, book) => {
     index.set(book.id, book);
     return index;
-  }, new Map<any, BookData>());
+  }, new Map<any, AnyBook>());
 
   return Array.from(bookIndex.values());
 }
@@ -331,14 +384,14 @@ export function feedToCollection(
     url: feedUrl,
     raw: feed.unparsed
   };
-  const books: BookData[] = [];
+  const books: AnyBook[] = [];
   const navigationLinks: LinkData[] = [];
   let lanes: LaneData[] = [];
   const laneTitles: any[] = [];
   const laneIndex: {
     title: any;
     url: string;
-    books: BookData[];
+    books: AnyBook[];
   }[] = [];
   let facetGroups: FacetGroupData[] = [];
   let nextPageUrl: string | undefined = undefined;

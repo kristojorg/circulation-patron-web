@@ -2,10 +2,14 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import {
-  getFulfillmentState,
   availabilityString,
   queueString,
-  bookIsAudiobook
+  bookIsAudiobook,
+  bookIsBorrowable,
+  bookIsReservable,
+  bookIsReserved,
+  bookIsOnHold,
+  bookIsFulfillable
 } from "utils/book";
 import Button, { NavButton } from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
@@ -15,9 +19,13 @@ import { MediumIcon } from "components/MediumIndicator";
 import SvgExternalLink from "icons/ExternalOpen";
 import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
-import useIsBorrowed from "hooks/useIsBorrowed";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { BookData, FulfillmentLink } from "interfaces";
+import {
+  AnyBook,
+  FulfillableBook,
+  FulfillmentLink,
+  ReservedBook
+} from "interfaces";
 import {
   dedupeLinks,
   DownloadDetails,
@@ -30,7 +38,7 @@ import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
 import { APP_CONFIG } from "config";
 
-const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
+const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
     <div
       aria-label="Borrow and download card"
@@ -47,138 +55,103 @@ const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
 };
 
 const FulfillmentContent: React.FC<{
-  book: BookData;
+  book: AnyBook;
 }> = ({ book }) => {
-  const isBorrowed = useIsBorrowed(book);
-  const fulfillmentState = getFulfillmentState(book, isBorrowed);
-
-  switch (fulfillmentState) {
-    case "AVAILABLE_OPEN_ACCESS":
-      if (!book.openAccessLinks)
-        throw new Error("This open-access book is missing open access links");
-      return (
-        <AccessCard
-          links={book.openAccessLinks}
-          book={book}
-          subtitle="This open-access book is available to keep forever."
-        />
-      );
-
-    case "AVAILABLE_TO_BORROW": {
-      return (
-        <BorrowOrReserveBlock
-          title="This book is available to borrow!"
-          subtitle={
-            <>
-              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
-              {availabilityString(book)}
-            </>
-          }
-          borrowUrl={book.borrowUrl}
-          isBorrow={true}
-        />
-      );
-    }
-
-    case "AVAILABLE_TO_RESERVE": {
-      return (
-        <BorrowOrReserveBlock
-          title="This book is currently unavailable."
-          subtitle={
-            <>
-              <MediumIcon book={book} sx={{ mr: 1 }} />{" "}
-              {availabilityString(book)}
-              {typeof book.holds?.total === "number" &&
-                ` ${book.holds.total} patrons in the queue.`}
-            </>
-          }
-          borrowUrl={book.borrowUrl}
-          isBorrow={false}
-        />
-      );
-    }
-
-    case "RESERVED":
-      return <Reserved book={book} />;
-
-    case "READY_TO_BORROW": {
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      const title = "You can now borrow this book!";
-      const subtitle =
-        availableUntil !== "NaN"
-          ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
-          : "You must borrow this book before your loan expires.";
-
-      return (
-        <BorrowOrReserveBlock
-          title={title}
-          subtitle={subtitle}
-          borrowUrl={book.borrowUrl}
-          isBorrow={true}
-        />
-      );
-    }
-
-    case "AVAILABLE_TO_ACCESS": {
-      if (!book.fulfillmentLinks)
-        throw new Error(
-          "This available-to-access book is missing fulfillment links."
-        );
-
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      const subtitle =
-        availableUntil !== "NaN"
-          ? `You have this book on loan until ${availableUntil}.`
-          : "You have this book on loan.";
-      return (
-        <AccessCard
-          links={book.fulfillmentLinks}
-          book={book}
-          subtitle={subtitle}
-        />
-      );
-    }
-
-    case "FULFILLMENT_STATE_ERROR":
-      return <ErrorCard />;
+  if (bookIsBorrowable(book)) {
+    return (
+      <BorrowOrReserveBlock
+        title="This book is available to borrow!"
+        subtitle={
+          <>
+            <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}
+          </>
+        }
+        url={book.borrowUrl}
+        isBorrow={true}
+      />
+    );
   }
+
+  if (bookIsReservable(book)) {
+    return (
+      <BorrowOrReserveBlock
+        title="This book is currently unavailable."
+        subtitle={
+          <>
+            <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}
+            {typeof book.holds?.total === "number" &&
+              ` ${book.holds.total} patrons in the queue.`}
+          </>
+        }
+        url={book.reserveUrl}
+        isBorrow={false}
+      />
+    );
+  }
+
+  if (bookIsReserved(book)) {
+    return <Reserved book={book} />;
+  }
+
+  if (bookIsOnHold(book)) {
+    const availableUntil = book.availability?.until
+      ? new Date(book.availability.until).toDateString()
+      : "NaN";
+
+    const title = "On Hold";
+    const subtitle =
+      availableUntil !== "NaN"
+        ? `Your hold will expire on ${availableUntil}. ${queueString(book)}`
+        : "You must borrow this book before your loan expires.";
+
+    return (
+      <BorrowOrReserveBlock
+        title={title}
+        subtitle={subtitle}
+        url={book.borrowUrl}
+        isBorrow={true}
+      />
+    );
+  }
+
+  if (bookIsFulfillable(book)) {
+    console.log(book);
+    const availableUntil = book.availability?.until
+      ? new Date(book.availability.until).toDateString()
+      : "NaN";
+
+    const subtitle =
+      availableUntil !== "NaN"
+        ? `You have this book on loan until ${availableUntil}.`
+        : "You have this book on loan.";
+    return (
+      <AccessCard
+        links={book.fulfillmentLinks}
+        book={book}
+        subtitle={subtitle}
+      />
+    );
+  }
+
+  return <Unsupported />;
 };
 
 const BorrowOrReserveBlock: React.FC<{
   title: string;
   subtitle: React.ReactNode;
   isBorrow: boolean;
-  borrowUrl: string | null;
-}> = ({ title, subtitle, isBorrow, borrowUrl }) => {
-  if (!borrowUrl) {
-    // TODO: track a bugsnag error. Shouldn't have ended up here
-    return <Text>This book cannot be borrowed at this time.</Text>;
-  }
+  url: string;
+}> = ({ title, subtitle, isBorrow, url }) => {
   return (
     <Stack direction="column" spacing={0} sx={{ my: 3 }}>
       <Text variant="text.body.bold">{title}</Text>
-      <Text
-        variant="text.body.italic"
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          textAlign: "center"
-        }}
-      >
-        {subtitle}
-      </Text>
-      <BorrowOrReserve borrowUrl={borrowUrl} isBorrow={isBorrow} />
+      <Text>{subtitle}</Text>
+      <BorrowOrReserve url={url} isBorrow={isBorrow} />
     </Stack>
   );
 };
 
-const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
+const Reserved: React.FC<{ book: ReservedBook }> = ({ book }) => {
   const position = book.holds?.position;
   return (
     <>
@@ -199,24 +172,14 @@ const Reserved: React.FC<{ book: BookData }> = ({ book }) => {
   );
 };
 
-const ErrorCard: React.FC = () => {
+const Unsupported: React.FC = () => {
   return (
-    <>
-      <Text variant="text.callouts.bold">
-        There was an error processing this book.
+    <Stack direction="column" spacing={0} sx={{ my: 3 }}>
+      <Text variant="text.body.bold">Unsupported</Text>
+      <Text>
+        This title is not supported in this application, please try another.
       </Text>
-      <Text
-        variant="text.body.italic"
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          textAlign: "center"
-        }}
-      >
-        We are unable to show you the book&apos;s availability. Try refreshing
-        your page. If the problem persists, please contact library support.
-      </Text>
-    </>
+    </Stack>
   );
 };
 
@@ -225,7 +188,7 @@ const ErrorCard: React.FC = () => {
  * via fulfillmentLink.
  */
 const AccessCard: React.FC<{
-  book: BookData;
+  book: FulfillableBook;
   links: FulfillmentLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
@@ -387,4 +350,4 @@ const DownloadButton: React.FC<{
   );
 };
 
-export default withErrorBoundary(FulfillmentCard, ErrorCard);
+export default withErrorBoundary(FulfillmentCard);

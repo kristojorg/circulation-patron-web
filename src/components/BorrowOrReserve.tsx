@@ -7,8 +7,8 @@ import { Text } from "./Text";
 
 const BorrowOrReserve: React.FC<{
   isBorrow: boolean;
-  borrowUrl: string;
-}> = ({ isBorrow, borrowUrl }) => {
+  url: string;
+}> = ({ isBorrow, url }) => {
   const {
     isLoading,
     loadingText,
@@ -20,7 +20,7 @@ const BorrowOrReserve: React.FC<{
     <div sx={{ my: 3 }}>
       <Button
         size="lg"
-        onClick={() => borrowOrReserve(borrowUrl)}
+        onClick={() => borrowOrReserve(url)}
         loading={isLoading}
         loadingText={loadingText}
       >

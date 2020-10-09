@@ -1,7 +1,17 @@
 import * as React from "react";
-import { BookData, BookMedium } from "interfaces";
+import {
+  AnyBook,
+  BookData,
+  BookMedium,
+  BorrowableBook,
+  FulfillableBook,
+  OnHoldBook,
+  ReservableBook,
+  ReservedBook
+} from "interfaces";
 import { BookFulfillmentState } from "interfaces";
 import { Book, Headset } from "../icons";
+import { DEFAULT_AVAILABILITY } from "utils/constants";
 
 export function getAuthors(book: BookData, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
@@ -33,59 +43,29 @@ export function availabilityString(book: BookData) {
 
 export function queueString(book: BookData) {
   const holds = book.holds?.total;
-  return typeof holds === "number" ? `${holds} patrons in the queue.` : "";
+  return typeof holds === "number"
+    ? `There are ${holds} other patrons in the queue.`
+    : "";
 }
 
-function hasBorrowRelation(book: BookData) {
-  return typeof book.borrowUrl === "string";
+export function bookIsFulfillable(book: AnyBook): book is FulfillableBook {
+  return book.status === "fulfillable";
 }
 
-/**
- * the default assumption is that a book is available. See:
- * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
- */
-const DEFAULT_AVAILABILITY = "available";
+export function bookIsReserved(book: AnyBook): book is ReservedBook {
+  return book.status === "reserved";
+}
 
-/**
- * This is mapped from a conversation with Leonard and the OPDS wiki:
- * https://github.com/NYPL-Simplified/Simplified/wiki/OPDS-For-Library-Patrons#opdsavailability---describing-resource-availability
- */
-export function getFulfillmentState(
-  book: BookData,
-  isBorrowed: boolean
-): BookFulfillmentState {
-  const availabilityStatus = book.availability?.status ?? DEFAULT_AVAILABILITY;
+export function bookIsReservable(book: AnyBook): book is ReservableBook {
+  return book.status === "reservable";
+}
 
-  // indicates the book is open access and ready to download.
-  // we prefer open access links to fulfillment links, if available.
-  // we can't show OA links unless book is borrowed, however.
-  if (
-    isBorrowed &&
-    availabilityStatus === "available" &&
-    book.openAccessLinks &&
-    book.openAccessLinks.length > 0
-  )
-    return "AVAILABLE_OPEN_ACCESS";
+export function bookIsOnHold(book: AnyBook): book is OnHoldBook {
+  return book.status === "on-hold";
+}
 
-  if (
-    availabilityStatus === "available" &&
-    book.fulfillmentLinks &&
-    book.fulfillmentLinks.length > 0
-  )
-    return "AVAILABLE_TO_ACCESS";
-
-  if (availabilityStatus === "available" && hasBorrowRelation(book))
-    return "AVAILABLE_TO_BORROW";
-
-  if (availabilityStatus === "ready" && hasBorrowRelation(book))
-    return "READY_TO_BORROW";
-
-  if (availabilityStatus === "unavailable" && hasBorrowRelation(book))
-    return "AVAILABLE_TO_RESERVE";
-
-  if (availabilityStatus === "reserved") return "RESERVED";
-
-  return "FULFILLMENT_STATE_ERROR";
+export function bookIsBorrowable(book: AnyBook): book is BorrowableBook {
+  return book.status === "borrowable";
 }
 
 export function bookIsAudiobook(book: BookData): boolean {

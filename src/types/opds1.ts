@@ -13,10 +13,12 @@
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
 export const AcquisitionLinkRel = "http://opds-spec.org/acquisition";
 export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
+export const RevokeLinkRel = "http://librarysimplified.org/terms/rel/revoke";
 export type AnyLinkRelation =
   | typeof AuthDocLinkRelation
   | typeof AcquisitionLinkRel
   | typeof BorrowLinkRel
+  | typeof RevokeLinkRel
   | AuthDocLinkRelations
   | "related";
 

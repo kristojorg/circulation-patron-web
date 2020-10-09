@@ -2,11 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { truncateString, stripHTML } from "../utils/string";
-import {
-  getAuthors,
-  getFulfillmentState,
-  availabilityString
-} from "../utils/book";
+import { getAuthors, availabilityString } from "../utils/book";
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
@@ -18,7 +14,7 @@ import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
 import Stack from "./Stack";
 import BorrowOrReserve from "./BorrowOrReserve";
-import { BookData, CollectionData, LaneData, RequiredKeys } from "interfaces";
+import { AnyBook, CollectionData, LaneData, RequiredKeys } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { useSWRInfinite } from "swr";
 
@@ -37,8 +33,8 @@ const ListLoadingIndicator = () => (
   </div>
 );
 
-type BookWithUrl = RequiredKeys<BookData, "url">;
-const hasUrl = (book: BookData): book is BookWithUrl => !!book.url;
+type BookWithUrl = RequiredKeys<AnyBook, "url">;
+const hasUrl = (book: AnyBook): book is BookWithUrl => !!book.url;
 
 export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
   firstPageUrl
@@ -91,7 +87,7 @@ export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
 };
 
 export const BookList: React.FC<{
-  books: BookData[];
+  books: AnyBook[];
 }> = ({ books }) => {
   return (
     <ul sx={{ px: 5 }} data-testid="listview-list">
@@ -103,7 +99,7 @@ export const BookList: React.FC<{
 };
 
 export const BookListItem: React.FC<{
-  book: BookData;
+  book: AnyBook;
 }> = ({ book }) => {
   // if there is no book url, it doesn't make sense to display it.
   if (!hasUrl(book)) return null;
@@ -170,6 +166,7 @@ export const BookListItem: React.FC<{
 };
 
 const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
+  throw new Error("UNIMPLEMETED");
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
 
