@@ -83,6 +83,8 @@ export const BookDetails: React.FC = () => {
               {book.authors?.join(", ") ?? "Unknown"}
             </Text>
             <MediumIndicator book={book} />
+            <FulfillmentCard book={book} sx={{ mt: 3 }} />
+            <Summary book={book} />
             <div sx={{ mt: 2 }}>
               <DetailField heading="Publisher" details={book.publisher} />
               <DetailField heading="Published" details={book.published} />
@@ -91,9 +93,7 @@ export const BookDetails: React.FC = () => {
                 details={book.categories?.join(", ")}
               />
             </div>
-            <FulfillmentCard book={book} sx={{ mt: 3 }} />
             <ReportProblem book={book} />
-            <Summary book={book} />
           </div>
         </div>
       </div>

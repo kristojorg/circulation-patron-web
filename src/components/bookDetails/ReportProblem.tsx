@@ -139,7 +139,7 @@ const ReportProblem: React.FC<{ book: BookData }> = ({ book }) => {
         data-testid="report-problem-link"
         variant="link"
         color="ui.gray.extraDark"
-        sx={{ fontStyle: "italic" }}
+        sx={{ fontStyle: "italic", alignSelf: "flex-start", my: 2 }}
       >
         Report a problem
       </DialogDisclosure>
