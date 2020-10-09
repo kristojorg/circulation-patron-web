@@ -10,7 +10,7 @@ function parseConfig(unparsed: any): AppConfig {
   // otherwise assume the file is properly structured.
   return {
     libraries: unparsed.libraries,
-    mediaSupport: unparsed.mediaSupport,
+    mediaSupport: unparsed.media_support ?? {},
     bugsnagApiKey: unparsed.bugsnagApiKey ?? null,
     gtmId: unparsed.gtmId ?? null,
     axisNowDecrypt,

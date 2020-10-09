@@ -11,8 +11,12 @@
  * Link Relations
  */
 export const AuthDocLinkRelation = "http://opds-spec.org/auth/document";
+export const AcquisitionLinkRel = "http://opds-spec.org/acquisition";
+export const BorrowLinkRel = "http://opds-spec.org/acquisition/borrow";
 export type AnyLinkRelation =
   | typeof AuthDocLinkRelation
+  | typeof AcquisitionLinkRel
+  | typeof BorrowLinkRel
   | AuthDocLinkRelations
   | "related";
 
@@ -58,7 +62,6 @@ export const BearerTokenMediaType =
 export type IndirectAcquisitionType =
   | typeof OPDSEntryMediaType
   | typeof AdeptMediaType
-  | typeof IncorrectAdeptMediaType
   | typeof BearerTokenMediaType;
 
 /**
@@ -79,6 +82,8 @@ export const OverdriveEbookMediaType =
   "application/vnd.overdrive.circulation.api+json;profile=ebook";
 export const AxisNowWebpubMediaType =
   "application/vnd.librarysimplified.axisnow+json";
+export const AccessRestrictionAudiobookMediaType =
+  'application/audiobook+json;profile="http://www.feedbooks.com/audiobooks/access-restriction"';
 
 export type ReadOnlineMediaType =
   | typeof ExternalReaderMediaType
@@ -90,11 +95,17 @@ export type DownloadMediaType =
   | typeof KepubMediaType
   | typeof PdfMediaType
   | typeof MobiPocketMediaType
-  | typeof Mobi8Mediatype
+  | typeof Mobi8Mediatype;
+
+export type UnsupportedMediaType =
+  | typeof AccessRestrictionAudiobookMediaType
   | typeof AudiobookMediaType
   | typeof OverdriveAudiobookMediaType;
 
-export type AnyBookMediaType = ReadOnlineMediaType | DownloadMediaType;
+export type AnyBookMediaType =
+  | ReadOnlineMediaType
+  | DownloadMediaType
+  | UnsupportedMediaType;
 
 export type AnyMediaType =
   | AnyBookMediaType

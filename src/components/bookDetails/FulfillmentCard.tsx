@@ -17,13 +17,14 @@ import SvgDownload from "icons/Download";
 import SvgPhone from "icons/Phone";
 import useIsBorrowed from "hooks/useIsBorrowed";
 import BorrowOrReserve from "components/BorrowOrReserve";
-import { BookData, MediaLink } from "interfaces";
+import { BookData, FulfillmentLink } from "interfaces";
 import {
   dedupeLinks,
   DownloadDetails,
   getFulfillmentDetails,
   ReadExternalDetails,
-  ReadInternalDetails
+  ReadInternalDetails,
+  shouldRedirectToCompanionApp
 } from "utils/fulfill";
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
@@ -31,21 +32,17 @@ import { APP_CONFIG } from "config";
 
 const FulfillmentCard: React.FC<{ book: BookData }> = ({ book }) => {
   return (
-    <Stack
-      direction="column"
+    <div
       aria-label="Borrow and download card"
       sx={{
-        bg: "ui.gray.lightWarm",
-        p: 3,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        color: "ui.gray.extraDark",
-        my: 3
+        alignItems: "flex-start",
+        color: "ui.gray.extraDark"
       }}
     >
       <FulfillmentContent book={book} />
-    </Stack>
+    </div>
   );
 };
 
@@ -54,6 +51,7 @@ const FulfillmentContent: React.FC<{
 }> = ({ book }) => {
   const isBorrowed = useIsBorrowed(book);
   const fulfillmentState = getFulfillmentState(book, isBorrowed);
+
   switch (fulfillmentState) {
     case "AVAILABLE_OPEN_ACCESS":
       if (!book.openAccessLinks)
@@ -68,7 +66,7 @@ const FulfillmentContent: React.FC<{
 
     case "AVAILABLE_TO_BORROW": {
       return (
-        <CTAPanel
+        <BorrowOrReserveBlock
           title="This book is available to borrow!"
           subtitle={
             <>
@@ -76,7 +74,7 @@ const FulfillmentContent: React.FC<{
               {availabilityString(book)}
             </>
           }
-          book={book}
+          borrowUrl={book.borrowUrl}
           isBorrow={true}
         />
       );
@@ -84,7 +82,7 @@ const FulfillmentContent: React.FC<{
 
     case "AVAILABLE_TO_RESERVE": {
       return (
-        <CTAPanel
+        <BorrowOrReserveBlock
           title="This book is currently unavailable."
           subtitle={
             <>
@@ -94,7 +92,7 @@ const FulfillmentContent: React.FC<{
                 ` ${book.holds.total} patrons in the queue.`}
             </>
           }
-          book={book}
+          borrowUrl={book.borrowUrl}
           isBorrow={false}
         />
       );
@@ -115,10 +113,10 @@ const FulfillmentContent: React.FC<{
           : "You must borrow this book before your loan expires.";
 
       return (
-        <CTAPanel
+        <BorrowOrReserveBlock
           title={title}
           subtitle={subtitle}
-          book={book}
+          borrowUrl={book.borrowUrl}
           isBorrow={true}
         />
       );
@@ -152,15 +150,19 @@ const FulfillmentContent: React.FC<{
   }
 };
 
-const CTAPanel: React.FC<{
+const BorrowOrReserveBlock: React.FC<{
   title: string;
   subtitle: React.ReactNode;
   isBorrow: boolean;
-  book: BookData;
-}> = ({ title, subtitle, isBorrow, book }) => {
+  borrowUrl: string | null;
+}> = ({ title, subtitle, isBorrow, borrowUrl }) => {
+  if (!borrowUrl) {
+    // TODO: track a bugsnag error. Shouldn't have ended up here
+    return <Text>This book cannot be borrowed at this time.</Text>;
+  }
   return (
-    <>
-      <Text variant="text.callouts.bold">{title}</Text>
+    <Stack direction="column" spacing={0} sx={{ my: 3 }}>
+      <Text variant="text.body.bold">{title}</Text>
       <Text
         variant="text.body.italic"
         sx={{
@@ -171,17 +173,8 @@ const CTAPanel: React.FC<{
       >
         {subtitle}
       </Text>
-      {book.allBorrowLinks?.map(link => {
-        return (
-          <BorrowOrReserve
-            book={book}
-            key={link.url}
-            borrowLink={link}
-            isBorrow={isBorrow}
-          />
-        );
-      })}
-    </>
+      <BorrowOrReserve borrowUrl={borrowUrl} isBorrow={isBorrow} />
+    </Stack>
   );
 };
 
@@ -233,7 +226,7 @@ const ErrorCard: React.FC = () => {
  */
 const AccessCard: React.FC<{
   book: BookData;
-  links: MediaLink[];
+  links: FulfillmentLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
   const { title } = book;
@@ -245,26 +238,22 @@ const AccessCard: React.FC<{
   const isFulfillable = fulfillments.length > 0;
 
   const isAudiobook = bookIsAudiobook(book);
-  const companionApp =
-    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
+  const redirectUser = shouldRedirectToCompanionApp(links);
 
   return (
-    <>
-      <Stack sx={{ alignItems: "center" }}>
-        <SvgPhone sx={{ fontSize: 64 }} />
-        <Stack direction="column">
-          <Text variant="text.callouts.bold">
-            You&apos;re ready to read this book in {companionApp}!
-          </Text>
-          <Text>{subtitle}</Text>
-        </Stack>
-      </Stack>
+    <Stack direction="column" sx={{ my: 3 }}>
+      <AccessHeading
+        redirectToCompanionApp={redirectUser}
+        subtitle={subtitle}
+      />
       {!isAudiobook && isFulfillable && (
-        <Stack direction="column" sx={{ mt: 3 }}>
-          <Text variant="text.body.italic" sx={{ textAlign: "center" }}>
-            If you would rather read on your computer, you can:
-          </Text>
-          <Stack sx={{ justifyContent: "center", flexWrap: "wrap" }}>
+        <>
+          {redirectUser && (
+            <Text variant="text.body.italic">
+              If you would rather read on your computer, you can:
+            </Text>
+          )}
+          <Stack sx={{ flexWrap: "wrap" }}>
             {fulfillments.map(details => {
               switch (details.type) {
                 case "download":
@@ -272,36 +261,85 @@ const AccessCard: React.FC<{
                     <DownloadButton
                       details={details}
                       title={title}
-                      key={details.url}
+                      key={details.id}
+                      isPrimaryAction={!redirectUser}
                     />
                   );
                 case "read-online-internal":
                   return (
-                    <ReadOnlineInternal details={details} key={details.url} />
+                    <ReadOnlineInternal
+                      details={details}
+                      key={details.url}
+                      isPrimaryAction={!redirectUser}
+                    />
                   );
                 case "read-online-external":
                   return (
-                    <ReadOnlineExternal details={details} key={details.id} />
+                    <ReadOnlineExternal
+                      details={details}
+                      key={details.id}
+                      isPrimaryAction={!redirectUser}
+                    />
                   );
               }
             })}
           </Stack>
-        </Stack>
+        </>
       )}
-    </>
+    </Stack>
   );
 };
 
-const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
-  details
-}) => {
+const AccessHeading: React.FC<{
+  subtitle: string;
+  redirectToCompanionApp: boolean;
+}> = ({ subtitle, redirectToCompanionApp }) => {
+  const companionApp =
+    APP_CONFIG.companionApp === "openebooks" ? "Open eBooks" : "SimplyE";
+
+  if (redirectToCompanionApp) {
+    return (
+      <Stack direction="column">
+        <Stack>
+          <SvgPhone sx={{ fontSize: 24 }} />
+          <Text variant="text.body.bold">
+            You&apos;re ready to read this book in {companionApp}!
+          </Text>
+        </Stack>
+        <Text>{subtitle}</Text>
+      </Stack>
+    );
+  }
+  return (
+    <Stack spacing={0} direction="column">
+      <Text variant="text.body.bold">Ready to read!</Text>
+      <Text>{subtitle}</Text>
+    </Stack>
+  );
+};
+
+function getButtonStyles(isPrimaryAction: boolean) {
+  return isPrimaryAction
+    ? ({
+        variant: "filled",
+        color: "brand.primary"
+      } as const)
+    : ({
+        variant: "ghost",
+        color: "ui.gray.extraDark"
+      } as const);
+}
+
+const ReadOnlineExternal: React.FC<{
+  details: ReadExternalDetails;
+  isPrimaryAction: boolean;
+}> = ({ details, isPrimaryAction }) => {
   const { open, loading, error } = useReadOnlineButton(details);
 
   return (
     <>
       <Button
-        variant="ghost"
-        color="ui.gray.extraDark"
+        {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgExternalLink}
         onClick={open}
         loading={loading}
@@ -316,11 +354,11 @@ const ReadOnlineExternal: React.FC<{ details: ReadExternalDetails }> = ({
 
 const ReadOnlineInternal: React.FC<{
   details: ReadInternalDetails;
-}> = ({ details }) => {
+  isPrimaryAction: boolean;
+}> = ({ details, isPrimaryAction }) => {
   return (
     <NavButton
-      variant="ghost"
-      color="ui.gray.extraDark"
+      {...getButtonStyles(isPrimaryAction)}
       iconLeft={SvgExternalLink}
       href={details.url}
     >
@@ -332,7 +370,8 @@ const ReadOnlineInternal: React.FC<{
 const DownloadButton: React.FC<{
   details: DownloadDetails;
   title: string;
-}> = ({ details, title }) => {
+  isPrimaryAction: boolean;
+}> = ({ details, title, isPrimaryAction }) => {
   const { buttonLabel } = details;
   const { download, error, loading } = useDownloadButton(details, title);
 
@@ -340,8 +379,7 @@ const DownloadButton: React.FC<{
     <>
       <Button
         onClick={download}
-        variant="ghost"
-        color="ui.gray.extraDark"
+        {...getButtonStyles(isPrimaryAction)}
         iconLeft={SvgDownload}
         loading={loading}
         loadingText="Downloading..."

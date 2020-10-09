@@ -33,7 +33,11 @@ export type IndirectMediaSupport = Partial<
   Record<OPDS1.IndirectAcquisitionType, DirectMediaSupport>
 >;
 
-export type MediaSupportLevel = "show" | "redirect" | "redirect-and-show";
+export type MediaSupportLevel =
+  | "show"
+  | "redirect"
+  | "redirect-and-show"
+  | "unsupported";
 
 export type LibraryRegistryBase = string;
 export type LibrariesConfig = Record<string, string | undefined>;
@@ -105,11 +109,13 @@ export interface LibraryData {
 /**
  * INTERNAL BOOK MODEL
  */
-export interface MediaLink {
+
+export type FulfillmentLink = {
+  contentType: OPDS1.AnyBookMediaType;
   url: string;
-  type: OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType;
-  indirectType?: OPDS1.AnyBookMediaType;
-}
+  indirectionType?: OPDS1.IndirectAcquisitionType;
+  supportLevel: MediaSupportLevel;
+};
 
 export type BookMedium =
   | "http://bib.schema.org/Audiobook"
@@ -133,10 +139,9 @@ export interface BookData {
   subtitle?: string;
   summary?: string;
   imageUrl?: string;
-  openAccessLinks?: MediaLink[];
-  borrowUrl?: string;
-  fulfillmentLinks?: MediaLink[];
-  allBorrowLinks?: MediaLink[];
+  openAccessLinks?: FulfillmentLink[];
+  borrowUrl: string | null;
+  fulfillmentLinks?: FulfillmentLink[];
   availability?: {
     status: BookAvailability;
     since?: string;

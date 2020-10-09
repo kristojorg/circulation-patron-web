@@ -10,7 +10,8 @@ import {
   CompleteEntryLink,
   OPDSCatalogRootLink,
   OPDSAcquisitionLink,
-  OPDSShelfLink
+  OPDSShelfLink,
+  OPDSIndirectAcquisition
 } from "opds-feed-parser";
 import {
   CollectionData,
@@ -20,8 +21,10 @@ import {
   FacetGroupData,
   BookAvailability,
   OPDS1,
-  MediaLink
+  FulfillmentLink
 } from "interfaces";
+import { IncorrectAdeptMediaType } from "types/opds1";
+import { getAppSupportLevel } from "utils/fulfill";
 
 /**
  * Parses OPDS 1.x Feed or Entry into a Collection or Book
@@ -62,16 +65,50 @@ function isRelatedLink(link: OPDSLink) {
 const resolve = (base: string, relative: string) =>
   new URL(relative, base).toString();
 
+/**
+ * There is or was an error in the CM where it sent us incorrectly formatted
+ * Adobe media types.
+ */
+export function fixMimeType(
+  mimeType: OPDS1.IndirectAcquisitionType | typeof OPDS1.IncorrectAdeptMediaType
+): OPDS1.IndirectAcquisitionType {
+  return mimeType === IncorrectAdeptMediaType ? OPDS1.AdeptMediaType : mimeType;
+}
+
+function parseFormat(format: OPDSAcquisitionLink | OPDSIndirectAcquisition) {
+  // if the format has an indirect type nested inside, that is the
+  // content type of the format
+  const indirectType = format.indirectAcquisitions?.[0]?.type;
+  const contentType = (indirectType ?? format.type) as OPDS1.AnyBookMediaType;
+  const indirectionType = indirectType
+    ? (format.type as OPDS1.IndirectAcquisitionType)
+    : undefined;
+  return {
+    contentType,
+    indirectionType
+  };
+}
+
+function getFormatSupportLevel(
+  format: OPDSAcquisitionLink | OPDSIndirectAcquisition
+) {
+  const { contentType, indirectionType } = parseFormat(format);
+  return getAppSupportLevel(contentType, indirectionType);
+}
+
 function buildFulfillmentLink(feedUrl: string) {
-  return (link: OPDSAcquisitionLink): MediaLink | undefined => {
-    const indirects = link.indirectAcquisitions;
-    const first = indirects?.[0];
-    const indirectType = first?.type as OPDS1.AnyBookMediaType | undefined;
-    // it is possible that it doesn't exist in the array of indirects
+  return (link: OPDSAcquisitionLink): FulfillmentLink => {
+    const { contentType, indirectionType } = parseFormat(link);
+    const supportLevel = getAppSupportLevel(contentType, indirectionType);
     return {
+      supportLevel,
       url: resolve(feedUrl, link.href),
-      type: link.type as OPDS1.AnyBookMediaType | OPDS1.IndirectAcquisitionType,
-      indirectType
+      contentType: contentType as OPDS1.AnyBookMediaType,
+      indirectionType: fixMimeType(
+        indirectionType as
+          | OPDS1.IndirectAcquisitionType
+          | typeof OPDS1.IncorrectAdeptMediaType
+      )
     };
   };
 }
@@ -138,52 +175,34 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     .filter(category => !!category.label)
     .map(category => category.label);
 
-  const openAccessLinks = entry.links
-    .filter(isAcquisitionLink)
+  const acquisitionLinks = entry.links.filter(isAcquisitionLink);
+
+  const borrowLink = getBorrowLink(acquisitionLinks);
+  const { availability, holds, copies } = borrowLink ?? {};
+  const borrowUrl = borrowLink?.href ?? null;
+
+  const openAccessLinks: FulfillmentLink[] = acquisitionLinks
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.OPEN_ACCESS_REL;
     })
     .map(link => {
+      const supportLevel = getFormatSupportLevel(link);
       return {
         url: resolve(feedUrl, link.href),
-        type: link.type as OPDS1.AnyBookMediaType
+        contentType: link.type as OPDS1.AnyBookMediaType,
+        supportLevel
       };
     });
 
   const relatedLinks = entry.links.filter(isRelatedLink);
   const relatedLink = relatedLinks.length > 0 ? relatedLinks[0] : null;
 
-  const borrowLink = entry.links.find(link => {
-    return (
-      isAcquisitionLink(link) && link.rel === OPDSAcquisitionLink.BORROW_REL
-    );
-  });
-  const borrowUrl = borrowLink?.href
-    ? resolve(feedUrl, borrowLink.href)
-    : undefined;
-
-  const allBorrowLinks: MediaLink[] = entry.links
-    .filter(isAcquisitionLink)
-    .filter(link => {
-      return link.rel === OPDSAcquisitionLink.BORROW_REL;
-    })
-    .map(buildFulfillmentLink(feedUrl))
-    .filter(isDefined);
-
-  const fulfillmentLinks = entry.links
-    .filter(isAcquisitionLink)
+  const fulfillmentLinks = acquisitionLinks
     .filter(link => {
       return link.rel === OPDSAcquisitionLink.GENERIC_REL;
     })
     .map(buildFulfillmentLink(feedUrl))
     .filter(isDefined);
-
-  const linkWithAvailability = entry.links.find(
-    (link): link is OPDSAcquisitionLink => {
-      return link instanceof OPDSAcquisitionLink && !!link.availability;
-    }
-  );
-  const { availability, holds, copies } = linkWithAvailability ?? {};
 
   return {
     id: entry.id,
@@ -195,9 +214,8 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     summary: entry.summary.content && sanitizeHtml?.(entry.summary.content),
     imageUrl: imageUrl,
     openAccessLinks: openAccessLinks,
-    borrowUrl: borrowUrl,
-    allBorrowLinks: allBorrowLinks,
     fulfillmentLinks: fulfillmentLinks,
+    borrowUrl,
     availability: {
       ...availability,
       // we type cast status because our internal types
@@ -214,6 +232,26 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): BookData {
     relatedUrl: relatedLink?.href ?? null,
     raw: entry.unparsed
   };
+}
+
+/**
+ * Extracts the url of the first borrow link that has a supported
+ * format according to the APP_CONFIG.
+ * In the future we hope to support many borrow links, but
+ * this works for now.
+ */
+function getBorrowLink(
+  links: OPDSAcquisitionLink[]
+): OPDSAcquisitionLink | null {
+  const supportedLink = links.find(link => {
+    const indirects = link.indirectAcquisitions;
+    const supportedFormat = indirects.find(
+      format => getFormatSupportLevel(format) !== "unsupported"
+    );
+    if (supportedFormat) return true;
+    return false;
+  });
+  return supportedLink ?? null;
 }
 
 function entryToLink(entry: OPDSEntry, feedUrl: string): LinkData | null {
