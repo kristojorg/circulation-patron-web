@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   OPDSFeed,
   OPDSEntry,
@@ -168,9 +169,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   const detailLink = entry.links.find(
     link => link instanceof CompleteEntryLink
   );
-  const detailUrl = detailLink?.href
-    ? resolve(feedUrl, detailLink.href)
-    : undefined;
+  const detailUrl = resolve(feedUrl, detailLink!.href);
 
   const categories = entry.categories
     .filter(category => !!category.label)
@@ -204,6 +203,10 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     .map(buildFulfillmentLink(feedUrl))
     .filter(isDefined);
 
+  const supportedFulfillmentLinks = fulfillmentLinks.filter(
+    link => link.supportLevel !== "unsupported"
+  );
+
   const revokeUrl =
     entry.links.find(link => link.rel === OPDS1.RevokeLinkRel)?.href ?? null;
 
@@ -234,9 +237,12 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
   };
 
   // it's a fulfillable book
-  if (fulfillmentLinks.length > 0) {
+  if (supportedFulfillmentLinks.length > 0) {
     // include open access links in the fulfillment links
-    const allFulfillmentLinks = [...fulfillmentLinks, ...openAccessLinks];
+    const allFulfillmentLinks = [
+      ...supportedFulfillmentLinks,
+      ...openAccessLinks
+    ];
     return {
       ...book,
       status: "fulfillable",
@@ -297,6 +303,7 @@ function getBorrowLink(
   links: OPDSAcquisitionLink[]
 ): OPDSAcquisitionLink | null {
   const supportedLink = links.find(link => {
+    if (link.rel !== OPDSAcquisitionLink.BORROW_REL) return false;
     const indirects = link.indirectAcquisitions;
     const supportedFormat = indirects.find(
       format => getFormatSupportLevel(format) !== "unsupported"

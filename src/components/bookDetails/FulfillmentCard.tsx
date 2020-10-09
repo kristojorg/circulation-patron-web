@@ -60,7 +60,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsBorrowable(book)) {
     return (
       <BorrowOrReserveBlock
-        title="This book is available to borrow!"
+        title="Available to borrow"
         subtitle={
           <>
             <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}
@@ -75,7 +75,7 @@ const FulfillmentContent: React.FC<{
   if (bookIsReservable(book)) {
     return (
       <BorrowOrReserveBlock
-        title="This book is currently unavailable."
+        title="Unavailable"
         subtitle={
           <>
             <MediumIcon book={book} sx={{ mr: 1 }} /> {availabilityString(book)}

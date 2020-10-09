@@ -2,7 +2,15 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { truncateString, stripHTML } from "../utils/string";
-import { getAuthors, availabilityString } from "../utils/book";
+import {
+  getAuthors,
+  availabilityString,
+  bookIsBorrowable,
+  bookIsFulfillable,
+  bookIsReservable,
+  bookIsReserved,
+  bookIsOnHold
+} from "../utils/book";
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
 import LoadingIndicator from "./LoadingIndicator";
@@ -14,7 +22,7 @@ import useIsBorrowed from "hooks/useIsBorrowed";
 import BookCover from "./BookCover";
 import Stack from "./Stack";
 import BorrowOrReserve from "./BorrowOrReserve";
-import { AnyBook, CollectionData, LaneData, RequiredKeys } from "interfaces";
+import { AnyBook, CollectionData, LaneData } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { useSWRInfinite } from "swr";
 
@@ -32,9 +40,6 @@ const ListLoadingIndicator = () => (
     <LoadingIndicator /> Loading ...
   </div>
 );
-
-type BookWithUrl = RequiredKeys<AnyBook, "url">;
-const hasUrl = (book: AnyBook): book is BookWithUrl => !!book.url;
 
 export const InfiniteBookList: React.FC<{ firstPageUrl: string }> = ({
   firstPageUrl
@@ -101,9 +106,6 @@ export const BookList: React.FC<{
 export const BookListItem: React.FC<{
   book: AnyBook;
 }> = ({ book }) => {
-  // if there is no book url, it doesn't make sense to display it.
-  if (!hasUrl(book)) return null;
-
   return (
     <li
       sx={{
@@ -165,183 +167,114 @@ export const BookListItem: React.FC<{
   );
 };
 
-const BookListCTA: React.FC<{ book: BookWithUrl }> = ({ book }) => {
-  throw new Error("UNIMPLEMETED");
-  const isBorrowed = useIsBorrowed(book);
-  const fulfillmentState = getFulfillmentState(book, isBorrowed);
-
-  const getCtaButtons = (isBorrow: boolean) => {
+const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
+  if (bookIsBorrowable(book)) {
     return (
-      <Stack
-        direction={"column"}
-        sx={{
-          mt: 2
-        }}
-      >
-        {book.allBorrowLinks?.map(link => {
-          return (
-            <BorrowOrReserve
-              key={link.url}
-              book={book}
-              borrowLink={link}
-              isBorrow={isBorrow}
-            />
-          );
-        })}
-      </Stack>
-    );
-  };
+      <>
+        <BorrowOrReserve url={book.borrowUrl} isBorrow />
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          {availabilityString(book)}
+        </Text>
 
-  switch (fulfillmentState) {
-    case "AVAILABLE_OPEN_ACCESS":
-      return (
-        <>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            This open-access book is available to keep forever.
-          </Text>
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-
-    case "AVAILABLE_TO_BORROW":
-      return (
-        <>
-          {getCtaButtons(true)}
-
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            {availabilityString(book)}
-          </Text>
-
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-
-    case "AVAILABLE_TO_RESERVE":
-      return (
-        <>
-          {getCtaButtons(false)}
-
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            {availabilityString(book)}
-          </Text>
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-
-    case "RESERVED": {
-      const position = book.holds?.position;
-      return (
-        <>
-          <Button disabled color="ui.black">
-            Reserved
-          </Button>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            You have this book on hold.{" "}
-            {typeof position === "number" &&
-              !isNaN(position) &&
-              `Position: ${position}`}
-          </Text>
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-    }
-
-    case "READY_TO_BORROW": {
-      return (
-        <>
-          {getCtaButtons(true)}
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            You can now borrow this book!
-          </Text>
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-    }
-
-    case "AVAILABLE_TO_ACCESS": {
-      const availableUntil = book.availability?.until
-        ? new Date(book.availability.until).toDateString()
-        : "NaN";
-
-      const subtitle =
-        availableUntil !== "NaN"
-          ? `You have this book on loan until ${availableUntil}.`
-          : "You have this book on loan.";
-
-      return (
-        <>
-          <Text
-            variant="text.body.italic"
-            sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
-          >
-            {subtitle}
-          </Text>
-          <NavButton
-            variant="ghost"
-            bookUrl={book.url}
-            iconRight={ArrowForward}
-          >
-            View Book Details
-          </NavButton>
-        </>
-      );
-    }
-
-    case "FULFILLMENT_STATE_ERROR":
-      return (
         <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
           View Book Details
         </NavButton>
-      );
-
-    default:
-      return null;
+      </>
+    );
   }
+
+  if (bookIsReservable(book)) {
+    return (
+      <>
+        <BorrowOrReserve url={book.reserveUrl} isBorrow={false} />
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          {availabilityString(book)}
+        </Text>
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+          View Book Details
+        </NavButton>
+      </>
+    );
+  }
+
+  if (bookIsReserved(book)) {
+    const position = book.holds?.position;
+    return (
+      <>
+        <Button disabled color="ui.black">
+          Reserved
+        </Button>
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          You have this book on hold.{" "}
+          {typeof position === "number" &&
+            !isNaN(position) &&
+            `Position: ${position}`}
+        </Text>
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+          View Book Details
+        </NavButton>
+      </>
+    );
+  }
+
+  if (bookIsOnHold(book)) {
+    return (
+      <>
+        <BorrowOrReserve url={book.borrowUrl} isBorrow />
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          You have this book on hold.
+        </Text>
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+          View Book Details
+        </NavButton>
+      </>
+    );
+  }
+
+  if (bookIsFulfillable(book)) {
+    const availableUntil = book.availability?.until
+      ? new Date(book.availability.until).toDateString()
+      : "NaN";
+
+    const subtitle =
+      availableUntil !== "NaN"
+        ? `You have this book on loan until ${availableUntil}.`
+        : "You have this book on loan.";
+
+    return (
+      <>
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          {subtitle}
+        </Text>
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+          View Book Details
+        </NavButton>
+      </>
+    );
+  }
+
+  // some error ocurred, we shouldn't get here
+  // TODO: log error to bugsnag
+  return (
+    <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+      View Book Details
+    </NavButton>
+  );
 };
 
 export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {

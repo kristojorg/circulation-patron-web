@@ -152,7 +152,7 @@ export interface Book {
     total: number;
     available: number;
   } | null;
-  url?: string;
+  url: string;
   publisher?: string;
   published?: string;
   categories?: string[];
