@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, fixtures, waitFor } from "test-utils";
 import merge from "deepmerge";
 import { BookDetails } from "../index";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import * as complaintActions from "hooks/useComplaints/actions";
 import userEvent from "@testing-library/user-event";
 import ReportProblem from "../ReportProblem";
@@ -73,7 +73,7 @@ describe("book details page", () => {
   });
 
   test("doesn't show categories when there aren't any", () => {
-    const bookWithoutCategories: BookData = merge(fixtures.book, {
+    const bookWithoutCategories: AnyBook = merge(fixtures.book, {
       categories: null
     });
     mockSwr({ data: bookWithoutCategories });
@@ -192,7 +192,7 @@ const fetchComplaintTypesSpy = jest
   .mockReturnValue(mockBoundFetchComplaintTypes);
 const postComplaintSpy = jest.spyOn(complaintActions, "postComplaint");
 
-const bookWithReportUrl = merge<BookData>(fixtures.book, {
+const bookWithReportUrl = merge<AnyBook>(fixtures.book, {
   raw: {
     link: [
       {

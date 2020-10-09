@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, fixtures, fireEvent } from "test-utils";
 import { MyBooks } from "../MyBooks";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 
 test("shows message and button when not authenticated", () => {
   const utils = render(<MyBooks />);
@@ -52,7 +52,7 @@ test("sign out calls sign out", async () => {
   expect(fixtures.mockSignOut).toHaveBeenCalledTimes(1);
 });
 
-const books: BookData[] = [
+const books: AnyBook[] = [
   ...fixtures.makeBooks(10),
   fixtures.mergeBook({
     id: "book 10",

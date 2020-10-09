@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
 import * as React from "react";
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import BookCover from "../BookCover";
 import Recommendations from "./Recommendations";
 import { PageLoader } from "../LoadingIndicator";
@@ -102,7 +102,7 @@ export const BookDetails: React.FC = () => {
   );
 };
 
-const Summary: React.FC<{ book: BookData; className?: string }> = ({
+const Summary: React.FC<{ book: AnyBook; className?: string }> = ({
   book,
   className
 }) => (

@@ -1,4 +1,4 @@
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import { getFulfillmentState, queueString, bookIsAudiobook } from "utils/book";
 import { book as bookFixture } from "../../test-utils/fixtures/book";
 import { getAuthors } from "../book";
@@ -191,14 +191,14 @@ describe("getFulfillmentState", () => {
 
 describe("queue string formatter", () => {
   test("returns empty string with no holds data", () => {
-    const book: BookData = {
+    const book: AnyBook = {
       ...bookFixture,
       holds: null
     };
     expect(queueString(book)).toBe("");
   });
   test("returns formatted string when total holds provided", () => {
-    const book: BookData = {
+    const book: AnyBook = {
       ...bookFixture,
       holds: {
         total: 10
@@ -210,7 +210,7 @@ describe("queue string formatter", () => {
 
 describe("book is audiobook", () => {
   test("correctly recognizes audiobook", () => {
-    const book: BookData = {
+    const book: AnyBook = {
       ...bookFixture,
       raw: {
         $: {

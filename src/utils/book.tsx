@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
   AnyBook,
-  BookData,
+  AnyBook,
   BookMedium,
   BorrowableBook,
   FulfillableBook,
@@ -13,7 +13,7 @@ import { BookFulfillmentState } from "interfaces";
 import { Book, Headset } from "../icons";
 import { DEFAULT_AVAILABILITY } from "utils/constants";
 
-export function getAuthors(book: BookData, lim?: number): string[] {
+export function getAuthors(book: AnyBook, lim?: number): string[] {
   // select contributors if the authors array is undefined or empty.
   const allAuth =
     typeof book.authors?.length === "number" && book.authors.length > 0
@@ -30,7 +30,7 @@ export function getAuthors(book: BookData, lim?: number): string[] {
   return allAuth;
 }
 
-export function availabilityString(book: BookData) {
+export function availabilityString(book: AnyBook) {
   if (book.openAccessLinks && book.openAccessLinks.length > 0)
     return "This open-access book is available to keep forever.";
 
@@ -41,7 +41,7 @@ export function availabilityString(book: BookData) {
     : "Number of books available is unknown.";
 }
 
-export function queueString(book: BookData) {
+export function queueString(book: AnyBook) {
   const holds = book.holds?.total;
   return typeof holds === "number"
     ? `There are ${holds} other patrons in the queue.`
@@ -68,7 +68,7 @@ export function bookIsBorrowable(book: AnyBook): book is BorrowableBook {
   return book.status === "borrowable";
 }
 
-export function bookIsAudiobook(book: BookData): boolean {
+export function bookIsAudiobook(book: AnyBook): boolean {
   if (getMedium(book) === "http://bib.schema.org/Audiobook") {
     return true;
   }
@@ -89,7 +89,7 @@ export const bookMediumMap: {
   "http://schema.org/Book": { name: "Book", icon: Book }
 };
 
-export function getMedium(book: BookData): BookMedium | "" {
+export function getMedium(book: AnyBook): BookMedium | "" {
   if (!book.raw || !book.raw["$"] || !book.raw["$"]["schema:additionalType"]) {
     return "";
   }

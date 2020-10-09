@@ -1,8 +1,8 @@
-import { BookData } from "interfaces";
+import { AnyBook } from "interfaces";
 import merge from "deepmerge";
 
-export const mergeBook = (input: Partial<BookData>) =>
-  merge<BookData>(book, input, {
+export const mergeBook = (input: Partial<AnyBook>) =>
+  merge<AnyBook>(book, input, {
     arrayMerge: (a, b) => b
   });
 
@@ -24,16 +24,16 @@ export function makeBook(i: number) {
  */
 export function makeBooks(
   n: number,
-  make: (i: number) => Partial<BookData> = makeBook
+  make: (i: number) => Partial<AnyBook> = makeBook
 ) {
-  const books: BookData[] = [];
+  const books: AnyBook[] = [];
   for (let i = 0; i < n; i++) {
     books[i] = mergeBook(make(i));
   }
   return books;
 }
 
-export const book: BookData = {
+export const book: AnyBook = {
   id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr9",
   relatedUrl: "http://related-url",
   url: "http://test-book-url",

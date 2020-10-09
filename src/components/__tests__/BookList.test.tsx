@@ -2,7 +2,7 @@ import * as React from "react";
 import { render, fixtures } from "test-utils";
 import { BookList, InfiniteBookList } from "../BookList";
 import merge from "deepmerge";
-import { BookData, CollectionData } from "interfaces";
+import { AnyBook, CollectionData } from "interfaces";
 import { useSWRInfinite } from "swr";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import userEvent from "@testing-library/user-event";
@@ -25,7 +25,7 @@ test("renders books", () => {
 });
 
 test("truncates long titles", () => {
-  const longBook = merge<BookData>(fixtures.book, {
+  const longBook = merge<AnyBook>(fixtures.book, {
     title: "This is an extremely long title it's really way too long"
   });
   const utils = render(<BookList books={[longBook]} />);
@@ -35,7 +35,7 @@ test("truncates long titles", () => {
 });
 
 test("truncates authors", () => {
-  const longBook = merge<BookData>(
+  const longBook = merge<AnyBook>(
     fixtures.book,
     {
       authors: ["one", "two", "three", "four", "five"]
