@@ -6,7 +6,7 @@ export const mergeBook = (input: Partial<AnyBook>) =>
     arrayMerge: (a, b) => b
   });
 
-export function makeBook(i: number): AnyBook {
+export function makeBook(i: number) {
   return {
     status: "borrowable",
     borrowUrl: "/borrow",

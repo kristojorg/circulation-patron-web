@@ -16,7 +16,7 @@ test("renders books", () => {
     const book = fixtures.makeBook(i);
     expect(utils.getByText(book.title)).toBeInTheDocument();
     // shows details as well
-    expect(utils.getByText(book.authors[0])).toBeInTheDocument();
+    expect(utils.getByText(book.authors?.[0])).toBeInTheDocument();
   }
 
   expectBook(0);

@@ -31,9 +31,12 @@ describe("open access book", () => {
       <BookListItem
         book={{
           ...fixtures.book,
+          status: "fulfillable",
+          revokeUrl: "/revoke",
           fulfillmentLinks: [
             {
-              type: "application/atom+xml;type=entry;profile=opds-catalog",
+              contentType: "application/epub+zip",
+              supportLevel: "show",
               url: "/download"
             }
           ]
@@ -80,7 +83,6 @@ const mockFetchBook = fetch.fetchBook as jest.MockedFunction<
 
 describe("available to borrow book", () => {
   const closedAccessBook = fixtures.mergeBook({
-    openAccessLinks: [],
     copies: {
       total: 13,
       available: 10
@@ -129,7 +131,6 @@ describe("available to borrow book", () => {
 
 describe("ready to borrow book", () => {
   const readyBook = fixtures.mergeBook({
-    openAccessLinks: undefined,
     fulfillmentLinks: undefined,
     availability: {
       status: "ready",
@@ -178,24 +179,23 @@ describe("ready to borrow book", () => {
 
 describe("ready to borrow book with multiple borrowUrls", () => {
   const readyBook = fixtures.mergeBook({
-    openAccessLinks: undefined,
     fulfillmentLinks: undefined,
     availability: {
       status: "ready",
       until: "2020-06-16"
-    },
-    allBorrowLinks: [
-      {
-        url: "/adobe-borrow-link",
-        type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/kepub+zip"
-      },
-      {
-        url: "/axis-borrow-link",
-        type: "application/atom+xml;type=entry;profile=opds-catalog",
-        indirectType: "application/vnd.librarysimplified.axisnow+json"
-      }
-    ]
+    }
+    // allBorrowLinks: [
+    //   {
+    //     url: "/adobe-borrow-link",
+    //     type: "application/atom+xml;type=entry;profile=opds-catalog",
+    //     indirectType: "application/kepub+zip"
+    //   },
+    //   {
+    //     url: "/axis-borrow-link",
+    //     type: "application/atom+xml;type=entry;profile=opds-catalog",
+    //     indirectType: "application/vnd.librarysimplified.axisnow+json"
+    //   }
+    // ]
   });
 
   test("shows two borrow buttons if books there are multiple borrow urls", () => {
@@ -244,7 +244,6 @@ describe("available to reserve book", () => {
     availability: {
       status: "unavailable"
     },
-    openAccessLinks: [],
     copies: {
       total: 13,
       available: 0
@@ -303,7 +302,6 @@ describe("reserved book", () => {
     availability: {
       status: "reserved"
     },
-    openAccessLinks: [],
     copies: {
       total: 13,
       available: 0
@@ -324,7 +322,6 @@ describe("reserved book", () => {
       availability: {
         status: "reserved"
       },
-      openAccessLinks: [],
       copies: {
         total: 13,
         available: 0
@@ -343,15 +340,16 @@ describe("reserved book", () => {
 
 describe("available to access book", () => {
   const downloadableBook = fixtures.mergeBook({
-    openAccessLinks: undefined,
     fulfillmentLinks: [
       {
         url: "/epub-link",
-        type: "application/epub+zip"
+        supportLevel: "show",
+        contentType: "application/epub+zip"
       },
       {
         url: "/pdf-link",
-        type: "application/pdf"
+        supportLevel: "show",
+        contentType: "application/pdf"
       }
     ],
     availability: {
