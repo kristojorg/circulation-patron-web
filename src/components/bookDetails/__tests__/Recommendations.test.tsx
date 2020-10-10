@@ -105,12 +105,12 @@ test("shows multiple lanes if existing", () => {
       {
         title: "lane 1",
         url: "/lane-1",
-        books: fixtures.makeBooks(10)
+        books: fixtures.makeBorrowableBooks(10)
       },
       {
         title: "lane 2",
         url: "/lane-2",
-        books: fixtures.makeBooks(10)
+        books: fixtures.makeBorrowableBooks(10)
       }
     ]
   };

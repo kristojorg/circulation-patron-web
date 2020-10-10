@@ -127,73 +127,72 @@ export type BookAvailability =
   | "unavailable"
   | "reserved"
   | "ready";
-export interface Book {
-  id: string;
-  title: string;
-  series?: {
-    name: string;
-    position?: number;
-  } | null;
-  authors?: string[];
-  contributors?: string[];
-  subtitle?: string;
-  summary?: string;
-  imageUrl?: string;
-  availability?: {
-    status: BookAvailability;
-    since?: string;
-    until?: string;
-  };
-  holds?: {
-    total: number;
-    position?: number;
-  } | null;
-  copies?: {
-    total: number;
-    available: number;
-  } | null;
-  url: string;
-  publisher?: string;
-  published?: string;
-  categories?: string[];
-  language?: string;
-  relatedUrl: string | null;
-  raw?: any;
-}
 
-export interface BorrowableBook extends Book {
+export type Book<Status = EmptyObject> = Readonly<
+  Status & {
+    id: string;
+    title: string;
+    series?: {
+      name: string;
+      position?: number;
+    } | null;
+    authors?: string[];
+    contributors?: string[];
+    subtitle?: string;
+    summary?: string;
+    imageUrl?: string;
+    availability?: {
+      status: BookAvailability;
+      since?: string;
+      until?: string;
+    };
+    holds?: {
+      total: number;
+      position?: number;
+    } | null;
+    copies?: {
+      total: number;
+      available: number;
+    } | null;
+    url: string;
+    publisher?: string;
+    published?: string;
+    categories?: string[];
+    language?: string;
+    relatedUrl: string | null;
+    raw?: any;
+  }
+>;
+
+export type BorrowableBook = Book<{
   status: "borrowable";
   borrowUrl: string;
-}
+}>;
 
-/**
- * This means it is on hold and can now be borrowed
- * before the hold expires
- */
-export interface OnHoldBook extends Book {
+export type OnHoldBook = Book<{
   status: "on-hold";
   borrowUrl: string;
-}
+}>;
 
-export interface ReservableBook extends Book {
+export type ReservableBook = Book<{
   status: "reservable";
   reserveUrl: string;
-}
+}>;
 
-export interface ReservedBook extends Book {
+export type ReservedBook = Book<{
   status: "reserved";
   revokeUrl: string | null;
-}
+}>;
 
-export interface FulfillableBook extends Book {
+export type FulfillableBook = Book<{
   status: "fulfillable";
   fulfillmentLinks: FulfillmentLink[];
   revokeUrl: string | null;
-}
+}>;
 
-export interface UnsupportedBook extends Book {
+export type UnsupportedBook = Book<{
   status: "unsupported";
-}
+}>;
 
 export type AnyBook =
   | BorrowableBook
@@ -284,6 +283,4 @@ export type NextLinkConfig = {
   as?: string;
 };
 
-export type EmptyObject = {
-  [k in any]: never;
-};
+export type EmptyObject = Record<never, unknown>;

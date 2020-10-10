@@ -3,6 +3,13 @@ import { render, fixtures, waitFor } from "test-utils";
 import { BookListItem } from "components/BookList";
 import userEvent from "@testing-library/user-event";
 import * as fetch from "dataflow/opds1/fetch";
+import {
+  BorrowableBook,
+  FulfillableBook,
+  OnHoldBook,
+  ReservableBook,
+  ReservedBook
+} from "interfaces";
 
 function expectViewDetails(utils: ReturnType<typeof render>) {
   const button = utils.getByRole("link", { name: "View Book Details" });
@@ -53,7 +60,7 @@ describe("open access book", () => {
   });
 
   test("renders without borrow button if no borrow url present", () => {
-    const noAuthBook = fixtures.mergeBook({
+    const noAuthBook = fixtures.mergeBook<ReservableBook>({
       status: "reservable",
       reserveUrl: "/reserve"
     });
@@ -66,7 +73,9 @@ describe("open access book", () => {
   });
 
   test("renders subtitle if provided", () => {
-    const bookWithSubtitle = fixtures.mergeBook({
+    const bookWithSubtitle = fixtures.mergeBook<BorrowableBook>({
+      borrowUrl: "/borrow",
+      status: "borrowable",
       subtitle:
         "Book subtitle that is quite long-winded and will break the ux if not truncated"
     });
@@ -83,7 +92,9 @@ const mockFetchBook = fetch.fetchBook as jest.MockedFunction<
 >;
 
 describe("available to borrow book", () => {
-  const closedAccessBook = fixtures.mergeBook({
+  const closedAccessBook = fixtures.mergeBook<BorrowableBook>({
+    status: "borrowable",
+    borrowUrl: "/borrow",
     copies: {
       total: 13,
       available: 10
@@ -131,8 +142,9 @@ describe("available to borrow book", () => {
 });
 
 describe("ready to borrow book", () => {
-  const readyBook = fixtures.mergeBook({
-    fulfillmentLinks: undefined,
+  const readyBook = fixtures.mergeBook<OnHoldBook>({
+    status: "on-hold",
+    borrowUrl: "/borrow",
     availability: {
       status: "ready",
       until: "2020-06-16"
@@ -179,27 +191,17 @@ describe("ready to borrow book", () => {
 });
 
 describe("ready to borrow book with multiple borrowUrls", () => {
-  const readyBook = fixtures.mergeBook({
-    fulfillmentLinks: undefined,
+  const readyBook = fixtures.mergeBook<OnHoldBook>({
+    status: "on-hold",
+    borrowUrl: "/borrow",
     availability: {
       status: "ready",
       until: "2020-06-16"
     }
-    // allBorrowLinks: [
-    //   {
-    //     url: "/adobe-borrow-link",
-    //     type: "application/atom+xml;type=entry;profile=opds-catalog",
-    //     indirectType: "application/kepub+zip"
-    //   },
-    //   {
-    //     url: "/axis-borrow-link",
-    //     type: "application/atom+xml;type=entry;profile=opds-catalog",
-    //     indirectType: "application/vnd.librarysimplified.axisnow+json"
-    //   }
-    // ]
   });
 
   test("shows two borrow buttons if books there are multiple borrow urls", () => {
+    throw new Error("This doesn't work!");
     const utils = render(<BookListItem book={readyBook} />);
     expect(
       utils.getByRole("button", { name: "Borrow to read on a mobile device" })
@@ -241,7 +243,9 @@ describe("ready to borrow book with multiple borrowUrls", () => {
 });
 
 describe("available to reserve book", () => {
-  const unavailableBook = fixtures.mergeBook({
+  const unavailableBook = fixtures.mergeBook<ReservableBook>({
+    reserveUrl: "/reserve",
+    status: "reservable",
     availability: {
       status: "unavailable"
     },
@@ -299,7 +303,9 @@ describe("available to reserve book", () => {
 });
 
 describe("reserved book", () => {
-  const reservedBook = fixtures.mergeBook({
+  const reservedBook = fixtures.mergeBook<ReservedBook>({
+    status: "reserved",
+    revokeUrl: "/revoke",
     availability: {
       status: "reserved"
     },
@@ -319,7 +325,9 @@ describe("reserved book", () => {
   });
 
   test("displays number of patrons in queue and your position", () => {
-    const reservedBookWithQueue = fixtures.mergeBook({
+    const reservedBookWithQueue = fixtures.mergeBook<ReservedBook>({
+      status: "reserved",
+      revokeUrl: "/revoke",
       availability: {
         status: "reserved"
       },
@@ -340,7 +348,9 @@ describe("reserved book", () => {
 });
 
 describe("available to access book", () => {
-  const downloadableBook = fixtures.mergeBook({
+  const downloadableBook = fixtures.mergeBook<FulfillableBook>({
+    status: "fulfillable",
+    revokeUrl: "/revoke",
     fulfillmentLinks: [
       {
         url: "/epub-link",

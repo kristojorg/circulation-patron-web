@@ -1,13 +1,21 @@
-import { AnyBook, Book, BorrowableBook } from "interfaces";
+import {
+  AnyBook,
+  Book,
+  BorrowableBook,
+  FulfillableBook,
+  FulfillmentLink
+} from "interfaces";
 import merge from "deepmerge";
 
-export function mergeBook<T extends AnyBook>(input: Partial<T>): T {
+export function mergeBook<T extends AnyBook>(
+  input: Partial<Book> & Omit<T, keyof Book>
+): T {
   return merge(book, input, {
     arrayMerge: (a, b) => b
-  });
+  }) as T;
 }
 
-export function makeBook(i: number) {
+export function makeBook(i: number): Book {
   return {
     id: `Book Id ${i}`,
     url: `/book-url-${i}`,
@@ -19,25 +27,37 @@ export function makeBook(i: number) {
   };
 }
 
-export function makeBorrowableBook(i: number): BorrowableBook {
-  return {
-    ...makeBook(i),
-    borrowUrl: "/borrow",
-    status: "borrowable"
-  };
-}
-
 /**
  * makes n books with a make function that takes index and outputs some
  * custom book info which gets merged with the default book fixture
  */
-export function makeBooks(
-  n: number
-  // make: (i: number) => Partial<AnyBook> = makeBook
-) {
-  const books: AnyBook[] = [];
+export function makeBorrowableBooks(n: number) {
+  const books: BorrowableBook[] = [];
   for (let i = 0; i < n; i++) {
-    books[i] = mergeBook(makeBook(i) as any);
+    books[i] = {
+      ...makeBook(i),
+      status: "borrowable",
+      borrowUrl: `/borrow-${i}`
+    };
+  }
+  return books;
+}
+
+export function makeFulfillableBooks(n: number): FulfillableBook[] {
+  const books: FulfillableBook[] = [];
+  for (let i = 0; i < n; i++) {
+    books[i] = {
+      ...makeBook(i),
+      status: "fulfillable",
+      revokeUrl: `/revoke-${i}`,
+      fulfillmentLinks: [
+        {
+          url: `/fulfill-${i}`,
+          supportLevel: "show",
+          contentType: "application/epub+zip"
+        }
+      ]
+    };
   }
   return books;
 }
@@ -132,6 +152,19 @@ export const borrowableBook: BorrowableBook = {
   ...book,
   borrowUrl: "/borrow",
   status: "borrowable"
+};
+
+export const fulfillmentLink: FulfillmentLink = {
+  contentType: "application/epub+zip",
+  url: "/epub",
+  supportLevel: "show"
+};
+
+export const fulfillableBook: FulfillableBook = {
+  ...book,
+  status: "fulfillable",
+  revokeUrl: "/revoke",
+  fulfillmentLinks: [fulfillmentLink]
 };
 
 export default book;

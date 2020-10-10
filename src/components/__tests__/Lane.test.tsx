@@ -29,7 +29,7 @@ beforeEach(() => {
 const laneData: LaneData = {
   title: "my lane",
   url: "http://link-to-lane",
-  books: fixtures.makeBooks(4)
+  books: fixtures.makeBorrowableBooks(4)
 };
 
 test("Renders", () => {

@@ -37,7 +37,7 @@ const collection: CollectionData = {
     {
       title: "my lane",
       url: "/link-to-lane",
-      books: fixtures.makeBooks(10)
+      books: fixtures.makeBorrowableBooks(10)
     }
   ]
 };

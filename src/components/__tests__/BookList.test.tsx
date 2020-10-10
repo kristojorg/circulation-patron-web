@@ -7,7 +7,7 @@ import { useSWRInfinite } from "swr";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import userEvent from "@testing-library/user-event";
 
-const books = fixtures.makeBooks(3);
+const books = fixtures.makeBorrowableBooks(3);
 
 test("renders books", () => {
   const utils = render(<BookList books={books} />);
@@ -16,7 +16,7 @@ test("renders books", () => {
     const book = fixtures.makeBook(i);
     expect(utils.getByText(book.title)).toBeInTheDocument();
     // shows details as well
-    expect(utils.getByText(book.authors?.[0])).toBeInTheDocument();
+    expect(utils.getByText("Book 0 author")).toBeInTheDocument();
   }
 
   expectBook(0);
@@ -78,7 +78,7 @@ describe("infinite loading book list", () => {
     mockCollection([
       {
         ...fixtures.emptyCollection,
-        books: fixtures.makeBooks(2)
+        books: fixtures.makeBorrowableBooks(2)
       },
       {
         ...fixtures.emptyCollection,
