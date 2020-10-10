@@ -39,21 +39,21 @@ test("shows recommendations loading state", async () => {
     data: undefined,
     isValidating: true
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   await waitFor(() =>
     expect(utils.getByText("Loading...")).toBeInTheDocument()
   );
 });
 
 test("fetches the proper url for recommendation collection", () => {
-  render(<Recommendations book={fixtures.book} />);
+  render(<Recommendations book={fixtures.borrowableBook} />);
   expect(mockedSWR).toHaveBeenCalledTimes(1);
   expect(mockedSWR).toHaveBeenCalledWith("http://related-url", fetchCollection);
 });
 
 test("shows recommendation lanes", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   expect(
     utils.getByRole("heading", { name: "Recommendations" })
   ).toBeInTheDocument();
@@ -67,13 +67,13 @@ test("doesn't show recommendations if there are none", () => {
     isValidating: false,
     data: undefined
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   expect(utils.container).toBeEmptyDOMElement();
 });
 
 test("recommendations are clickable", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
   const recommendationCover = utils.getByRole("link", {
     name: "View Recommendation 1"
@@ -86,7 +86,7 @@ test("recommendations are clickable", () => {
 
 test("displays a more button for recommendations", () => {
   mockSwr();
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
   const moreButton = utils.getByText("See More");
   expect(moreButton).toHaveAttribute(
     "href",
@@ -118,7 +118,7 @@ test("shows multiple lanes if existing", () => {
     isValidating: false,
     data: multipleLanes
   });
-  const utils = render(<Recommendations book={fixtures.book} />);
+  const utils = render(<Recommendations book={fixtures.borrowableBook} />);
 
   expect(utils.getByText("lane 1")).toBeInTheDocument();
   expect(utils.getByText("lane 2")).toBeInTheDocument();

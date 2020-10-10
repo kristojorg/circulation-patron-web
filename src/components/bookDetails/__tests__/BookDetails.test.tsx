@@ -334,7 +334,7 @@ describe("report problem", () => {
     postComplaintSpy.mockReturnValue(_url => mockBoundPostComplaint);
 
     mockSwr({ data: bookWithReportUrl });
-    const utils = render(<ReportProblem book={fixtures.book} />);
+    const utils = render(<ReportProblem book={fixtures.borrowableBook} />);
     // open the form
     const reportProblemLink = utils.getByTestId("report-problem-link");
     userEvent.click(reportProblemLink);

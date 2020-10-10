@@ -12,7 +12,7 @@ function expectViewDetails(utils: ReturnType<typeof render>) {
 
 describe("open access book", () => {
   test("renders with view details button", () => {
-    const utils = render(<BookListItem book={fixtures.book} />);
+    const utils = render(<BookListItem book={fixtures.borrowableBook} />);
     expect(
       utils.getByText("This open-access book is available to keep forever.")
     ).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe("open access book", () => {
   });
 
   test("shows borrow button if not yet loaned", () => {
-    const utils = render(<BookListItem book={fixtures.book} />);
+    const utils = render(<BookListItem book={fixtures.borrowableBook} />);
     expect(
       utils.getByRole("button", { name: "Borrow to read on a mobile device" })
     ).toBeInTheDocument();
@@ -54,7 +54,8 @@ describe("open access book", () => {
 
   test("renders without borrow button if no borrow url present", () => {
     const noAuthBook = fixtures.mergeBook({
-      borrowUrl: undefined
+      status: "reservable",
+      reserveUrl: "/reserve"
     });
     const utils = render(<BookListItem book={noAuthBook} />);
     expect(

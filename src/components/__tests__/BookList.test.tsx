@@ -83,7 +83,7 @@ describe("infinite loading book list", () => {
       {
         ...fixtures.emptyCollection,
         id: "id-2",
-        books: [fixtures.book]
+        books: [fixtures.borrowableBook]
       }
     ]);
     const utils = render(<InfiniteBookList firstPageUrl="/first-page" />);
@@ -101,7 +101,7 @@ describe("infinite loading book list", () => {
 
   test("shows loading indicator when fetching more", () => {
     const notFinalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],
@@ -121,7 +121,7 @@ describe("infinite loading book list", () => {
 
   test("doesn't show loader when at end of list", () => {
     const finalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],
@@ -146,7 +146,7 @@ describe("infinite loading book list", () => {
 
   test("shows view more button which loads more books on click", () => {
     const notFinalCollection: CollectionData = {
-      books: [fixtures.book],
+      books: [fixtures.borrowableBook],
       id: "id!",
       lanes: [],
       navigationLinks: [],
