@@ -342,7 +342,7 @@ describe("FulfillableBook", () => {
       ]
     });
     const utils = render(<FulfillmentCard book={readOnlineBook} />);
-    const readOnline = utils.getByRole("button", { name: "Read Online" });
+    const readOnline = utils.getByRole("button", { name: "Read" });
 
     // should not have been called ever
     expect(fetchMock).toHaveBeenCalledTimes(0);
