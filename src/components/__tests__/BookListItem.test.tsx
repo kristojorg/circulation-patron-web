@@ -17,82 +17,22 @@ function expectViewDetails(utils: ReturnType<typeof render>) {
   expect(button).toHaveAttribute("href", "/book/http%3A%2F%2Ftest-book-url");
 }
 
-describe("open access book", () => {
-  test("renders with view details button", () => {
-    const utils = render(<BookListItem book={fixtures.borrowableBook} />);
-    expect(
-      utils.getByText("This open-access book is available to keep forever.")
-    ).toBeInTheDocument();
-    expectViewDetails(utils);
-  });
-
-  test("shows borrow button if not yet loaned", () => {
-    const utils = render(<BookListItem book={fixtures.borrowableBook} />);
-    expect(
-      utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-    ).toBeInTheDocument();
-  });
-
-  test("shows no borrow button when book is loaned", async () => {
-    const utils = render(
-      <BookListItem
-        book={{
-          ...fixtures.book,
-          status: "fulfillable",
-          revokeUrl: "/revoke",
-          fulfillmentLinks: [
-            {
-              contentType: "application/epub+zip",
-              supportLevel: "show",
-              url: "/download"
-            }
-          ]
-        }}
-      />
-    );
-
-    await waitFor(() =>
-      expect(
-        utils.queryByText("Borrow to read on a mobile device")
-      ).not.toBeInTheDocument()
-    );
-    expectViewDetails(utils);
-  });
-
-  test("renders without borrow button if no borrow url present", () => {
-    const noAuthBook = fixtures.mergeBook<ReservableBook>({
-      status: "reservable",
-      reserveUrl: "/reserve"
-    });
-    const utils = render(<BookListItem book={noAuthBook} />);
-    expect(
-      utils.getByText("This open-access book is available to keep forever.")
-    ).toBeInTheDocument();
-    expect(utils.queryByText("Borrow to read on a mobile device")).toBeNull();
-    expectViewDetails(utils);
-  });
-
-  test("renders subtitle if provided", () => {
-    const bookWithSubtitle = fixtures.mergeBook<BorrowableBook>({
-      borrowUrl: "/borrow",
-      status: "borrowable",
-      subtitle:
-        "Book subtitle that is quite long-winded and will break the ux if not truncated"
-    });
-    const utils = render(<BookListItem book={bookWithSubtitle} />);
-    expect(
-      utils.getByText("Book subtitle that is quite long-winded and will...")
-    ).toBeInTheDocument();
-  });
-});
+/**
+ * Borrowable
+ * OnHold
+ * Reservable
+ * Reserved
+ * Fulfillable
+ * Unsupported
+ */
 
 (fetch as any).fetchBook = jest.fn();
 const mockFetchBook = fetch.fetchBook as jest.MockedFunction<
   typeof fetch.fetchBook
 >;
 
-describe("available to borrow book", () => {
-  const closedAccessBook = fixtures.mergeBook<BorrowableBook>({
+describe("BorrowableBook", () => {
+  const borrowableBook = fixtures.mergeBook<BorrowableBook>({
     status: "borrowable",
     borrowUrl: "/borrow",
     copies: {
@@ -102,7 +42,7 @@ describe("available to borrow book", () => {
   });
 
   test("shows correct string and link to book details", () => {
-    const utils = render(<BookListItem book={closedAccessBook} />);
+    const utils = render(<BookListItem book={borrowableBook} />);
     expectViewDetails(utils);
     expect(
       utils.getByText("10 out of 13 copies available.")
@@ -111,8 +51,8 @@ describe("available to borrow book", () => {
 
   test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
     const mockSetBook = jest.fn();
-    mockFetchBook.mockResolvedValue(closedAccessBook);
-    const utils = render(<BookListItem book={closedAccessBook} />, {
+    mockFetchBook.mockResolvedValue(borrowableBook);
+    const utils = render(<BookListItem book={borrowableBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -121,10 +61,10 @@ describe("available to borrow book", () => {
     });
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
+    userEvent.click(utils.getByText("Borrow"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
-      "/epub-borrow-link",
+      "/borrow",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
@@ -136,13 +76,13 @@ describe("available to borrow book", () => {
 
     // we revalidate the loans
     await waitFor(() =>
-      expect(mockSetBook).toHaveBeenCalledWith(closedAccessBook)
+      expect(mockSetBook).toHaveBeenCalledWith(borrowableBook)
     );
   });
 });
 
-describe("ready to borrow book", () => {
-  const readyBook = fixtures.mergeBook<OnHoldBook>({
+describe("OnHoldBook", () => {
+  const onHoldBook = fixtures.mergeBook<OnHoldBook>({
     status: "on-hold",
     borrowUrl: "/borrow",
     availability: {
@@ -152,18 +92,16 @@ describe("ready to borrow book", () => {
   });
 
   test("shows correct string and link to book details", () => {
-    const utils = render(<BookListItem book={readyBook} />);
+    const utils = render(<BookListItem book={onHoldBook} />);
     expectViewDetails(utils);
-    expect(
-      utils.getByText("You can now borrow this book!")
-    ).toBeInTheDocument();
+    expect(utils.getByText("You have this book on hold.")).toBeInTheDocument();
   });
 
   test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
     const mockSetBook = jest.fn();
-    mockFetchBook.mockResolvedValue(readyBook);
+    mockFetchBook.mockResolvedValue(onHoldBook);
 
-    const utils = render(<BookListItem book={readyBook} />, {
+    const utils = render(<BookListItem book={onHoldBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -172,10 +110,10 @@ describe("ready to borrow book", () => {
     });
 
     // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
+    userEvent.click(utils.getByText("Borrow"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
-      "/epub-borrow-link",
+      "/borrow",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
@@ -186,64 +124,12 @@ describe("ready to borrow book", () => {
     expect(borrowButton).toHaveAttribute("disabled", "");
 
     // we revalidate the loans
-    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(readyBook));
+    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(onHoldBook));
   });
 });
 
-describe("ready to borrow book with multiple borrowUrls", () => {
-  const readyBook = fixtures.mergeBook<OnHoldBook>({
-    status: "on-hold",
-    borrowUrl: "/borrow",
-    availability: {
-      status: "ready",
-      until: "2020-06-16"
-    }
-  });
-
-  test("shows two borrow buttons if books there are multiple borrow urls", () => {
-    throw new Error("This doesn't work!");
-    const utils = render(<BookListItem book={readyBook} />);
-    expect(
-      utils.getByRole("button", { name: "Borrow to read on a mobile device" })
-    ).toBeInTheDocument();
-    expect(
-      utils.getByRole("button", { name: "Borrow to read online" })
-    ).toBeInTheDocument();
-  });
-
-  test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
-    const mockSetBook = jest.fn();
-    mockFetchBook.mockResolvedValue(readyBook);
-
-    const utils = render(<BookListItem book={readyBook} />, {
-      user: {
-        setBook: mockSetBook,
-        isAuthenticated: true,
-        loans: fixtures.loans.books
-      }
-    });
-
-    // click borrow
-    userEvent.click(utils.getByText("Borrow to read on a mobile device"));
-    expect(mockFetchBook).toHaveBeenCalledTimes(1);
-    expect(mockFetchBook).toHaveBeenCalledWith(
-      "/adobe-borrow-link",
-      "http://test-cm.com/catalogUrl",
-      "user-token"
-    );
-    const borrowButton = utils.getByRole("button", {
-      name: /Borrowing.../i
-    });
-    expect(borrowButton).toBeInTheDocument();
-    expect(borrowButton).toHaveAttribute("disabled", "");
-
-    // we revalidate the loans
-    await waitFor(() => expect(mockSetBook).toHaveBeenCalledWith(readyBook));
-  });
-});
-
-describe("available to reserve book", () => {
-  const unavailableBook = fixtures.mergeBook<ReservableBook>({
+describe("ReservableBook", () => {
+  const reservableBook = fixtures.mergeBook<ReservableBook>({
     reserveUrl: "/reserve",
     status: "reservable",
     availability: {
@@ -256,7 +142,7 @@ describe("available to reserve book", () => {
   });
 
   test("displays correct title and subtitle", () => {
-    const utils = render(<BookListItem book={unavailableBook} />);
+    const utils = render(<BookListItem book={reservableBook} />);
     expect(
       utils.getByText("0 out of 13 copies available.")
     ).toBeInTheDocument();
@@ -264,16 +150,16 @@ describe("available to reserve book", () => {
   });
 
   test("displays reserve button", () => {
-    const utils = render(<BookListItem book={unavailableBook} />);
+    const utils = render(<BookListItem book={reservableBook} />);
     const reserveButton = utils.getByRole("button", { name: "Reserve" });
     expect(reserveButton).toBeInTheDocument();
   });
 
   test("shows loading state when borrowing, borrows, and revalidates loans", async () => {
     const mockSetBook = jest.fn();
-    mockFetchBook.mockResolvedValue(unavailableBook);
+    mockFetchBook.mockResolvedValue(reservableBook);
 
-    const utils = render(<BookListItem book={unavailableBook} />, {
+    const utils = render(<BookListItem book={reservableBook} />, {
       user: {
         setBook: mockSetBook,
         isAuthenticated: true,
@@ -285,7 +171,7 @@ describe("available to reserve book", () => {
     userEvent.click(utils.getByText("Reserve"));
     expect(mockFetchBook).toHaveBeenCalledTimes(1);
     expect(mockFetchBook).toHaveBeenCalledWith(
-      "/epub-borrow-link",
+      "/reserve",
       "http://test-cm.com/catalogUrl",
       "user-token"
     );
@@ -297,12 +183,12 @@ describe("available to reserve book", () => {
 
     // we revalidate the loans
     await waitFor(() =>
-      expect(mockSetBook).toHaveBeenCalledWith(unavailableBook)
+      expect(mockSetBook).toHaveBeenCalledWith(reservableBook)
     );
   });
 });
 
-describe("reserved book", () => {
+describe("ReservedBook", () => {
   const reservedBook = fixtures.mergeBook<ReservedBook>({
     status: "reserved",
     revokeUrl: "/revoke",
