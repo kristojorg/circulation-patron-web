@@ -236,8 +236,14 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     raw: entry.unparsed
   };
 
-  // it's a fulfillable book
-  if (supportedFulfillmentLinks.length > 0) {
+  /**
+   * It's fulfillable if there are fulfillment links,
+   * or no borrow link and open access links
+   */
+  if (
+    supportedFulfillmentLinks.length > 0 ||
+    (!borrowLink && openAccessLinks.length > 0)
+  ) {
     // include open access links in the fulfillment links
     const allFulfillmentLinks = [
       ...supportedFulfillmentLinks,
@@ -250,7 +256,6 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
       revokeUrl
     };
   }
-
   // it's a reserved book
   if (availability?.status === "reserved") {
     return {
@@ -304,7 +309,7 @@ function getBorrowLink(
 ): OPDSAcquisitionLink | null {
   const supportedLink = links.find(link => {
     if (link.rel !== OPDSAcquisitionLink.BORROW_REL) return false;
-    const indirects = link.indirectAcquisitions;
+    const indirects = link.indirectAcquisitions ?? [];
     const supportedFormat = indirects.find(
       format => getFormatSupportLevel(format) !== "unsupported"
     );

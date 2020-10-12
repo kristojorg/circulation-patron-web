@@ -169,13 +169,13 @@ export function getAppSupportLevel(
   return mediaSupport[contentType] ?? "unsupported";
 }
 
+/**
+ * Check if any of the links is redirect or redirect-and-show support level
+ */
 export function shouldRedirectToCompanionApp(links: FulfillmentLink[]) {
   return links.reduce((prev, link) => {
     if (prev) return true;
-    const supportLevel = getAppSupportLevel(
-      link.contentType,
-      link.indirectionType
-    );
+    const supportLevel = link.supportLevel;
     if (supportLevel === "redirect" || supportLevel === "redirect-and-show") {
       return true;
     }
