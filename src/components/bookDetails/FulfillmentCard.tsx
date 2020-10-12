@@ -39,6 +39,12 @@ import useReadOnlineButton from "hooks/useReadOnlineButton";
 import { APP_CONFIG } from "config";
 import track from "analytics/track";
 import { useRouter } from "next/router";
+import useUser from "components/context/UserContext";
+import fetchWithHeaders from "dataflow/fetch";
+import { ServerError } from "errors";
+import { fetchBook } from "dataflow/opds1/fetch";
+import useLibraryContext from "components/context/LibraryContext";
+import CancelOrReturn from "components/CancelOrReturn";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -154,9 +160,10 @@ const BorrowOrReserveBlock: React.FC<{
 
 const Reserved: React.FC<{ book: ReservedBook }> = ({ book }) => {
   const position = book.holds?.position;
+
   return (
-    <>
-      <Text variant="text.callouts.bold">You have this book on hold.</Text>
+    <Stack direction="column" spacing={0} sx={{ my: 3 }}>
+      <Text variant="text.callouts.bold">Reserved</Text>
       {!!position && (
         <Text
           variant="text.body.italic"
@@ -166,10 +173,13 @@ const Reserved: React.FC<{ book: ReservedBook }> = ({ book }) => {
           Your hold position is: {position}.
         </Text>
       )}
-      <Button size="lg" disabled aria-label="Reserved" role="button">
-        <Text variant="text.body.bold">Reserved</Text>
-      </Button>
-    </>
+      <CancelOrReturn
+        url={book.revokeUrl}
+        text="Cancel Reservation"
+        loadingText="Cancelling..."
+        id={book.id}
+      />
+    </Stack>
   );
 };
 
@@ -209,6 +219,12 @@ const AccessCard: React.FC<{
       <AccessHeading
         redirectToCompanionApp={redirectUser}
         subtitle={subtitle}
+      />
+      <CancelOrReturn
+        url={book.revokeUrl}
+        loadingText="Returning..."
+        id={book.id}
+        text="Return"
       />
       {!isAudiobook && isFulfillable && (
         <>
