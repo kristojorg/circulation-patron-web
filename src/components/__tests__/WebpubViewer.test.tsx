@@ -9,7 +9,12 @@ jest.mock("utils/reader", () => ({
   default: jest.fn()
 }));
 
+// mock fetch to avoid console errors
+fetchMock.mockResponse(JSON.stringify({ some: "response" }));
+
 test("throws error when url does not include bookUrl", () => {
+  // suppress console warning about error because they're expected for this test
+  jest.spyOn(console, "error").mockImplementation(jest.fn);
   expect(() => render(<WebpubViewer />)).toThrowError(PageNotFoundError);
   expect(() => render(<WebpubViewer />)).toThrow(
     "The requested URL is missing a bookUrl parameter."
