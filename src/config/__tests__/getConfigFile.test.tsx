@@ -3,9 +3,19 @@ import fetchMock from "jest-fetch-mock";
 import getAppConfig from "../fetch-config";
 const fs = require("fs");
 
-fs.existsSync = jest.fn();
-fs.readFileSync = jest.fn();
 process.cwd = jest.fn(() => "/");
+
+const realExistsSync = fs.existsSync;
+const realReadFileSync = fs.readFileSync;
+
+beforeAll(() => {
+  fs.existsSync = jest.fn();
+  fs.readFileSync = jest.fn();
+});
+afterAll(() => {
+  fs.existsSync = realExistsSync;
+  fs.readFileSync = realReadFileSync;
+});
 
 test("Throws Error when no config file found on root", async () => {
   fs.existsSync.mockReturnValue(false);
