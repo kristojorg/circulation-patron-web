@@ -115,7 +115,6 @@ const FulfillmentContent: React.FC<{
   }
 
   if (bookIsFulfillable(book)) {
-    console.log(book);
     const availableUntil = book.availability?.until
       ? new Date(book.availability.until).toDateString()
       : "NaN";
