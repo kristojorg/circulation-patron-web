@@ -7,7 +7,7 @@ import fetchWithHeaders from "dataflow/fetch";
 import extractParam from "dataflow/utils";
 import { PageNotFoundError, ServerError } from "errors";
 import useAuthModalContext from "auth/AuthModalContext";
-import { APP_CONFIG } from  "config";
+import { APP_CONFIG } from "config";
 
 const initializeReader = async (
   entryUrl: string,
