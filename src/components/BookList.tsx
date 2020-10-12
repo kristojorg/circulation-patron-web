@@ -9,7 +9,8 @@ import {
   bookIsFulfillable,
   bookIsReservable,
   bookIsReserved,
-  bookIsOnHold
+  bookIsOnHold,
+  bookIsUnsupported
 } from "../utils/book";
 import Lane from "./Lane";
 import Button, { NavButton } from "./Button";
@@ -23,6 +24,7 @@ import BorrowOrReserve from "./BorrowOrReserve";
 import { AnyBook, CollectionData, LaneData } from "interfaces";
 import { fetchCollection } from "dataflow/opds1/fetch";
 import { useSWRInfinite } from "swr";
+import ApplicationError from "errors";
 
 const ListLoadingIndicator = () => (
   <div
@@ -266,13 +268,25 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
     );
   }
 
-  // some error ocurred, we shouldn't get here
-  // TODO: log error to bugsnag
-  return (
-    <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
-      View Book Details
-    </NavButton>
-  );
+  if (bookIsUnsupported(book)) {
+    return (
+      <>
+        <Text
+          variant="text.body.italic"
+          sx={{ fontSize: "-1", color: "ui.gray.dark", my: 1 }}
+        >
+          This book is unsupported.
+        </Text>
+        <NavButton variant="ghost" bookUrl={book.url} iconRight={ArrowForward}>
+          View Book Details
+        </NavButton>
+      </>
+    );
+  }
+  /**
+   * We have covered all possibilities.
+   */
+  throw new ApplicationError("Encountered a book with impossible state");
 };
 
 export const LanesView: React.FC<{ lanes: LaneData[] }> = ({ lanes }) => {

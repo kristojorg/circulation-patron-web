@@ -6,7 +6,8 @@ import {
   FulfillableBook,
   OnHoldBook,
   ReservableBook,
-  ReservedBook
+  ReservedBook,
+  UnsupportedBook
 } from "interfaces";
 import { Book, Headset } from "../icons";
 
@@ -44,6 +45,10 @@ export function queueString(book: AnyBook) {
 
 export function bookIsFulfillable(book: AnyBook): book is FulfillableBook {
   return book.status === "fulfillable";
+}
+
+export function bookIsUnsupported(book: AnyBook): book is UnsupportedBook {
+  return book.status === "unsupported";
 }
 
 export function bookIsReserved(book: AnyBook): book is ReservedBook {
