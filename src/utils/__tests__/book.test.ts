@@ -63,7 +63,7 @@ describe("queue string formatter", () => {
         total: 10
       }
     };
-    expect(queueString(book)).toBe("10 patrons in the queue.");
+    expect(queueString(book)).toBe("There are 10 other patrons in the queue.");
   });
 });
 

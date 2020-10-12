@@ -1,5 +1,5 @@
 const YAML = require("yaml");
-const { readFileSync, existsSync } = require("fs");
+const fs = require("fs");
 const path = require("path");
 
 /**
@@ -11,10 +11,10 @@ async function getAppConfig(configFileSetting) {
     return await fetchConfigFile(configFileSetting);
   }
   const configFilePath = path.join(process.cwd(), configFileSetting);
-  if (!existsSync(configFilePath)) {
+  if (!fs.existsSync(configFilePath)) {
     throw new Error("Config file not found at: " + configFilePath);
   }
-  const text = readFileSync(configFilePath, "utf8");
+  const text = fs.readFileSync(configFilePath, "utf8");
   return parseConfigText(text);
 }
 

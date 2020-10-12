@@ -1,17 +1,14 @@
 /* eslint-disable camelcase */
-import { existsSync, readFileSync } from "fs";
 import fetchMock from "jest-fetch-mock";
 import getAppConfig from "../fetch-config";
+const fs = require("fs");
 
-jest.mock("fs");
-const mockedExistsSync = existsSync as jest.MockedFunction<typeof existsSync>;
-const mockedReadFileSync = readFileSync as jest.MockedFunction<
-  typeof readFileSync
->;
+fs.existsSync = jest.fn();
+fs.readFileSync = jest.fn();
 process.cwd = jest.fn(() => "/");
 
 test("Throws Error when no config file found on root", async () => {
-  mockedExistsSync.mockReturnValue(false);
+  fs.existsSync.mockReturnValue(false);
   await expect(
     getAppConfig("./doesnt exist")
   ).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -44,8 +41,8 @@ const mockResult = {
 };
 
 test("returns parsed config file", async () => {
-  mockedExistsSync.mockReturnValue(true);
-  mockedReadFileSync.mockReturnValue(mockFile);
+  fs.existsSync.mockReturnValue(true);
+  fs.readFileSync.mockReturnValue(mockFile);
 
   const conf = await getAppConfig("anywhere");
   expect(conf).toEqual(mockResult);
