@@ -11,7 +11,7 @@ import {
   bookIsOnHold,
   bookIsFulfillable
 } from "utils/book";
-import Button, { NavButton } from "../Button";
+import Button from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
@@ -37,6 +37,8 @@ import {
 import useDownloadButton from "hooks/useDownloadButton";
 import useReadOnlineButton from "hooks/useReadOnlineButton";
 import { APP_CONFIG } from "config";
+import track from "analytics/track";
+import { useRouter } from "next/router";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -233,6 +235,7 @@ const AccessCard: React.FC<{
                       details={details}
                       key={details.url}
                       isPrimaryAction={!redirectUser}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
                     />
                   );
                 case "read-online-external":
@@ -241,6 +244,7 @@ const AccessCard: React.FC<{
                       details={details}
                       key={details.id}
                       isPrimaryAction={!redirectUser}
+                      trackOpenBookUrl={book.trackOpenBookUrl}
                     />
                   );
               }
@@ -295,8 +299,12 @@ function getButtonStyles(isPrimaryAction: boolean) {
 const ReadOnlineExternal: React.FC<{
   details: ReadExternalDetails;
   isPrimaryAction: boolean;
-}> = ({ details, isPrimaryAction }) => {
-  const { open, loading, error } = useReadOnlineButton(details);
+  trackOpenBookUrl: string | null;
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const { open, loading, error } = useReadOnlineButton(
+    details,
+    trackOpenBookUrl
+  );
 
   return (
     <>
@@ -316,12 +324,18 @@ const ReadOnlineExternal: React.FC<{
 
 const ReadOnlineInternal: React.FC<{
   details: ReadInternalDetails;
+  trackOpenBookUrl: string | null;
   isPrimaryAction: boolean;
-}> = ({ details, isPrimaryAction }) => {
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const router = useRouter();
+  function open() {
+    track.openBook(trackOpenBookUrl);
+    router.push(details.url);
+  }
   return (
-    <NavButton {...getButtonStyles(isPrimaryAction)} href={details.url}>
+    <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
       Read
-    </NavButton>
+    </Button>
   );
 };
 
@@ -332,7 +346,6 @@ const DownloadButton: React.FC<{
 }> = ({ details, title, isPrimaryAction }) => {
   const { buttonLabel } = details;
   const { download, error, loading } = useDownloadButton(details, title);
-
   return (
     <>
       <Button

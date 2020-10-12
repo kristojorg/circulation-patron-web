@@ -20,6 +20,7 @@ export const recommendations: CollectionData = {
         {
           status: "borrowable",
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id:
             "https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice",
           title: "Recommendation 1",
@@ -951,6 +952,7 @@ export const recommendations: CollectionData = {
         {
           status: "borrowable",
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id:
             "https://standardebooks.org/ebooks/jane-austen/sense-and-sensibility",
           title: "Sense and Sensibility",
@@ -984,6 +986,7 @@ export const recommendations: CollectionData = {
         {
           status: "borrowable",
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/persuasion",
           title: "Persuasion",
           series: null,
@@ -1009,6 +1012,7 @@ export const recommendations: CollectionData = {
         {
           status: "borrowable",
           relatedUrl: null,
+          trackOpenBookUrl: null,
           id: "https://standardebooks.org/ebooks/jane-austen/emma",
           title: "Emma",
           series: null,

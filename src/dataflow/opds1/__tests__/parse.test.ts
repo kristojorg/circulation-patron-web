@@ -72,6 +72,11 @@ test("extracts basic book info", () => {
     title: "collection title"
   });
 
+  const trackOpenBookLink = factory.opdsLink({
+    rel: OPDS1.TrackOpenBookRel,
+    href: "/track-open"
+  });
+
   const entry = factory.entry({
     id: "urn:librarysimplified.org/terms/id/3M%20ID/crrmnr91",
     title: "The Mayan Secrets",
@@ -97,7 +102,8 @@ test("extracts basic book info", () => {
       borrowLink,
       fulfillmentLink,
       collectionLink,
-      detailLink
+      detailLink,
+      trackOpenBookLink
     ],
     issued: "2014-06-08",
     publisher: "Fake Publisher",
@@ -151,6 +157,7 @@ test("extracts basic book info", () => {
   expect(book.holds).toBe(borrowLink.holds);
   expect(book.copies).toBe(borrowLink.copies);
   expect(book.status).toBe("unsupported");
+  expect(book.trackOpenBookUrl).toBe("/track-open");
 });
 
 const basicInfo = {
