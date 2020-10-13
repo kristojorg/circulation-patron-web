@@ -13,12 +13,8 @@ test("Renders proper href with standard next.js href prop", () => {
     "/somewhere-new"
   );
 });
-test("Renders proper href with standard next.js href+as props", () => {
-  const utils = render(
-    <Link href="/[library]/home" as="/mylib/home">
-      click here
-    </Link>
-  );
+test("Renders proper href with standard next.js href props", () => {
+  const utils = render(<Link href="/mylib/home">click here</Link>);
   expect(utils.getByText("click here")).toHaveAttribute("href", "/mylib/home");
 });
 test("Renders proper href with bookUrl prop", () => {
