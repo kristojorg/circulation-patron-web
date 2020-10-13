@@ -29,7 +29,6 @@ const CancelOrReturn: React.FC<{
       const newBook = await fetchBook(revokeUrl, catalogUrl, token);
       setBook(newBook, id);
       setLoading(false);
-      console.log(newBook);
       // if it works, we need to refetch our loans
     } catch (e) {
       setLoading(false);
@@ -37,6 +36,7 @@ const CancelOrReturn: React.FC<{
         setError(e.info.detail);
         return;
       }
+      console.log(e);
       setError("An unknown error occurred");
     }
   }

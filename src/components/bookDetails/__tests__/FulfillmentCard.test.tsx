@@ -1,6 +1,6 @@
 import * as React from "react";
 import { render, waitForElementToBeRemoved, waitFor } from "test-utils";
-import { mergeBook } from "test-utils/fixtures";
+import { mergeBook, mockSetBook } from "test-utils/fixtures";
 import FulfillmentCard from "../FulfillmentCard";
 import userEvent from "@testing-library/user-event";
 import _download from "downloadjs";
@@ -15,10 +15,18 @@ import {
 import { ProblemDocument } from "types/opds1";
 import fetchMock from "jest-fetch-mock";
 import { mockPush } from "test-utils/mockNextRouter";
+import * as fetch from "dataflow/opds1/fetch";
+import { ServerError } from "errors";
 
 jest.mock("downloadjs");
 window.open = jest.fn();
 
+jest.mock("dataflow/opds1/fetch");
+
+(fetch as any).fetchBook = jest.fn();
+const mockFetchBook = fetch.fetchBook as jest.MockedFunction<
+  typeof fetch.fetchBook
+>;
 /**
  * Borrowable
  * OnHold
@@ -45,6 +53,12 @@ describe("BorrowableBook", () => {
   });
 
   test("borrow button fetches book and displays borrow errors", async () => {
+    const problem: ProblemDocument = {
+      detail: "Can't do that",
+      title: "Nope",
+      status: 418
+    };
+    mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
     const utils = render(<FulfillmentCard book={borrowableBook} />, {
       user: { isAuthenticated: true }
     });
@@ -56,10 +70,7 @@ describe("BorrowableBook", () => {
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    // there is an error because we didn't mock fetch to return something
-    expect(
-      utils.getByText("Error: An error occurred while borrowing this book.")
-    );
+    expect(utils.getByText("Error: Can't do that"));
   });
 });
 
@@ -80,6 +91,12 @@ describe("OnHoldBook", () => {
   });
 
   test("borrow button fetches url and shows error", async () => {
+    const problem: ProblemDocument = {
+      detail: "Can't do that",
+      title: "Nope",
+      status: 418
+    };
+    mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
     const utils = render(<FulfillmentCard book={onHoldBook} />, {
       user: { isAuthenticated: true }
     });
@@ -91,10 +108,7 @@ describe("OnHoldBook", () => {
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Borrowing..."));
-    // there is an error because we didn't mock fetch to return something
-    expect(
-      utils.getByText("Error: An error occurred while borrowing this book.")
-    );
+    expect(utils.getByText("Error: Can't do that"));
   });
 
   test("handles lack of availability.until info", () => {
@@ -172,6 +186,12 @@ describe("ReservableBook", () => {
   });
 
   test("shows reserve button which fetches book", async () => {
+    const problem: ProblemDocument = {
+      detail: "Can't do that",
+      title: "Nope",
+      status: 418
+    };
+    mockFetchBook.mockRejectedValue(new ServerError("/borrow", 418, problem));
     const utils = render(<FulfillmentCard book={reservableBook} />, {
       user: { isAuthenticated: true }
     });
@@ -183,10 +203,7 @@ describe("ReservableBook", () => {
 
     // the borrow button should be gone now
     await waitForElementToBeRemoved(() => utils.getByText("Reserving..."));
-    // there is an error because we didn't mock fetch to return something
-    expect(
-      utils.getByText("Error: An error occurred while borrowing this book.")
-    );
+    expect(utils.getByText("Error: Can't do that"));
   });
 });
 
@@ -203,11 +220,62 @@ describe("reserved", () => {
     }
   });
 
-  test("displays disabled reserve button", () => {
+  test("displays cancel reservation button that calls apropriate url", async () => {
+    const unreservedBook = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unreservedBook);
     const utils = render(<FulfillmentCard book={reservedBook} />);
-    const reserveButton = utils.getByRole("button", { name: "Reserved" });
-    expect(reserveButton).toBeInTheDocument();
-    expect(reserveButton).toBeDisabled();
+    const revokeButton = utils.getByRole("button", {
+      name: "Cancel Reservation"
+    });
+    expect(revokeButton).toBeInTheDocument();
+
+    userEvent.click(revokeButton);
+
+    expect(
+      await utils.findByRole("button", { name: "Cancelling..." })
+    ).toBeInTheDocument();
+
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/revoke",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+
+    expect(mockSetBook).toHaveBeenCalledWith(unreservedBook, reservedBook.id);
+  });
+
+  test("handles cancel reservation errors", async () => {
+    const problem: ProblemDocument = {
+      detail: "Can't do that",
+      title: "Nope",
+      status: 418
+    };
+    mockFetchBook.mockRejectedValue(new ServerError("/revoke", 418, problem));
+    const utils = render(<FulfillmentCard book={reservedBook} />);
+    const revokeButton = utils.getByRole("button", {
+      name: "Cancel Reservation"
+    });
+    expect(revokeButton).toBeInTheDocument();
+
+    userEvent.click(revokeButton);
+
+    expect(
+      await utils.findByRole("button", { name: "Cancelling..." })
+    ).toBeInTheDocument();
+
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/revoke",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+
+    expect(await utils.findByText("Error: Can't do that")).toBeInTheDocument();
+    expect(
+      await utils.findByRole("button", { name: "Cancel Reservation" })
+    ).toBeInTheDocument();
   });
 
   test("displays number of patrons in queue and your position", () => {
@@ -269,6 +337,33 @@ describe("FulfillableBook", () => {
       status: "available",
       until: "2020-06-18"
     }
+  });
+
+  test("displays return button that calls apropriate url", async () => {
+    const unborrowed = mergeBook<BorrowableBook>({
+      status: "borrowable",
+      borrowUrl: "/borrow"
+    });
+    mockFetchBook.mockResolvedValue(unborrowed);
+    const utils = render(<FulfillmentCard book={downloadableBook} />);
+    const revokeButton = utils.getByRole("button", {
+      name: "Return"
+    });
+    expect(revokeButton).toBeInTheDocument();
+
+    userEvent.click(revokeButton);
+
+    expect(
+      await utils.findByRole("button", { name: "Returning..." })
+    ).toBeInTheDocument();
+
+    expect(mockFetchBook).toHaveBeenCalledWith(
+      "/revoke",
+      "http://test-cm.com/catalogUrl",
+      "user-token"
+    );
+
+    expect(mockSetBook).toHaveBeenCalledWith(unborrowed, downloadableBook.id);
   });
 
   test("constructs link to viewer for OpenAxis Books", () => {
