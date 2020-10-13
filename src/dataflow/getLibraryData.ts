@@ -151,7 +151,7 @@ function getShelfUrl(catalog: OPDSFeed): string | null {
 export function buildLibraryData(
   authDoc: OPDS1.AuthDocument,
   catalogUrl: string,
-  librarySlug: string | undefined,
+  librarySlug: string,
   catalog: OPDSFeed,
   searchData?: SearchData
 ): LibraryData {
@@ -162,7 +162,7 @@ export function buildLibraryData(
   const authMethods = flattenSamlMethod(authDoc);
   const shelfUrl = getShelfUrl(catalog);
   return {
-    slug: librarySlug ?? null,
+    slug: librarySlug,
     catalogUrl,
     shelfUrl: shelfUrl ?? null,
     catalogName: authDoc.title,

@@ -14,7 +14,10 @@ import {
 function expectViewDetails(utils: ReturnType<typeof render>) {
   const button = utils.getByRole("link", { name: "View Book Details" });
   expect(button).toBeInTheDocument();
-  expect(button).toHaveAttribute("href", "/book/http%3A%2F%2Ftest-book-url");
+  expect(button).toHaveAttribute(
+    "href",
+    "/testlib/book/http%3A%2F%2Ftest-book-url"
+  );
 }
 
 /**

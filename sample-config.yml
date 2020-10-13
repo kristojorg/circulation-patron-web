@@ -1,5 +1,5 @@
 # APP MEDIA SUPPORT
-# Each entry has an array with "show", "redirect" or "show-and-redirect".
+# Each entry has a setting of "show", "redirect" or "show-and-redirect".
 # 
 # "redirect" tells the app to display a prompt directing the 
 # user to read the book in the companion mobile app (usually SimplyE).

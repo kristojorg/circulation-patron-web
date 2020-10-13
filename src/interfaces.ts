@@ -91,7 +91,7 @@ export interface AuthCredentials {
 }
 
 export interface LibraryData {
-  slug: string | null;
+  slug: string;
   catalogUrl: string;
   catalogName: string;
   logoUrl: string | null;

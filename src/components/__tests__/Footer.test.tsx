@@ -43,7 +43,7 @@ test("shows external links when present in state w/ apropriate attributes", () =
   // my books nav link
   const myBooks = utils.getByRole("link", { name: /my books/i });
   expect(myBooks).toBeInTheDocument();
-  expect(myBooks).toHaveAttribute("href", "/loans");
+  expect(myBooks).toHaveAttribute("href", "/testlib/loans");
 });
 
 describe("toggling SimplyE Branding", () => {
@@ -75,7 +75,7 @@ describe("toggling SimplyE Branding", () => {
     // my books nav link
     const myBooks = utils.queryByText(/my books/i);
     expect(myBooks).toBeInTheDocument();
-    expect(myBooks).toHaveAttribute("href", "/loans");
+    expect(myBooks).toHaveAttribute("href", "/testlib/loans");
   });
 
   test("shows simplyE callout when NEXT_PUBLIC_COMPANION_APP is 'simplye'", () => {
@@ -119,6 +119,6 @@ describe("toggling SimplyE Branding", () => {
       name: /my books/i
     });
     expect(myBooks).toBeInTheDocument();
-    expect(myBooks).toHaveAttribute("href", "/loans");
+    expect(myBooks).toHaveAttribute("href", "/testlib/loans");
   });
 });

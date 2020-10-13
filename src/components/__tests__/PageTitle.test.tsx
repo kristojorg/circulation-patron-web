@@ -70,8 +70,7 @@ describe("Format filters", () => {
     userEvent.selectOptions(select, "http://all");
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(
-      "/collection/[collectionUrl]",
-      "/collection/http%3A%2F%2Fall"
+      "/testlib/collection/http%3A%2F%2Fall"
     );
   });
 });

@@ -185,16 +185,6 @@ describe("buildLibraryData", () => {
     });
   });
 
-  test("works correctly without librarySlug", () => {
-    const library = buildLibraryData(
-      fixtures.authDoc,
-      "/catalog-url",
-      undefined,
-      fixtures.opdsFeed
-    );
-    expect(library.slug).toBeNull();
-  });
-
   test("correctly parses web_color_scheme", () => {
     const library = buildLibraryData(
       {

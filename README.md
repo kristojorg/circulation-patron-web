@@ -75,7 +75,7 @@ The application will start at the base URL of `localhost:3000`.
 This app supports read online for encrypted books only in the AxisNow format, and if you have access to the [Decryptor](https://github.com/NYPL-Simplified/axisnow-access-control-web)
 
 To run with decryption:  
-- Set `axisnow_decrupt=true` in your app's `config.yml` file.
+- Set `axisnow_decrypt=true` in your app's `config.yml` file.
 - Run `git submodule update`
 - Verify that `axisnow-access-control-web` folder exists.  
 - Run `npm install` as normal.
