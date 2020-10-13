@@ -39,6 +39,7 @@ import useReadOnlineButton from "hooks/useReadOnlineButton";
 import { APP_CONFIG } from "config";
 import track from "analytics/track";
 import { useRouter } from "next/router";
+import useLinkUtils from "components/context/LinkUtilsContext";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
@@ -328,9 +329,12 @@ const ReadOnlineInternal: React.FC<{
   isPrimaryAction: boolean;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
   const router = useRouter();
+  const { buildMultiLibraryLink } = useLinkUtils();
+
+  const internalLink = buildMultiLibraryLink(details.url);
   function open() {
     track.openBook(trackOpenBookUrl);
-    router.push(details.url);
+    router.push(internalLink);
   }
   return (
     <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
