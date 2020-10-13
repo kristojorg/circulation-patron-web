@@ -243,10 +243,7 @@ export function entryToBook(entry: OPDSEntry, feedUrl: string): AnyBook {
     raw: entry.unparsed
   };
 
-  /**
-   * It's fulfillable if there are fulfillment links,
-   * or no borrow link and open access links
-   */
+  // It's fulfillable
   if (
     supportedFulfillmentLinks.length > 0 ||
     (!borrowLink && openAccessLinks.length > 0)
