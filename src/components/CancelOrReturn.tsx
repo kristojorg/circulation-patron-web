@@ -7,6 +7,7 @@ import { fetchBook } from "dataflow/opds1/fetch";
 import { ServerError } from "errors";
 import Button from "components/Button";
 import { Text } from "components/Text";
+import track from "analytics/track";
 
 const CancelOrReturn: React.FC<{
   text: string;
@@ -32,11 +33,11 @@ const CancelOrReturn: React.FC<{
       // if it works, we need to refetch our loans
     } catch (e) {
       setLoading(false);
+      track.error(e);
       if (e instanceof ServerError) {
         setError(e.info.detail);
         return;
       }
-      console.log(e);
       setError("An unknown error occurred");
     }
   }
