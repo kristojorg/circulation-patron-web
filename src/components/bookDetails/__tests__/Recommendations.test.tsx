@@ -80,7 +80,7 @@ test("recommendations are clickable", () => {
   });
   expect(recommendationCover.closest("a")).toHaveAttribute(
     "href",
-    "/book/http%3A%2F%2Frecommendation-1-url"
+    "/testlib/book/http%3A%2F%2Frecommendation-1-url"
   );
 });
 
@@ -90,7 +90,7 @@ test("displays a more button for recommendations", () => {
   const moreButton = utils.getByText("See More");
   expect(moreButton).toHaveAttribute(
     "href",
-    "/collection/http%3A%2F%2Ftest-cm.com%2FcatalogUrl%2Fworks%2Fcontributor%2FJane%2520Austen%2Feng%2F"
+    "/testlib/collection/http%3A%2F%2Ftest-cm.com%2FcatalogUrl%2Fworks%2Fcontributor%2FJane%2520Austen%2Feng%2F"
   );
 });
 

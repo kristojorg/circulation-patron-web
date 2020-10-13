@@ -72,6 +72,6 @@ test("more button navigates to the right link", () => {
 
   expect(moreButton).toHaveAttribute(
     "href",
-    "/collection/http%3A%2F%2Flink-to-lane"
+    "/testlib/collection/http%3A%2F%2Flink-to-lane"
   );
 });
