@@ -39,11 +39,6 @@ import useReadOnlineButton from "hooks/useReadOnlineButton";
 import { APP_CONFIG } from "config";
 import track from "analytics/track";
 import { useRouter } from "next/router";
-import useUser from "components/context/UserContext";
-import fetchWithHeaders from "dataflow/fetch";
-import { ServerError } from "errors";
-import { fetchBook } from "dataflow/opds1/fetch";
-import useLibraryContext from "components/context/LibraryContext";
 import CancelOrReturn from "components/CancelOrReturn";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
