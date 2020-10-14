@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   availabilityString,
   queueString,
-  bookIsAudiobook,
   bookIsBorrowable,
   bookIsReservable,
   bookIsReserved,
@@ -25,8 +24,7 @@ import {
   ReservedBook
 } from "interfaces";
 import {
-  dedupeLinks,
-  getFulfillmentDetails,
+  getFulfillmentsFromBook,
   shouldRedirectToCompanionApp
 } from "utils/fulfill";
 import { APP_CONFIG } from "config";
@@ -185,14 +183,9 @@ const AccessCard: React.FC<{
   links: FulfillmentLink[];
   subtitle: string;
 }> = ({ book, links, subtitle }) => {
-  const dedupedLinks = dedupeLinks(links);
-  const fulfillments = dedupedLinks
-    .map(getFulfillmentDetails)
-    .filter(details => details.type !== "unsupported");
+  const fulfillments = getFulfillmentsFromBook(book);
 
   const isFulfillable = fulfillments.length > 0;
-
-  const isAudiobook = bookIsAudiobook(book);
   const redirectUser = shouldRedirectToCompanionApp(links);
 
   return (
@@ -201,7 +194,7 @@ const AccessCard: React.FC<{
         redirectToCompanionApp={redirectUser}
         subtitle={subtitle}
       />
-      {!isAudiobook && isFulfillable && (
+      {isFulfillable && (
         <>
           {redirectUser && (
             <Text variant="text.body.italic">
@@ -209,13 +202,14 @@ const AccessCard: React.FC<{
             </Text>
           )}
           <Stack sx={{ flexWrap: "wrap" }}>
-            {fulfillments.map(details => {
+            {fulfillments.map(details => (
               <FulfillmentButton
+                key={details.id}
                 details={details}
                 book={book}
                 isPrimaryAction={!redirectUser}
-              />;
-            })}
+              />
+            ))}
           </Stack>
         </>
       )}

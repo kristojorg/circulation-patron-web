@@ -2,10 +2,10 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import {
-  DownloadDetails,
-  FulfillmentDetails,
-  ReadExternalDetails,
-  ReadInternalDetails
+  AnyFullfillment,
+  DownloadFulfillment,
+  ReadExternalFulfillment,
+  ReadInternalFulfillment
 } from "utils/fulfill";
 import { FulfillableBook } from "interfaces";
 import track from "analytics/track";
@@ -49,7 +49,7 @@ function useError() {
 }
 
 const FulfillmentButton: React.FC<{
-  details: FulfillmentDetails;
+  details: AnyFullfillment;
   book: FulfillableBook;
   isPrimaryAction: boolean;
 }> = ({ details, book, isPrimaryAction }) => {
@@ -59,7 +59,6 @@ const FulfillmentButton: React.FC<{
         <DownloadButton
           details={details}
           title={book.title}
-          key={details.id}
           isPrimaryAction={isPrimaryAction}
         />
       );
@@ -67,7 +66,6 @@ const FulfillmentButton: React.FC<{
       return (
         <ReadOnlineInternal
           details={details}
-          key={details.url}
           isPrimaryAction={isPrimaryAction}
           trackOpenBookUrl={book.trackOpenBookUrl}
         />
@@ -76,7 +74,6 @@ const FulfillmentButton: React.FC<{
       return (
         <ReadOnlineExternal
           details={details}
-          key={details.id}
           isPrimaryAction={isPrimaryAction}
           trackOpenBookUrl={book.trackOpenBookUrl}
         />
@@ -101,7 +98,7 @@ function getButtonStyles(isPrimaryAction: boolean) {
 }
 
 const ReadOnlineExternal: React.FC<{
-  details: ReadExternalDetails;
+  details: ReadExternalFulfillment;
   isPrimaryAction: boolean;
   trackOpenBookUrl: string | null;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
@@ -144,7 +141,7 @@ const ReadOnlineExternal: React.FC<{
 };
 
 const ReadOnlineInternal: React.FC<{
-  details: ReadInternalDetails;
+  details: ReadInternalFulfillment;
   trackOpenBookUrl: string | null;
   isPrimaryAction: boolean;
 }> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
@@ -164,7 +161,7 @@ const ReadOnlineInternal: React.FC<{
 };
 
 const DownloadButton: React.FC<{
-  details: DownloadDetails;
+  details: DownloadFulfillment;
   title: string;
   isPrimaryAction: boolean;
 }> = ({ details, title, isPrimaryAction }) => {

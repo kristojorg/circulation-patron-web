@@ -27,7 +27,7 @@ import { useSWRInfinite } from "swr";
 import ApplicationError from "errors";
 import useUser from "components/context/UserContext";
 import FulfillmentButton from "components/FulfillmentButton";
-import { dedupeLinks, getFulfillmentDetails } from "utils/fulfill";
+import { getFulfillmentsFromBook } from "utils/fulfill";
 
 const ListLoadingIndicator = () => (
   <div
@@ -261,10 +261,7 @@ const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
         : "You have this book on loan.";
 
     // we will show a fulfillment button if there is only one option
-    const dedupedLinks = dedupeLinks(book.fulfillmentLinks);
-    const fulfillments = dedupedLinks
-      .map(getFulfillmentDetails)
-      .filter(details => details.type !== "unsupported");
+    const fulfillments = getFulfillmentsFromBook(book);
     const singleFulfillment =
       fulfillments.length === 1 ? fulfillments[0] : undefined;
 
