@@ -14,17 +14,13 @@ export default function useError() {
       setError(`Error: ${e.info.detail}`);
       return;
     }
-    if (e instanceof Error) {
-      setError(`Error: ${e.message}`);
-      return;
-    }
     console.error(e);
     setError("Error: An unknown error occurred.");
   }
 
   // for internal error states we don't need to track
   function setErrorString(str: string) {
-    setError(str);
+    setError(`Error: ${str}`);
   }
 
   function clearError() {
