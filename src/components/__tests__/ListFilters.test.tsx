@@ -49,6 +49,27 @@ const availabilityFacet: FacetGroupData = {
   ]
 };
 
+const formatsFacet: FacetGroupData = {
+  label: "Formats",
+  facets: [
+    {
+      label: "eBooks",
+      active: true,
+      href: "http://ebooks"
+    },
+    {
+      label: "Audiobooks",
+      href: "http://audiobooks",
+      active: false
+    },
+    {
+      label: "All",
+      href: "http://all",
+      active: false
+    }
+  ]
+};
+
 const collectionWithFacets = (facets: FacetGroupData[]): CollectionData => ({
   id: "id",
   url: "url",
@@ -99,28 +120,25 @@ test("does redirect when selected", () => {
   );
 });
 
-const formatsFacet: FacetGroupData = {
-  label: "Formats",
-  facets: [
-    {
-      label: "eBooks",
-      active: true,
-      href: "http://ebooks"
-    },
-    {
-      label: "Audiobooks",
-      href: "http://audiobooks",
-      active: false
-    },
-    {
-      label: "All",
-      href: "http://all",
-      active: false
-    }
-  ]
-};
+test("renders all facets when present", () => {
+  const utils = render(
+    <ListFilters
+      collection={collectionWithFacets([
+        sortByFacet,
+        availabilityFacet,
+        formatsFacet
+      ])}
+    />
+  );
 
-const collection: CollectionData = {
+  expect(utils.getByRole("combobox", { name: "Formats" })).toBeInTheDocument();
+  expect(
+    utils.getByRole("combobox", { name: "Availability" })
+  ).toBeInTheDocument();
+  expect(utils.getByRole("combobox", { name: "Sort by" })).toBeInTheDocument();
+});
+
+const collectionWithFormats: CollectionData = {
   facetGroups: [formatsFacet],
   title: "my lane",
   url: "/link-to-lane",
@@ -145,14 +163,18 @@ describe("Format filters", () => {
     expect(utils.queryByLabelText("Audiobooks")).toBeFalsy();
   });
   test("Format filters are visible in PageTitle w/ facets", () => {
-    const utils = render(<PageTitle collection={collection}>Child</PageTitle>);
+    const utils = render(
+      <PageTitle collection={collectionWithFormats}>Child</PageTitle>
+    );
     expect(utils.getByRole("option", { name: "All" })).toBeTruthy();
     expect(utils.getByRole("option", { name: "eBooks" })).toBeTruthy();
     expect(utils.getByRole("option", { name: "Audiobooks" })).toBeTruthy();
   });
 
   test("format filters navigate to respective urls", async () => {
-    const utils = render(<PageTitle collection={collection}>Child</PageTitle>);
+    const utils = render(
+      <PageTitle collection={collectionWithFormats}>Child</PageTitle>
+    );
 
     const select = utils.getByRole("combobox", {
       name: "Formats"
