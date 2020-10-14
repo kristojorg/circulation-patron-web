@@ -8,6 +8,7 @@ import {
   OPDS1
 } from "interfaces";
 import { bookIsAudiobook } from "utils/book";
+import { AXISNOW_DECRYPT } from "utils/env";
 import { typeMap } from "utils/file";
 
 /**
@@ -93,7 +94,7 @@ export function getFulfillmentFromLink(link: FulfillmentLink): AnyFullfillment {
 
     case OPDS1.AxisNowWebpubMediaType:
       // you can only read these if you can decrypt them.
-      if (!APP_CONFIG.axisNowDecrypt) {
+      if (!AXISNOW_DECRYPT) {
         return { type: "unsupported" };
       }
       return {

@@ -17,18 +17,18 @@ import { Text } from "components/Text";
 import { MediumIcon } from "components/MediumIndicator";
 import SvgPhone from "icons/Phone";
 import BorrowOrReserve from "components/BorrowOrReserve";
+import FulfillmentButton from "components/FulfillmentButton";
+import {
+  getFulfillmentsFromBook,
+  shouldRedirectToCompanionApp
+} from "utils/fulfill";
 import {
   AnyBook,
   FulfillableBook,
   FulfillmentLink,
   ReservedBook
 } from "interfaces";
-import {
-  getFulfillmentsFromBook,
-  shouldRedirectToCompanionApp
-} from "utils/fulfill";
 import { APP_CONFIG } from "config";
-import FulfillmentButton from "components/FulfillmentButton";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
