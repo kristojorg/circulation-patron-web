@@ -18,35 +18,7 @@ import Button from "components/Button";
 import useLibraryContext from "components/context/LibraryContext";
 import useUser from "components/context/UserContext";
 import downloadFile from "dataflow/download";
-import { ServerError } from "errors";
-
-function useError() {
-  const [error, setError] = React.useState<null | string>(null);
-
-  function handleError(e: any) {
-    // TODO: track error to bugsnag
-    if (e instanceof ServerError) {
-      setError(`Error: ${e.info.detail}`);
-      return;
-    }
-    if (e instanceof Error) {
-      setError(`Error: ${e.message}`);
-      return;
-    }
-    console.error(e);
-    setError("An unknown error occurred trying to open the book");
-  }
-
-  function clearError() {
-    setError(null);
-  }
-
-  return {
-    error,
-    handleError,
-    clearError
-  };
-}
+import useError from "hooks/useError";
 
 const FulfillmentButton: React.FC<{
   details: AnyFullfillment;
