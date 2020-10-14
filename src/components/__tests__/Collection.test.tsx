@@ -66,7 +66,7 @@ test("displays lanes when present", () => {
   const utils = render(<Collection />);
 
   // expect there to be a lane with books
-  const laneTitle = utils.getByText("my lane");
+  const laneTitle = utils.getByText("my lane ");
   expect(laneTitle).toBeInTheDocument();
   expect(utils.getByText(fixtures.makeBook(0).title)).toBeInTheDocument();
   expect(utils.getByText("Book 0 author")).toBeInTheDocument();
