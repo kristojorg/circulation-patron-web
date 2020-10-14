@@ -40,7 +40,7 @@ import { APP_CONFIG } from "config";
 import track from "analytics/track";
 import { useRouter } from "next/router";
 import CancelOrReturn from "components/CancelOrReturn";
-import useLinkUtils from "components/context/LinkUtilsContext";
+import useLinkUtils from "hooks/useLinkUtils";
 
 const FulfillmentCard: React.FC<{ book: AnyBook }> = ({ book }) => {
   return (
