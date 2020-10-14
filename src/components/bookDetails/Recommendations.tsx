@@ -29,7 +29,7 @@ const Recommendations: React.FC<{ book: AnyBook }> = ({ book }) => {
     (prev, lane) => (lane.books.length > 1 ? true : prev),
     false
   );
-  if (!hasBooks) return null;
+  if (!isLoading && !hasBooks) return null;
 
   return (
     <section
