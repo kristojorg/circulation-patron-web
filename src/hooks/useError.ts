@@ -19,7 +19,7 @@ export default function useError() {
       return;
     }
     console.error(e);
-    setError("An unknown error occurred.");
+    setError("Error: An unknown error occurred.");
   }
 
   // for internal error states we don't need to track
