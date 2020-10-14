@@ -271,7 +271,7 @@ describe("FulfillableBook", () => {
     }
   });
 
-  test.only("constructs link to viewer for OpenAxis Books", () => {
+  test("constructs link to viewer for OpenAxis Books", () => {
     mockConfig({ companionApp: "openebooks", axisNowDecrypt: true });
     const utils = render(<FulfillmentCard book={viewableAxisNowBook} />);
     const readerButton = utils.getByRole("button", {
