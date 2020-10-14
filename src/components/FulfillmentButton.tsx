@@ -1,0 +1,204 @@
+/** @jsx jsx */
+import { jsx } from "theme-ui";
+import * as React from "react";
+import {
+  DownloadDetails,
+  FulfillmentDetails,
+  ReadExternalDetails,
+  ReadInternalDetails
+} from "utils/fulfill";
+import { FulfillableBook } from "interfaces";
+import track from "analytics/track";
+import useLinkUtils from "components/context/LinkUtilsContext";
+import SvgDownload from "icons/Download";
+import SvgExternalLink from "icons/ExternalOpen";
+import { useRouter } from "next/router";
+import { Text } from "components/Text";
+import Button from "components/Button";
+import useLibraryContext from "components/context/LibraryContext";
+import useUser from "components/context/UserContext";
+import downloadFile from "dataflow/download";
+import { ServerError } from "errors";
+
+function useError() {
+  const [error, setError] = React.useState<null | string>(null);
+
+  function handleError(e: any) {
+    // TODO: track error to bugsnag
+    if (e instanceof ServerError) {
+      setError(`Error: ${e.info.detail}`);
+      return;
+    }
+    if (e instanceof Error) {
+      setError(`Error: ${e.message}`);
+      return;
+    }
+    console.error(e);
+    setError("An unknown error occurred trying to open the book");
+  }
+
+  function clearError() {
+    setError(null);
+  }
+
+  return {
+    error,
+    handleError,
+    clearError
+  };
+}
+
+const FulfillmentButton: React.FC<{
+  details: FulfillmentDetails;
+  book: FulfillableBook;
+  isPrimaryAction: boolean;
+}> = ({ details, book, isPrimaryAction }) => {
+  switch (details.type) {
+    case "download":
+      return (
+        <DownloadButton
+          details={details}
+          title={book.title}
+          key={details.id}
+          isPrimaryAction={isPrimaryAction}
+        />
+      );
+    case "read-online-internal":
+      return (
+        <ReadOnlineInternal
+          details={details}
+          key={details.url}
+          isPrimaryAction={isPrimaryAction}
+          trackOpenBookUrl={book.trackOpenBookUrl}
+        />
+      );
+    case "read-online-external":
+      return (
+        <ReadOnlineExternal
+          details={details}
+          key={details.id}
+          isPrimaryAction={isPrimaryAction}
+          trackOpenBookUrl={book.trackOpenBookUrl}
+        />
+      );
+    case "unsupported":
+      return null;
+  }
+};
+
+export default FulfillmentButton;
+
+function getButtonStyles(isPrimaryAction: boolean) {
+  return isPrimaryAction
+    ? ({
+        variant: "filled",
+        color: "brand.primary"
+      } as const)
+    : ({
+        variant: "ghost",
+        color: "ui.gray.extraDark"
+      } as const);
+}
+
+const ReadOnlineExternal: React.FC<{
+  details: ReadExternalDetails;
+  isPrimaryAction: boolean;
+  trackOpenBookUrl: string | null;
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const { catalogUrl } = useLibraryContext();
+  const { token } = useUser();
+  const [loading, setLoading] = React.useState(false);
+  const { error, handleError, clearError } = useError();
+
+  async function open() {
+    setLoading(true);
+    clearError();
+    try {
+      // the url may be behind indirection, so we fetch it with the
+      // provided function
+      const url = await details.getUrl(catalogUrl, token);
+      // we are about to open the book, so send a track event
+      track.openBook(trackOpenBookUrl);
+      setLoading(false);
+      window.open(url, "__blank");
+    } catch (e) {
+      setLoading(false);
+      handleError(e);
+    }
+  }
+
+  return (
+    <>
+      <Button
+        {...getButtonStyles(isPrimaryAction)}
+        iconLeft={SvgExternalLink}
+        onClick={open}
+        loading={loading}
+        loadingText="Opening..."
+      >
+        {details.buttonLabel}
+      </Button>
+      {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
+    </>
+  );
+};
+
+const ReadOnlineInternal: React.FC<{
+  details: ReadInternalDetails;
+  trackOpenBookUrl: string | null;
+  isPrimaryAction: boolean;
+}> = ({ details, isPrimaryAction, trackOpenBookUrl }) => {
+  const router = useRouter();
+  const { buildMultiLibraryLink } = useLinkUtils();
+
+  const internalLink = buildMultiLibraryLink(details.url);
+  function open() {
+    track.openBook(trackOpenBookUrl);
+    router.push(internalLink);
+  }
+  return (
+    <Button {...getButtonStyles(isPrimaryAction)} onClick={open}>
+      Read
+    </Button>
+  );
+};
+
+const DownloadButton: React.FC<{
+  details: DownloadDetails;
+  title: string;
+  isPrimaryAction: boolean;
+}> = ({ details, title, isPrimaryAction }) => {
+  const { buttonLabel } = details;
+  const [loading, setLoading] = React.useState(false);
+  const { error, handleError, clearError } = useError();
+  const { catalogUrl } = useLibraryContext();
+  const { token } = useUser();
+
+  async function download() {
+    setLoading(true);
+    clearError();
+    try {
+      const url = await details.getUrl(catalogUrl, token);
+      await downloadFile(url, title, details.contentType, token);
+    } catch (e) {
+      setLoading(false);
+      handleError(e);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <>
+      <Button
+        onClick={download}
+        {...getButtonStyles(isPrimaryAction)}
+        iconLeft={SvgDownload}
+        loading={loading}
+        loadingText="Downloading..."
+      >
+        {buttonLabel}
+      </Button>
+      {error && <Text sx={{ color: "ui.error" }}>{error}</Text>}
+    </>
+  );
+};
