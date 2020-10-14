@@ -30,7 +30,6 @@ const CancelOrReturn: React.FC<{
       const newBook = await fetchBook(revokeUrl, catalogUrl, token);
       setBook(newBook, id);
       setLoading(false);
-      // if it works, we need to refetch our loans
     } catch (e) {
       setLoading(false);
       track.error(e);
