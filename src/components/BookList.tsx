@@ -173,9 +173,6 @@ export const BookListItem: React.FC<{
 };
 
 const BookListCTA: React.FC<{ book: AnyBook }> = ({ book }) => {
-  if (book.title === "Why Soccer Matters") {
-    console.log(book);
-  }
   if (bookIsBorrowable(book)) {
     return (
       <>
