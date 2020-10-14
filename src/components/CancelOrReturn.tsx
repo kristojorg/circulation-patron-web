@@ -22,7 +22,7 @@ const CancelOrReturn: React.FC<{
 
   async function cancelReservation(revokeUrl: string) {
     if (!token) {
-      setError("You muse be signed in.");
+      setError("You must be signed in.");
       return;
     }
     setLoading(true);
