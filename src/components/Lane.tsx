@@ -2,7 +2,7 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { Tabbable } from "reakit/Tabbable";
-import Book, { BOOK_HEIGHT } from "./BookCard";
+import Book, { BOOK_HEIGHT, BOOK_WIDTH } from "./BookCard";
 import withErrorBoundary, { FallbackProps } from "./ErrorBoundary";
 import { lighten } from "@theme-ui/color";
 import { H2 } from "./Text";
@@ -10,6 +10,8 @@ import { NavButton } from "./Button";
 import ArrowForward from "icons/ArrowForward";
 import Stack from "./Stack";
 import { AnyBook, LaneData } from "interfaces";
+import Link from "components/Link";
+import { Text } from "components/Text";
 
 type BookRefs = {
   [id: string]: React.RefObject<HTMLLIElement>;
@@ -197,10 +199,49 @@ const Lane: React.FC<{
           {filteredBooks.map(book => (
             <Book key={book.id} book={book} ref={bookRefs[book.id]} />
           ))}
+          <SeeMoreBlock url={url} title={title} />
         </ul>
 
         <PrevNextButton onClick={handleRightClick} disabled={isAtEnd} />
       </div>
+    </li>
+  );
+};
+
+const SeeMoreBlock: React.FC<{ url: string; title: string }> = ({
+  url,
+  title
+}) => {
+  return (
+    <li
+      sx={{
+        listStyle: "none",
+        border: "solid",
+        borderRadius: "card",
+        flex: `0 0 ${BOOK_WIDTH}px`,
+        height: BOOK_HEIGHT,
+        mx: 2,
+        color: "ui.white"
+      }}
+    >
+      <Link
+        collectionUrl={url}
+        sx={{
+          bg: "brand.primary",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          flexDirection: "column",
+          height: "100%",
+          p: 2
+        }}
+      >
+        <Stack direction="column">
+          <Text>See All</Text>
+          <Text variant="text.headers.tertiary">{title}</Text>
+        </Stack>
+      </Link>
     </li>
   );
 };
