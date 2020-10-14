@@ -2,7 +2,6 @@
 import { jsx } from "theme-ui";
 import * as React from "react";
 import { H1 } from "./Text";
-import Stack from "./Stack";
 import { CollectionData } from "interfaces";
 import ListFilters from "components/ListFilters";
 
@@ -11,16 +10,20 @@ const PageTitle: React.FC<{ collection?: CollectionData }> = ({
   collection
 }) => {
   return (
-    <Stack
-      direction="column"
+    <div
       sx={{
         px: [3, 5],
-        mt: 4
+        mt: 4,
+        display: "flex",
+        flexDirection: ["column", "column", "row"],
+        justifyContent: ["flex-start", "space-between"],
+        alignItems: ["stretch", "stretch", "flex-end"],
+        mb: [0, 0, 4]
       }}
     >
-      <H1 sx={{ mb: 3 }}>{children}</H1>
+      <H1 sx={{ mb: [3, 3, 0] }}>{children}</H1>
       {collection && <ListFilters collection={collection} />}
-    </Stack>
+    </div>
   );
 };
 
