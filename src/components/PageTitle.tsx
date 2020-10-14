@@ -3,8 +3,8 @@ import { jsx } from "theme-ui";
 import * as React from "react";
 import { H1 } from "./Text";
 import Stack from "./Stack";
-import FormatFilter from "./FormatFilter";
 import { CollectionData } from "interfaces";
+import ListFilters from "components/ListFilters";
 
 const PageTitle: React.FC<{ collection?: CollectionData }> = ({
   children,
@@ -12,17 +12,14 @@ const PageTitle: React.FC<{ collection?: CollectionData }> = ({
 }) => {
   return (
     <Stack
-      direction="row"
+      direction="column"
       sx={{
         px: [3, 5],
-        my: 4,
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap"
+        mt: 4
       }}
     >
-      <H1 sx={{ m: 0 }}>{children}</H1>
-      {collection && <FormatFilter collection={collection} />}
+      <H1 sx={{ mb: 3 }}>{children}</H1>
+      {collection && <ListFilters collection={collection} />}
     </Stack>
   );
 };
