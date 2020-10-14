@@ -13,7 +13,6 @@ import { fetchCollection } from "dataflow/opds1/fetch";
 import extractParam from "dataflow/utils";
 import { useRouter } from "next/router";
 import useSWR from "swr";
-import ListFilters from "components/ListFilters";
 
 export const Collection: React.FC<{
   title?: string;
