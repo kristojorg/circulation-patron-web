@@ -46,11 +46,11 @@ test("renders breadcrumbs with 0 books", () => {
   const utils = render(<Lane lane={withNoBooks} />);
 
   // it should just show the breadcrumb
-  const breadcrumb = utils.getByText("my lane");
+  const breadcrumb = utils.getByLabelText("Lane Title");
   expect(breadcrumb).toBeInTheDocument();
 
-  // there should be no li elements
-  expect(utils.getByTestId("lane-list")).toBeEmptyDOMElement();
+  // there should be only one See More element
+  expect(utils.getByTestId("lane-list").childNodes).toHaveLength(1);
 });
 
 test("filters books", () => {
@@ -74,4 +74,11 @@ test("more button navigates to the right link", () => {
     "href",
     "/testlib/collection/http%3A%2F%2Flink-to-lane"
   );
+});
+
+test("renders a see more card", () => {
+  const utils = render(<Lane lane={laneData} />);
+
+  const seeMoreCard = utils.getByRole("link", { name: "See All my lane" });
+  expect(seeMoreCard).toBeInTheDocument();
 });
