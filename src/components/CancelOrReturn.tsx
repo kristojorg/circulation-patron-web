@@ -47,7 +47,7 @@ const CancelOrReturn: React.FC<{
         onClick={() => cancelReservation(url)}
         loading={loading}
         loadingText={loadingText}
-        size="lg"
+        // size="lg"
         variant="ghost"
         color="ui.gray.light"
         sx={{
