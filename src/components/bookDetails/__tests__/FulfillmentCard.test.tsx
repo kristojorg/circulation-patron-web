@@ -478,9 +478,7 @@ describe("FulfillableBook", () => {
     const utils = render(<FulfillmentCard book={bookWithRedirect} />);
 
     expect(utils.queryByText("Ready to Read!")).not.toBeInTheDocument();
-    expect(
-      utils.getByText("You're ready to read this book in SimplyE!")
-    ).toBeInTheDocument();
+    expect(utils.getByText("Ready to read in SimplyE!")).toBeInTheDocument();
     expect(utils.getByText("You have this book on loan.")).toBeInTheDocument();
     expect(
       utils.getByText("If you would rather read on your computer, you can:")
@@ -492,7 +490,7 @@ describe("FulfillableBook", () => {
     mockConfig({ companionApp: "openebooks" });
     const utils = render(<FulfillmentCard book={bookWithRedirect} />);
     expect(
-      utils.getByText("You're ready to read this book in Open eBooks!")
+      utils.getByText("Ready to read in Open eBooks!")
     ).toBeInTheDocument();
     expect(utils.getByText("You have this book on loan.")).toBeInTheDocument();
   });
