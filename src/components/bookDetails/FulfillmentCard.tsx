@@ -11,7 +11,7 @@ import {
   bookIsOnHold,
   bookIsFulfillable
 } from "utils/book";
-import Button, { AnchorButton } from "../Button";
+import Button from "../Button";
 import withErrorBoundary from "../ErrorBoundary";
 import Stack from "components/Stack";
 import { Text } from "components/Text";
